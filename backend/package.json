@@ -1,0 +1,20 @@
+{
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "google-auth-library": "^9.14.1",
+    "mysql2": "^3.11.0",
+    "sequelize": "^6.37.3"
+  },
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "BackEnd do TCC Smart Plantio",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Renan Magalhães Lage",
+  "license": "ISC"
+}

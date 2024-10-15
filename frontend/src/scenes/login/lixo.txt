@@ -1,0 +1,96 @@
+                    <Formik
+                        onSubmit={handleFormSubmit}
+                        initialValues={initialValues}
+                        validationSchema={checkoutSchema}
+                    >
+                        {({ values, errors, touched, handleBlur, handleChange, handleSubmit, isSubmitting }) => (
+                            <form onSubmit={handleSubmit} style={{ width: '100%' }}>
+                                <TextField
+                                    label="E-mail"
+                                    placeholder="Digite seu e-mail"
+                                    name='email'
+                                    variant="filled"
+                                    onBlur={handleBlur}
+                                    onChange={handleChange}
+                                    value={values.email}
+                                    fullWidth
+                                    required
+                                    margin="normal"
+                                    error={!!touched.email && !!errors.email}
+                                    helperText={touched.email && errors.email}
+                                />
+                                <TextField
+                                    label="Senha"
+                                    placeholder="Digite sua senha"
+                                    name='password'
+                                    variant="filled"
+                                    onBlur={handleBlur}
+                                    onChange={handleChange}
+                                    value={values.password}
+                                    type="password"
+                                    fullWidth
+                                    required
+                                    margin="normal"
+                                    error={!!touched.password && !!errors.password}
+                                    helperText={touched.password && errors.password}
+                                />
+                                <Box display="flex" justifyContent="center" mt={2}>
+                                    <Button
+                                        type="submit"
+                                        color="primary"
+                                        variant="contained"
+                                        style={btnStyle}
+                                        disabled={isSubmitting} // Disable button while submitting
+                                    >
+                                        {isSubmitting ? "Loading" : "Entrar"}
+                                    </Button>
+                                </Box>
+                            </form>
+                        )}
+                    </Formik>
+
+                    <Box display="flex" alignItems="center" my={2} width="100%">
+                        <Box flexGrow={1} height="1px" bgcolor="text.disabled" />
+                        <Typography variant="body1" mx={2} color="text.disabled">
+                            ou
+                        </Typography>
+                        <Box flexGrow={1} height="1px" bgcolor="text.disabled" />
+                    </Box>
+
+                    <Button
+                        type="submit"
+                        color="primary"
+                        variant="contained"
+                        style={btnStyle}
+                    >
+                        Criar Conta
+                    </Button>
+                    
+                    <Typography style={{ marginTop: 10 }}>
+                        <Link href="#">
+                            Esqueceu sua senha?
+                        </Link>
+                    </Typography>
+
+
+
+    const btnStyle = { margin: '15px 0 8px 0', padding: '8px 0', width: '70%' };
+    
+    const initialValues = {
+        email: '',
+        password: '',
+        remember: false
+    };
+
+        const checkoutSchema = yup.object().shape({
+        email: yup.string().email('Escreva um e-mail válido!').required("Required"),
+        password: yup.string().required("Required")
+    });
+    
+    const handleFormSubmit = (values, { resetForm, setSubmitting }) => {
+        console.log(values);
+        setTimeout(() => {
+            resetForm();
+            setSubmitting(false);
+        }, 2000);
+    };
