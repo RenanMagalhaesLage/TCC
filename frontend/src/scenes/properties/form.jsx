@@ -39,7 +39,7 @@ const PropertiesForm = () => {
     if (response.status === 201) {
       //console.log("Propriedade criada com sucesso:", response.data);
 
-      navigate(`/propriedades?message=${encodeURIComponent("Propriedade criada com sucesso!")}`);
+      navigate(`/propriedades?message=${encodeURIComponent("1")}`);
     }
   } catch (error) {
     console.error("Erro ao criar propriedade:", error);

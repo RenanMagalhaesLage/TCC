@@ -1,5 +1,5 @@
 import { Box, Typography, useTheme, Button, useMediaQuery  } from "@mui/material";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,useParams } from 'react-router-dom';
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import { mockDataUsers, mockDataGlebas } from "../../data/mockData";
@@ -14,7 +14,7 @@ import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
 import React, { useState, useEffect } from "react";
 import secureLocalStorage from 'react-secure-storage';
 import axios from "axios";
-import { useParams } from 'react-router-dom';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
 const Propertie = () => {
     const theme = useTheme();
@@ -23,6 +23,7 @@ const Propertie = () => {
     const [userData, setUserData] = useState(null);
     const [propriedade, setPropriedade] = useState("");
     const [usuarios, setUsuarios] = useState([]);
+    const [glebas, setGlebas] = useState([]);
     const [owner, setOwner] = useState("");
     const { id } = useParams(); 
 
@@ -108,7 +109,7 @@ const Propertie = () => {
             headerName: "Ações",
             flex: 1,
             renderCell: (params) => {
-                const { access } = params.row;
+                const { id } = params.row;
 
                 return (
                     <Box 
@@ -124,7 +125,7 @@ const Propertie = () => {
                                      backgroundColor: colors.grey[700], 
                                 },
                              }} 
-                            onClick={() => handleView(params.row)}
+                             onClick={() => handleView(id)}
                         >
                             <VisibilityIcon />
                         </Button>
@@ -140,9 +141,8 @@ const Propertie = () => {
     const handleEdit = () => {
         navigate(`/propriedades/edit/${id}`);
     }
-    const navigate = useNavigate();
-    const handleView = (row) => {
-        navigate(`/glebas/id`);
+    const handleView = (id) => {
+        navigate(`/glebas/${id}`);
     };
     
     useEffect(() => {
@@ -157,10 +157,11 @@ const Propertie = () => {
             const fetchPropriedades = async () => {
                 try {
                     const response = await axios.get(`http://localhost:3000/propriedades/${id}`);
-                    const { propriedade, usuarios, owner } = response.data;
+                    const { propriedade, usuarios, owner, glebas } = response.data;
                     setPropriedade(propriedade);
                     setUsuarios(usuarios); 
                     setOwner(owner);
+                    setGlebas(glebas)
                 } catch (error) {
                     console.log("ERROR - ao buscar as propriedade.");
                 }
@@ -168,6 +169,11 @@ const Propertie = () => {
             fetchPropriedades();
         }
     }, [userData]);  
+
+    const navigate = useNavigate(); 
+    const handleAdd = () =>{
+        navigate(`/glebas/add/${id}`);
+    }
 
     return (
         <Box m="20px">
@@ -321,19 +327,46 @@ const Propertie = () => {
                             </Typography>
                         </Box>
                         <Box
-                        gridColumn="span 12"
-                        backgroundColor={colors.primary[400]}
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="center"
-                        minHeight="475px"
-                        mt={isMobile ? "30px": -12}
-                        >
-                            <DataGrid
-                                rows={mockDataGlebas}
-                                columns={columnsGlebas}
-                            />
+                            gridColumn="span 12"
+                            backgroundColor={colors.primary[400]}
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center"
+                            minHeight="475px"
+                            mt={isMobile ? "30px": -12}
+                            >
+                            {glebas.length === 0 ? (
+                                <Box
+                                    display="flex"
+                                    flexDirection= "column"
+                                    alignItems="center"  
+                                    justifyContent="center"
+                                    gap="20px"
+                                >
+                                    <Typography variant={isMobile ? "h6": "h5"} fontWeight="bold" color={colors.grey[100]}>
+                                        Nenhuma gleba da propriedade foi encontrada.
+                                    </Typography>
+                                    <Button
+                                        sx={{
+                                        backgroundColor: colors.mygreen[400],
+                                        color: colors.grey[100],
+                                        fontSize: "14px",
+                                        fontWeight: "bold",
+                                        padding: "10px 20px",
+                                        }}
+                                        onClick={() => handleAdd()}
+                                    >
+                                        <AddCircleOutlineIcon sx={{ mr: "10px" }} />
+                                        {("Adicionar Gleba")}
+                                    </Button>
+                                </Box>
+                            ) : (
+                                <DataGrid
+                                    rows={glebas}
+                                    columns={columnsGlebas}
 
+                                />
+                            )}
                         </Box>
                         <Box
                             gridColumn="span 12"
@@ -360,6 +393,7 @@ const Propertie = () => {
                             rows={usuarios}
                             columns={columnsUsers}
                             sx={{mb:"20px"}}
+                            localeText={{ noRowsLabel: <b>Nenhum usuário da propriedade foi encontrado.</b> }}
                         />
                         </Box>
                     </Box>

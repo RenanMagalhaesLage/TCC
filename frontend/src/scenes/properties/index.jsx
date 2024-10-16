@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Box, Typography, useTheme, Button, useMediaQuery,Snackbar, Alert  } from "@mui/material";
-import { useNavigate,useLocation } from 'react-router-dom';
+import { useNavigate,useLocation,useParams } from 'react-router-dom';
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
@@ -9,7 +9,6 @@ import Header from "../../components/Header";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import axios from "axios";
-import { useParams } from 'react-router-dom';
 import secureLocalStorage from 'react-secure-storage';
 
 
@@ -23,9 +22,32 @@ const Properties = () => {
 
     const location = useLocation();
     const query = new URLSearchParams(location.search);
-    const message = query.get('message');
+    const message = Number(query.get('message'));
     const [openSnackbar, setOpenSnackbar] = useState(!!message);
-    const [snackbarMessage, setSnackbarMessage] = useState(message); 
+    const [snackbarMessage, setSnackbarMessage] = useState(""); 
+    useEffect(() => {
+        switch (message) {
+          case 1:
+            setSnackbarMessage("Propriedade criada!");
+            break;
+    
+          case 2:
+            setSnackbarMessage("Edição realizada!");
+            break;
+    
+          case 3:
+            setSnackbarMessage("Propriedade excluída!");
+            break;
+    
+          case 4:
+            setSnackbarMessage("Usuário adicionado na propriedade!");
+            break;
+    
+          default:
+            console.log("Mensagem não reconhecida.");
+            break;
+        }
+      }, [message]);
 
     const columns = [
         { field: "id", headerName: "Id", flex: 1, cellClassName: "id-column--cell", resizable: false },
@@ -121,7 +143,7 @@ const Properties = () => {
     }, [userData]);  
 
     useEffect(() => {
-        console.log(propriedades); 
+        //console.log(propriedades); 
     }, [propriedades]);
 
     const navigate = useNavigate(); 
@@ -193,30 +215,30 @@ const Properties = () => {
                 />
             </Box>
             <div>
-            {message && (
-                <Snackbar 
-                open={openSnackbar} 
-                autoHideDuration={2500} 
-                onClose={handleCloseSnackbar}
-                anchorOrigin={{ vertical: 'top', horizontal: 'center' }} 
-            >
-                <Alert
+                {message && (
+                    <Snackbar 
+                    open={openSnackbar} 
+                    autoHideDuration={2500} 
                     onClose={handleCloseSnackbar}
-                    severity="success"
-                    variant="filled"
-                    sx={{ 
-                      width: '550px', 
-                      height: '70px',
-                      display: 'flex', 
-                      alignItems: 'center',
-                      justifyContent: 'center', 
-                      fontSize: '20px',
-                  }}
+                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }} 
                 >
-                    {snackbarMessage}
-                </Alert>
-            </Snackbar>
-            )}
+                    <Alert
+                        onClose={handleCloseSnackbar}
+                        severity="success"
+                        variant="filled"
+                        sx={{ 
+                        width: '450px', 
+                        height: '60px',
+                        display: 'flex', 
+                        alignItems: 'center',
+                        justifyContent: 'center', 
+                        fontSize: '20px',
+                    }}
+                    >
+                        {snackbarMessage}
+                    </Alert>
+                </Snackbar>
+                )}
             </div>
             
         </Box>

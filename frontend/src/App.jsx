@@ -21,6 +21,7 @@ import PropertiesEditForm from './scenes/properties/editForm';
 import Glebas from './scenes/glebas';
 import Gleba from './scenes/glebas/gleba';
 import GlebasForm from './scenes/glebas/form';
+import GlebasEditForm from './scenes/glebas/editForm';
 import Safras from './scenes/safras'
 
 
@@ -64,6 +65,8 @@ function App() {
                   <Route path="/glebas" element={<Glebas />} />
                   <Route path="/glebas/:id" element={<Gleba />} />
                   <Route path="/glebas/add" element={<GlebasForm />} />
+                  <Route path="/glebas/add/:id?" element={<GlebasForm />} />
+                  <Route path="/glebas/edit/:id" element={<GlebasEditForm />} />
                   <Route path="/safras" element={<Safras />} />
                 </Routes>
               </main>

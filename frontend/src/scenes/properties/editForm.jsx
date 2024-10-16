@@ -60,7 +60,7 @@ const PropertiesEditForm = () => {
 
             if (response.status === 200) {
                 //console.log("Propriedade atualizada com sucesso:", response.data);
-                navigate(`/propriedades?message=${encodeURIComponent("Edição realizada com sucesso!")}`);
+                navigate(`/propriedades?message=${encodeURIComponent("2")}`);
               }
         } catch (error) {
             console.error("Erro ao atualizar propriedade:", error);

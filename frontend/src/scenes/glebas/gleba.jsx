@@ -10,6 +10,8 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import secureLocalStorage from 'react-secure-storage';
 import axios from "axios";
 import { useParams } from 'react-router-dom';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+
 
 const Gleba = () => {
     const theme = useTheme();
@@ -21,6 +23,8 @@ const Gleba = () => {
     const [userData, setUserData] = useState(null);
     const [propriedade, setPropriedade] = useState("");
     const [gleba, setGleba] = useState("");
+    const [safrasPlanejadas,setSafrasPlanejadas] = useState([]);
+    const [safrasRealizadas,setSafrasRealizadas] = useState([]);
     const columnsSafras = [
         { field: "cultivo", headerName: "Cultivo", flex: 1, cellClassName: "city-column--cell", resizable: false },
         { field: "semente", headerName: "Semente", type: "number", headerAlign: "left", align: "left", flex: 1,resizable: false },
@@ -232,21 +236,47 @@ const Gleba = () => {
                             </Typography>
                         </Box>
                         <Box
-                        gridColumn="span 12"
-                        backgroundColor={colors.primary[400]}
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="center"
-                        minHeight="475px"
-                        mt={isMobile ? "30px": -12}
+                            gridColumn="span 12"
+                            backgroundColor={colors.primary[400]}
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center"
+                            minHeight="475px"
+                            mt={isMobile ? "30px": -12}
                         >
-                            
-                            <DataGrid
-                                rows={mockDataGlebas}
-                                columns={columnsSafras}
-                            />
-
-                        </Box>
+                            {safrasPlanejadas.length === 0 ? (
+                                <Box
+                                    display="flex"
+                                    flexDirection= "column"
+                                    alignItems="center"  
+                                    justifyContent="center"
+                                    gap="20px"
+                                >
+                                    <Typography variant={isMobile ? "h6": "h5"} fontWeight="bold" color={colors.grey[100]}>
+                                        Nenhuma safra planejada da gleba foi encontrada.
+                                    </Typography>
+                                    <Button
+                                        sx={{
+                                        backgroundColor: colors.mygreen[400],
+                                        color: colors.grey[100],
+                                        fontSize: "14px",
+                                        fontWeight: "bold",
+                                        padding: "10px 20px",
+                                        }}
+                                        onClick={() => handleAdd()}
+                                    >
+                                        <AddCircleOutlineIcon sx={{ mr: "10px" }} />
+                                        {("Adicionar Safra")}
+                                    </Button>
+                                </Box>
+                            ):(
+                                
+                                <DataGrid
+                                    rows={mockDataGlebas}
+                                    columns={columnsSafras}
+                                />
+                            )}
+                        </Box>        
                         <Box
                             gridColumn="span 12"
                             display="flex"
@@ -260,22 +290,48 @@ const Gleba = () => {
                             </Typography>
                         </Box>        
                         <Box
-                        gridColumn="span 12"
-                        backgroundColor={colors.primary[400]}
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="center"
-                        minHeight="475px" 
-                        mt={isMobile ? "290px": "155px"}
+                            gridColumn="span 12"
+                            backgroundColor={colors.primary[400]}
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center"
+                            minHeight="475px" 
+                            mt={isMobile ? "290px": "155px"}
+                            mb="10000px"
                         >
-                            <DataGrid
-                            rows={mockDataGlebas}
-                            columns={columnsSafras}
-                            sx={{mb:"20px"}}
-                            />
+                            {safrasPlanejadas.length === 0 ? (
+                                <Box
+                                    display="flex"
+                                    flexDirection= "column"
+                                    alignItems="center"  
+                                    justifyContent="center"
+                                    gap="20px"
+                                >
+                                    <Typography variant={isMobile ? "h6": "h5"} fontWeight="bold" color={colors.grey[100]}>
+                                        Nenhuma safra planejada da gleba foi encontrada.
+                                    </Typography>
+                                    <Button
+                                        sx={{
+                                        backgroundColor: colors.mygreen[400],
+                                        color: colors.grey[100],
+                                        fontSize: "14px",
+                                        fontWeight: "bold",
+                                        padding: "10px 20px",
+                                        }}
+                                        onClick={() => handleAdd()}
+                                    >
+                                        <AddCircleOutlineIcon sx={{ mr: "10px" }} />
+                                        {("Adicionar Safra")}
+                                    </Button>
+                                </Box>
+                            ):(
+                                <DataGrid
+                                    rows={mockDataGlebas}
+                                    columns={columnsSafras}
+                                    sx={{mb:"20px"}}
+                                />
+                            )}
                         </Box>
-                        
-                        
                     </Box>
             </Box>
         </Box>

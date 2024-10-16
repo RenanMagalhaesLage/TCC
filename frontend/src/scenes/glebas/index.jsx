@@ -21,6 +21,32 @@ const Glebas = () => {
     const [glebas, setGlebas] = useState([]);
     const [userData, setUserData] = useState(null);
 
+    const location = useLocation();
+    const query = new URLSearchParams(location.search);
+    const message = Number(query.get('message'));
+    const [openSnackbar, setOpenSnackbar] = useState(!!message);
+    const [snackbarMessage, setSnackbarMessage] = useState(""); 
+
+    useEffect(() => {
+        switch (message) {
+          case 1:
+            setSnackbarMessage("Gleba criada!");
+            break;
+    
+          case 2:
+            setSnackbarMessage("Edição realizada!");
+            break;
+    
+          case 3:
+            setSnackbarMessage("Gleba excluída!");
+            break;
+    
+          default:
+            console.log("Mensagem não reconhecida.");
+            break;
+        }
+      }, [message]);
+
     const columns = [
         { field: "name", headerName: "Nome", flex: 1, cellClassName: "name-column--cell", resizable: false },
         { field: "propertie", headerName: "Propriedade", flex: 1, cellClassName: "propertie-column--cell", resizable: false },
@@ -125,7 +151,7 @@ const Glebas = () => {
     }, [userData]);  
 
     useEffect(() => {
-        console.log(glebas); 
+        //console.log(glebas); 
     }, [glebas]);
 
     const navigate = useNavigate(); 
@@ -137,7 +163,12 @@ const Glebas = () => {
         navigate(`/glebas/add`);
     }
 
-
+    const handleCloseSnackbar = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setOpenSnackbar(false); // Fecha o Snackbar
+    };
 
     return (
         <Box m="20px">
@@ -193,6 +224,32 @@ const Glebas = () => {
                     localeText={{ noRowsLabel: <b>Nenhuma gleba encontrada.</b> }}
                 />
             </Box>
+            <div>
+                {message && (
+                    <Snackbar 
+                    open={openSnackbar} 
+                    autoHideDuration={2500} 
+                    onClose={handleCloseSnackbar}
+                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }} 
+                >
+                    <Alert
+                        onClose={handleCloseSnackbar}
+                        severity="success"
+                        variant="filled"
+                        sx={{ 
+                        width: '450px', 
+                        height: '60px',
+                        display: 'flex', 
+                        alignItems: 'center',
+                        justifyContent: 'center', 
+                        fontSize: '20px',
+                    }}
+                    >
+                        {snackbarMessage}
+                    </Alert>
+                </Snackbar>
+                )}
+            </div>
         </Box>
     );
 };

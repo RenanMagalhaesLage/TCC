@@ -11,7 +11,7 @@ import secureLocalStorage from 'react-secure-storage';
 import Autocomplete from '@mui/material/Autocomplete';
 
 
-const GlebasForm = () => {
+const GlebasEditForm = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const isNonMobile = useMediaQuery("(min-width:600px)");
@@ -90,10 +90,10 @@ const GlebasForm = () => {
       if (response.status === 201) {
         //console.log("Gleba criada com sucesso:", response.data);
   
-        navigate(`/glebas?message=${encodeURIComponent("1")}`);
+        navigate(`/glebas?message=${encodeURIComponent("2")}`);
       }
     } catch (error) {
-      console.error("Erro ao criar gleba: " , error);
+      console.error("Erro ao editar gleba: " , error);
     }
   };
 
@@ -103,7 +103,7 @@ const GlebasForm = () => {
   
   return (
     <Box m="20px">
-      <Header title="Adicionar Gleba" subtitle="Preencha os campos para que seja criado a gleba" />
+      <Header title="Editar Gleba" subtitle="Edite os campos da gleba" />
 
       <Formik
         onSubmit={handleFormSubmit}
@@ -224,4 +224,4 @@ const checkoutSchema = yup.object().shape({
     propertie: yup.string().required("Campo de preenchimento obrigatório"),
 
 });
-export default GlebasForm;
+export default GlebasEditForm;

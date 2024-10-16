@@ -220,6 +220,25 @@ app.get('/propriedades/:id', async (req, res) => {
             return res.status(404).json({ error: 'Propriedade não encontrada' });
         }
 
+        const propriedadeGleba = await PropriedadeGleba.findAll({
+            where: {propriedadeId: id},
+            attributes: ['glebaId']
+        })
+
+        let glebas = [];
+        if (propriedadeGleba && propriedadeGleba.length > 0) {
+            // Extraindo os IDs de cada gleba (caso haja mais de uma)
+            const glebasId = propriedadeGleba.map(pg => pg.glebaId);
+        
+            // Buscando todas as glebas com base nos IDs retornados
+            glebas = await Gleba.findAll({
+                where: { id: glebasId }
+            });
+        
+        } else {
+            console.log('Nenhuma gleba encontrada para a propriedade.');
+        }
+
         //Procurando todos os usuários dessa propriedade
         const usuariosPropriedade = await UsuarioPropriedade.findAll({
             where: { propriedadeId: id },
@@ -257,13 +276,14 @@ app.get('/propriedades/:id', async (req, res) => {
                 area: propriedade.area 
             },
             usuarios: usuariosCompletos, 
-            owner: owner ? { name: owner.name, email: owner.email } : null 
+            owner: owner ? { name: owner.name, email: owner.email } : null,
+            glebas: glebas
 
         };
 
         return res.status(200).json(resposta);
     } catch (error) {
-        console.error('Erro ao buscar propriedade:', error);
+        //console.error('Erro ao buscar propriedade:', error);
         return res.status(500).json({ error: 'Erro ao buscar propriedade' });
     }
 });
