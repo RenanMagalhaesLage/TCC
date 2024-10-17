@@ -128,7 +128,7 @@ const Glebas = () => {
         if (userData && userData.email) { 
             const fetchGlebas = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:3000/${userData.email}/searchGlebas`);
+                    const response = await axios.get(`http://localhost:3000/searchGlebas/${userData.email}`);
                     const linhasDaTabela = response.data.flatMap(fazenda => {
                         return fazenda.glebas.map(gleba => ({
                             id: gleba.id, 

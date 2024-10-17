@@ -51,7 +51,7 @@ const PropertiesEditForm = () => {
 
     const handleFormSubmit = async (values) => {
         try {
-            const response = await axios.put(`http://localhost:3000/propriedades/edit/${id}`, {
+            const response = await axios.put(`http://localhost:3000/editPropriedade/${id}`, {
                 name: values.namePropertie,
                 area: values.area,
                 city: values.city,

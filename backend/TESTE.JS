@@ -1,153 +1,9 @@
-const express = require("express");
-
-//Configurando autenticação Google
-const {OAuth2Client} = require('google-auth-library');
-require('dotenv').config();
-const client = new OAuth2Client();
-
-const app = express();
-const connection = require("./database/database");
-const bodyParser = require("body-parser");
-const cors = require('cors');
-app.use(cors({
-    origin: 'http://localhost:5173', // ou a porta onde seu front-end está rodando
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true,
-}));
-
-
-/*  Models  */
-const Usuario = require("./database/Usuario");
-const Propriedade = require("./database/Propriedade");
-const UsuarioPropriedade = require("./database/UsuarioPropriedade");
-const Gleba = require("./database/Gleba");
-//const PropriedadeGleba = require("./database/PropriedadeGleba"); 
-
-/* Relacionamentos dos modelos */
-Usuario.belongsToMany(Propriedade, { through: UsuarioPropriedade, onDelete: 'CASCADE', onUpdate: 'CASCADE' });
-Propriedade.belongsToMany(Usuario, { through: UsuarioPropriedade, onDelete: 'CASCADE', onUpdate: 'CASCADE' });
-
-Propriedade.hasMany(Gleba, {
-    foreignKey: 'propriedadeId',
-    as: 'glebas',
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'  
-  });
-
-Gleba.belongsTo(Propriedade,  {
-    foreignKey: 'propriedadeId',
-    as: 'propriedade',
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE' 
-  });
-
-/*
-const syncModels = async () => {
-    await connection.sync({ force: true }); // Cuidado: isso irá apagar dados existentes
-};
-
-syncModels().then(() => {
-    console.log("Tabelas sincronizadas");
-}).catch((error) => {
-    console.error("Erro ao sincronizar tabelas:", error);
-});*/
-
-
-connection
-    .authenticate()
-    .then(() =>{
-        console.log("Conexão feita com o banco de dados!")
-    })
-    .catch((msgErro) =>{
-        console.log(msgErro)
-    })
-
-
-app.use(bodyParser.urlencoded({extended: false}));
-app.use(bodyParser.json());
-
-app.use(express.json());
-const port = 3000;
-
-async function verificaTokens(req, res, next) {
-    try{
-        const token = req.headers.authorization.split(' ')[1];
-        console.log(token)
-        if(!token || token === undefined){
-            return res.status(401).json({error:'Invalid token'});
-        }
-
-        const ticket = await client.verifyIdToken({
-            idToken: token,
-            audience: process.env.AUDIENCE,  
-        });
-        const payload = ticket.getPayload();
-        const userid = payload['sub'];
-        const timestamp = payload.exp;
-        const expiracaoData = new Date(timestamp*1000);
-        const agora = new Date();
-
-        if(expiracaoData < agora){
-            return res.status(401).json({error:'Token expirado'});
-        }
-
-        req.user = payload;
-        next();
-    }catch(error){
-        return res.status(500).json({error:'Internal Server Error'});
-
-    }
-}
-
-app.get("/publica",(req,res) =>{
-    res.json({message:"rota publica"});
-})
-
-app.post("/protegida", verificaTokens,async(req,res) =>{
-    const user = req.user
-    //Dados que necessito
-    const userName = req.user.name
-    const userEmail = req.user.email
-    const userPicture = req.user.picture
-    try {
-        const existingUser = await Usuario.findOne({ where: { email: userEmail } });
-
-        if (!existingUser) {
-           const newUser = await Usuario.create({
-                name: userName,
-                email: userEmail,
-                picture: userPicture,
-            });
-            //console.log('Usuário criado:', newUser);
-            return res.json({
-                message: "Usuário criado com sucesso",
-                user: newUser,
-                name: userName,
-                email: userEmail,
-                picture: userPicture,
-            });
-        }else{
-            return res.json({
-                message: "Usuário ja existente",
-                name: userName,
-                email: userEmail,
-                picture: userPicture,
-            });
-        }
-
-    } catch (error) {
-        console.error('Erro ao processar a solicitação:', error);
-        return res.status(500).json({ message: "Erro ao processar a solicitação" });
-    }
-    //node --watch index.js
-});
-
 /*------------------------
     ROTAS PROPRIEDADE
 --------------------------*/
 
 /* Rota para --> CADASTRO DE PROPRIEDADE */
-app.post('/createPropriedade', async (req, res) => {
+app.post('/propriedade', async (req, res) => {
     try {
         const { name, city, area, email } = req.body;
         const user = await Usuario.findOne({ where: { email: email } });
@@ -180,7 +36,7 @@ app.post('/createPropriedade', async (req, res) => {
 });
 
 /* Rota para --> BUSCA DE PROPRIEDADES */
-app.get('/searchPropriedades/:email', async (req, res) => {
+app.get('/:email/propriedades', async (req, res) => {
     const { email } = req.params;
 
     try {
@@ -222,30 +78,7 @@ app.get('/searchPropriedades/:email', async (req, res) => {
     }
 });
 
-/* Rota para --> EDIÇÃO DE PROPRIEDADE */
-app.put('/editPropriedade/:id', async (req, res) => {
-    try {
-        const { name, area, city } = req.body;
-        const [updated] = await Propriedade.update(
-            { name, area, city},
-            { where: { id: req.params.id } }
-        );
-
-
-        if (updated) {
-            const updatedProperty = await Propriedade.findByPk(req.params.id);
-            return res.json(updatedProperty);
-        }
-
-        res.status(404).json({ message: 'Propriedade não encontrada' });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-});
-
-/* Rota para --> REMOVER DE PROPRIEDADE */
-
-/* Rota para --> BUSCA POR DETERMINADA PROPRIEDADE E SEUS USUÁRIOS E SUAS GLEBAS */
+// BUSCA POR DETERMINADA PROPRIEDADE E SEUS USUÁRIOS E SUAS GLEBAS
 app.get('/propriedades/:id', async (req, res) => {
     const { id } = req.params;
 
@@ -255,9 +88,24 @@ app.get('/propriedades/:id', async (req, res) => {
             return res.status(404).json({ error: 'Propriedade não encontrada' });
         }
 
-        const glebas =  await Gleba.findAll({
+        const propriedadeGleba = await PropriedadeGleba.findAll({
             where: {propriedadeId: id},
-        })        
+            attributes: ['glebaId']
+        })
+
+        let glebas = [];
+        if (propriedadeGleba && propriedadeGleba.length > 0) {
+            // Extraindo os IDs de cada gleba (caso haja mais de uma)
+            const glebasId = propriedadeGleba.map(pg => pg.glebaId);
+        
+            // Buscando todas as glebas com base nos IDs retornados
+            glebas = await Gleba.findAll({
+                where: { id: glebasId }
+            });
+        
+        } else {
+            console.log('Nenhuma gleba encontrada para a propriedade.');
+        }
 
         //Procurando todos os usuários dessa propriedade
         const usuariosPropriedade = await UsuarioPropriedade.findAll({
@@ -308,6 +156,27 @@ app.get('/propriedades/:id', async (req, res) => {
     }
 });
 
+/* Rota para --> EDIÇÃO/UPDATE DE PROPRIEDADE */
+app.put('/propriedades/edit/:id', async (req, res) => {
+    try {
+        const { name, area, city } = req.body;
+        const [updated] = await Propriedade.update(
+            { name, area, city},
+            { where: { id: req.params.id } }
+        );
+
+
+        if (updated) {
+            const updatedProperty = await Propriedade.findByPk(req.params.id);
+            return res.json(updatedProperty);
+        }
+
+        res.status(404).json({ message: 'Propriedade não encontrada' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 /* Rota para --> OBTER UMA PROPRIEDADE PELO ID */
 app.get('/propriedade/:id', async (req, res) => {
     try {
@@ -338,13 +207,17 @@ app.post('/createGleba', async (req, res) => {
 
         const novaGleba = await Gleba.create({
             name: name,
-            area: area,
-            propriedadeId: propertieId
+            area: area
         });
 
+        const propriedadeGleba = await PropriedadeGleba.create({
+            propriedadeId: propertieId, 
+            glebaId: novaGleba.id, 
+        });
 
         return res.status(201).json({ 
-            gleba: novaGleba
+            gleba: novaGleba, 
+            relacionamento: propriedadeGleba
         });
     } catch (error) {
         console.error('Erro ao salvar gleba:', error);
@@ -353,10 +226,11 @@ app.post('/createGleba', async (req, res) => {
 });
 
 /* Rota para --> BUSCA DE GLEBAS */
-app.get('/searchGlebas/:email', async (req, res) => {
+app.get('/:email/searchGlebas', async (req, res) => {
     const { email } = req.params;
 
     try {
+        //const usuario = await Usuario.findByPk(userId);
         const user = await Usuario.findOne({ where: { email: email } });
         if (!user) {
             return res.status(404).json({ error: 'Usuário não encontrado' });
@@ -376,7 +250,8 @@ app.get('/searchGlebas/:email', async (req, res) => {
                 id: propriedadeIds
             },
             include: {
-                model: Gleba, as: 'glebas', 
+                model: Gleba, 
+                through: { attributes: [] } 
             }
         });
         
@@ -400,12 +275,60 @@ app.get('/searchGlebas/:email', async (req, res) => {
 
         return res.status(200).json(resultado);
     } catch (error) {
-        console.error('Erro ao buscar glebas do usuário:', error);
-        return res.status(500).json({ error: 'Erro ao buscar glebas do usuário' });
+        console.error('Erro ao buscar propriedades do usuário:', error);
+        return res.status(500).json({ error: 'Erro ao buscar propriedades do usuário' });
     }
 });
 
-/*  Rota para --> EDIÇÃO GLEBA */
+/*  Rota para --> BUSCA POR DETERMINADA GLEBA E SUAS SAFRAS */
+app.get('/gleba/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const gleba = await Gleba.findByPk(id);
+        if (!gleba) {
+            return res.status(404).json({ error: 'Gleba não encontrada' });
+        }
+
+        //Procurando a propriedade que essa gleba pertence
+        const propriedadeGleba = await PropriedadeGleba.findOne({
+            where: { glebaId: id },
+            attributes: ['propriedadeId']
+        });
+
+        const propriedadeId = propriedadeGleba?.propriedadeId;
+
+        //Recebendo dados da propriedade
+        const propriedade = await Propriedade.findByPk(propriedadeId);
+
+        //Procurar dono da propriedade
+        const ownerPropriedade = await UsuarioPropriedade.findOne({
+            where: { propriedadeId: propriedadeId },
+            attributes: ['usuarioId', 'access']
+        }); 
+        
+        const userId = ownerPropriedade?.usuarioId
+
+        const owner = await Usuario.findByPk(userId);
+        if (!owner) {
+            return res.status(404).json({ error: 'Dono da gleba não encontrado' });
+        }
+        
+        const resposta = {
+            gleba: gleba,
+            propriedade: propriedade,
+            owner: owner
+
+        };
+
+        return res.status(200).json(resposta);
+    } catch (error) {
+        console.error('Erro ao buscar gleba:', error);
+        return res.status(500).json({ error: 'Erro ao buscar gleba' });
+    }
+});
+
+/*  Rota para --> EDIÇÃO/UPDATE GLEBA */
 app.put('/editGleba/:id', async (req, res) => {
     try {
         const { name, area } = req.body;
@@ -426,64 +349,8 @@ app.put('/editGleba/:id', async (req, res) => {
     }
 });
 
-/* Rota para --> REMOVER DE GLEBA */
 
-/*  Rota para --> BUSCA POR DETERMINADA GLEBA E SUAS SAFRAS */
-app.get('/gleba/:id', async (req, res) => {
-    const { id } = req.params;
-
-    try {
-        const gleba = await Gleba.findByPk(id);
-        if (!gleba) {
-            return res.status(404).json({ error: 'Gleba não encontrada' });
-        }
-
-        //Recebendo dados da propriedade
-        const propriedade = await Propriedade.findByPk(gleba.propriedadeId);
-
-        //Procurar dono da propriedade
-        const ownerPropriedade = await UsuarioPropriedade.findOne({
-            where: { propriedadeId: gleba.propriedadeId },
-            attributes: ['usuarioId', 'access']
-        }); 
-        
-        const userId = ownerPropriedade?.usuarioId
-
-        const owner = await Usuario.findByPk(userId);
-        if (!owner) {
-            return res.status(404).json({ error: 'Dono da gleba não encontrado' });
-        }
-        
-        const resposta = {
-            gleba: gleba,
-            propriedade: propriedade,
-            owner: owner
-        };
-
-        return res.status(200).json(resposta);
-    } catch (error) {
-        console.error('Erro ao buscar gleba:', error);
-        return res.status(500).json({ error: 'Erro ao buscar gleba' });
-    }
-});
 
 /*------------------------
         ROTAS SAFRAS
 --------------------------*/
-
-
-
-app.listen(port,()=>{
-    console.log(`Servidor rodando na porta ${port}`);
-})
-
-
-
-/*
-app.get("/",(req,res) =>{
-    res.send("Bem vinde");
-})
-
-app.listen(8080,()=>{
-    console.log("App rodando na porta 8080");
-})*/

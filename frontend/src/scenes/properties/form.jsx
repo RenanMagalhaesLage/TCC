@@ -29,7 +29,7 @@ const PropertiesForm = () => {
   try {
     console.log(userData.email);
     // Realizar a requisição POST para o backend usando axios
-    const response = await axios.post("http://localhost:3000/propriedade", {
+    const response = await axios.post("http://localhost:3000/createPropriedade", {
       name: values.namePropertie,
       area: values.area,          
       city: values.city,          

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate,useParams } from 'react-router-dom';
+import secureLocalStorage from 'react-secure-storage';
+import axios from "axios";
 import { Box, Typography, useTheme, Button, useMediaQuery,Checkbox, FormControlLabel, Modal, Backdrop, Fade } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
@@ -8,10 +10,7 @@ import Header from "../../components/Header";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import secureLocalStorage from 'react-secure-storage';
-import axios from "axios";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-
 
 const Gleba = () => {
     const theme = useTheme();
@@ -90,7 +89,7 @@ const Gleba = () => {
             fetchGlebas();
         }
     }, [userData]);  
-    
+
     const navigate = useNavigate(); 
 
     const handleEdit = () => {
@@ -242,15 +241,17 @@ const Gleba = () => {
                                         >
                                             <Fade in={open}>
                                                 <Box 
+                                                color={colors.grey[100]}
+                                                backgroundColor={colors.primary[400]}
+
                                                     sx={{ 
                                                         position: 'absolute',
                                                         top: '50%',
                                                         left: '50%',
                                                         transform: 'translate(-50%, -50%)',
                                                         width: 450,
-                                                        bgcolor: '#fff', // Cor de fundo branco puro para contraste
-                                                        borderRadius: 3, // Cantos arredondados
-                                                        boxShadow: '0px 10px 30px rgba(0, 0, 0, 0.1)', // Sombra suave e moderna
+                                                        borderRadius: 3, 
+                                                        boxShadow: '0px 10px 30px rgba(0, 0, 0, 0.1)',
                                                         p: 4,
 
                                                     }}

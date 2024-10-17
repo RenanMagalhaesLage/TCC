@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import secureLocalStorage from 'react-secure-storage';
 import { useNavigate,useParams } from 'react-router-dom';
-import { Box, Typography, useTheme, Button, useMediaQuery,  Checkbox, FormControlLabel  } from "@mui/material";
+import { Box, Typography, useTheme, Button, useMediaQuery,  Checkbox, FormControlLabel, Fade, Backdrop, Modal  } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
@@ -14,10 +14,6 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import Modal from '@mui/material/Modal';
-import Backdrop from '@mui/material/Backdrop';
-import Fade from '@mui/material/Fade';
-
 
 const Propertie = () => {
     const theme = useTheme();
@@ -179,7 +175,7 @@ const Propertie = () => {
     const handleAdd = () =>{
         navigate(`/glebas/add/${id}`);
     }
-    
+
     const handleOpen = () => setOpen(true);
     const handleClose = () => {
         setOpen(false);

@@ -132,7 +132,7 @@ const Properties = () => {
         if (userData && userData.email) { 
             const fetchPropriedades = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:3000/${userData.email}/propriedades`);
+                    const response = await axios.get(`http://localhost:3000/searchPropriedades/${userData.email}`);
                     setPropriedades(response.data); 
                 } catch (error) {
                     console.log("ERRO - ao buscar as propriedades.");
