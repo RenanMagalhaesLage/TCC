@@ -20,7 +20,7 @@ const GlebasForm = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const { id } = useParams(); 
-  const [singlePropertie,setSinglePropertie] = useState(null)
+  const [propertie,setPropertie] = useState(null)
 
 
   useEffect(() => {
@@ -43,10 +43,20 @@ const GlebasForm = () => {
             setOptionsPropertieId(propriedadesId);
             setOptionsPropertie(propriedades);
 
-            const foundPropertie = propriedadesId.find(propriedade => propriedade.id === Number(id));
-            if (foundPropertie) {
-              setSinglePropertie(foundPropertie.name); 
-              //console.log(foundPropertie.name)
+            if(id){
+              const fetchPropertyData = async () => {
+                try {
+                    const response = await axios.get(`http://localhost:3000/gleba/${id}`);
+                    const { gleba, propriedade, owner } = response.data;
+                    setPropertie(propriedade);
+                    //console.log("info --> " + propriedade.name + " " + gleba.name )
+                    setLoading(false); 
+                } catch (error) {
+                    console.error("Erro ao buscar dados da gleba:", error);
+                    setLoading(false); 
+                }
+            };
+            fetchPropertyData();
             }
 
         } catch (err) {
@@ -59,16 +69,17 @@ const GlebasForm = () => {
     }
   }, [userData]);
 
+  const initialValues = {
+    nameGleba: "",
+    area: "",
+    propertie: propertie? propertie.name :"" 
+  }
+
   
 
   const navigate = useNavigate(); 
   const handleFormSubmit = async (values) => {
     try {
-      //console.log(userData.email);
-      if(singlePropertie){
-        values.propertie = singlePropertie
-        //console.log(values.propertie)
-      }
       const index = optionsPropertieId.findIndex(item => item.name === values.propertie);
 
       if (index === -1) {
@@ -107,11 +118,7 @@ const GlebasForm = () => {
 
       <Formik
         onSubmit={handleFormSubmit}
-        initialValues={{
-          nameGleba: "",
-          area: "",
-          propertie: singlePropertie ? singlePropertie : "" 
-        }}
+        initialValues={initialValues}
         validationSchema={checkoutSchema}
       >
         {({
@@ -158,12 +165,12 @@ const GlebasForm = () => {
                   helperText={touched.area && errors.area}
                   sx={{ gridColumn: "span 2" }}
                 />
-                {singlePropertie ? (
+                {propertie ? (
                   <TextField
                     fullWidth
                     variant="filled"
                     label="Propriedades"
-                    value={singlePropertie}
+                    value={propertie.name}
                     disabled 
                     sx={{ gridColumn: "span 2" }}
                     

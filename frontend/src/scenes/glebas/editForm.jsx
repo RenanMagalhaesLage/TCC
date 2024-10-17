@@ -18,9 +18,10 @@ const GlebasEditForm = () => {
   const [optionsPropertie, setOptionsPropertie] = useState([]);
   const [optionsPropertieId, setOptionsPropertieId] = useState([]);
   const [userData, setUserData] = useState(null);
+  const [propertie, setPropertie] = useState("");
+  const [gleba, setGleba] = useState("");
   const [loading, setLoading] = useState(true);
   const { id } = useParams(); 
-  const [singlePropertie,setSinglePropertie] = useState(null)
 
 
   useEffect(() => {
@@ -32,63 +33,43 @@ const GlebasEditForm = () => {
 
   useEffect(() => {
     if (userData && userData.email) {
-      const fetchPropriedades = async () => {
-        try {
-            const response = await axios.get(`http://localhost:3000/${userData.email}/propriedades`);
-            const propriedades = response.data.map(propriedade => propriedade.name);
-            const propriedadesId = response.data.map(propriedade => ({
-              id: propriedade.id,
-              name: propriedade.name,
-            }));
-            setOptionsPropertieId(propriedadesId);
-            setOptionsPropertie(propriedades);
-
-            const foundPropertie = propriedadesId.find(propriedade => propriedade.id === Number(id));
-            if (foundPropertie) {
-              setSinglePropertie(foundPropertie.name); 
-              //console.log(foundPropertie.name)
+        const fetchPropertyData = async () => {
+            try {
+                const response = await axios.get(`http://localhost:3000/gleba/${id}`);
+                const { gleba, propriedade, owner } = response.data;
+                setGleba(gleba);
+                setPropertie(propriedade);
+                setLoading(false); 
+            } catch (error) {
+                console.error("Erro ao buscar dados da gleba:", error);
+                setLoading(false); 
             }
-
-        } catch (err) {
-            console.error('Erro ao buscar propriedades:', err);  
-        }finally {
-          setLoading(false);
-        }
-      };
-      fetchPropriedades();
+        };
+        fetchPropertyData();
     }
-  }, [userData]);
+}, [userData, id]);
 
-  
+  const initialValues = {
+    nameGleba: gleba? gleba.name : "",
+    area: gleba ? gleba.area : "",
+    propertie: propertie? propertie.name :"" 
+  }
+
+  console.log(initialValues)
+
+
 
   const navigate = useNavigate(); 
   const handleFormSubmit = async (values) => {
     try {
-      //console.log(userData.email);
-      if(singlePropertie){
-        values.propertie = singlePropertie
-        //console.log(values.propertie)
-      }
-      const index = optionsPropertieId.findIndex(item => item.name === values.propertie);
-
-      if (index === -1) {
-        console.error("Propriedade não encontrada ao procurar na Gleba");
-        return; 
-      }
-
-      // Agora você pode usar o índice para acessar o vetor X
-      const propriedadeId = optionsPropertieId[index].id;
-
-      // Realizar a requisição POST para o backend usando axios
-      const response = await axios.post("http://localhost:3000/createGleba", {
+      const response = await axios.put(`http://localhost:3000/editGleba/${id}`, {
         name: values.nameGleba,
-        propertieId: propriedadeId,          
         area: values.area,          
         email: userData.email
       });
   
-      if (response.status === 201) {
-        //console.log("Gleba criada com sucesso:", response.data);
+      if (response.status === 200) {
+        //console.log("Gleba editada com sucesso:", response.data);
   
         navigate(`/glebas?message=${encodeURIComponent("2")}`);
       }
@@ -107,11 +88,7 @@ const GlebasEditForm = () => {
 
       <Formik
         onSubmit={handleFormSubmit}
-        initialValues={{
-          nameGleba: "",
-          area: "",
-          propertie: singlePropertie ? singlePropertie : "" 
-        }}
+        initialValues={initialValues}
         validationSchema={checkoutSchema}
       >
         {({
@@ -158,12 +135,12 @@ const GlebasEditForm = () => {
                   helperText={touched.area && errors.area}
                   sx={{ gridColumn: "span 2" }}
                 />
-                {singlePropertie ? (
+                {propertie ? (
                   <TextField
                     fullWidth
                     variant="filled"
-                    label="Propriedades"
-                    value={singlePropertie}
+                    label="Propriedade"
+                    value={propertie.name}
                     disabled 
                     sx={{ gridColumn: "span 2" }}
                     
@@ -181,7 +158,7 @@ const GlebasEditForm = () => {
                     renderInput={(params) => (
                       <TextField 
                         {...params} 
-                        label="Propriedades"
+                        label="Propriedade"
                         variant="filled"
                         name="propertie"
                         error={!!touched.propertie && !!errors.propertie }
@@ -207,7 +184,7 @@ const GlebasEditForm = () => {
                                 },
                     }} 
                     variant="contained">
-                Adicionar
+                Editar
               </Button>
             </Box>
           </form>

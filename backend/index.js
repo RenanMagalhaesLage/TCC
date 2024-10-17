@@ -412,7 +412,7 @@ app.get('/:email/searchGlebas', async (req, res) => {
     }
 });
 
-// BUSCA POR DETERMINADA GLEBA E SUAS SAFRAS
+/*  Rota para --> BUSCA POR DETERMINADA GLEBA E SUAS SAFRAS */
 app.get('/gleba/:id', async (req, res) => {
     const { id } = req.params;
 
@@ -457,6 +457,27 @@ app.get('/gleba/:id', async (req, res) => {
     } catch (error) {
         console.error('Erro ao buscar gleba:', error);
         return res.status(500).json({ error: 'Erro ao buscar gleba' });
+    }
+});
+
+/*  Rota para --> EDIÇÃO/UPDATE GLEBA */
+app.put('/editGleba/:id', async (req, res) => {
+    try {
+        const { name, area } = req.body;
+        const [updated] = await Gleba.update(
+            { name, area},
+            { where: { id: req.params.id } }
+        );
+
+
+        if (updated) {
+            const updatedGleba = await Gleba.findByPk(req.params.id);
+            return res.json(updatedGleba);
+        }
+
+        res.status(404).json({ message: 'Gleba não encontrada' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
 });
 

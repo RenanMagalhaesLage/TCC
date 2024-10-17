@@ -44,7 +44,7 @@ const Properties = () => {
             break;
     
           default:
-            console.log("Mensagem não reconhecida.");
+            //console.log("Mensagem não reconhecida.");
             break;
         }
       }, [message]);

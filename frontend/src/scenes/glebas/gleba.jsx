@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, useTheme, Button, useMediaQuery  } from "@mui/material";
+import { useNavigate,useParams } from 'react-router-dom';
+import { Box, Typography, useTheme, Button, useMediaQuery,Checkbox, FormControlLabel, Modal, Backdrop, Fade } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import { mockDataUsers, mockDataGlebas } from "../../data/mockData";
@@ -9,7 +10,6 @@ import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import secureLocalStorage from 'react-secure-storage';
 import axios from "axios";
-import { useParams } from 'react-router-dom';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
 
@@ -17,7 +17,6 @@ const Gleba = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const isMobile = useMediaQuery("(max-width: 800px)");
-    
     const [owner, setOwner] = useState("");
     const { id } = useParams();
     const [userData, setUserData] = useState(null);
@@ -25,6 +24,10 @@ const Gleba = () => {
     const [gleba, setGleba] = useState("");
     const [safrasPlanejadas,setSafrasPlanejadas] = useState([]);
     const [safrasRealizadas,setSafrasRealizadas] = useState([]);
+    const [open, setOpen] = useState(false);
+    const [isChecked, setIsChecked] = useState(false);
+
+
     const columnsSafras = [
         { field: "cultivo", headerName: "Cultivo", flex: 1, cellClassName: "city-column--cell", resizable: false },
         { field: "semente", headerName: "Semente", type: "number", headerAlign: "left", align: "left", flex: 1,resizable: false },
@@ -87,6 +90,26 @@ const Gleba = () => {
             fetchGlebas();
         }
     }, [userData]);  
+    
+    const navigate = useNavigate(); 
+
+    const handleEdit = () => {
+        navigate(`/glebas/edit/${id}`);
+    }
+
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => {
+        setOpen(false);
+        setIsChecked(false);
+    };
+
+    const handleDelete = () =>{
+        handleClose();
+    }
+
+    const handleCheckboxChange = (event) => {
+        setIsChecked(event.target.checked);
+    };
 
 
     return (
@@ -194,7 +217,7 @@ const Gleba = () => {
                                     >
                                         <Button 
                                             variant="contained" 
-                                            onClick={() => handleDelete(params.row)} 
+                                            onClick={handleOpen} 
                                             sx={{ backgroundColor:  colors.redAccent[500],
                                                 "&:hover": {
                                                     backgroundColor: colors.grey[700], 
@@ -204,9 +227,84 @@ const Gleba = () => {
                                         >
                                             <DeleteIcon />
                                         </Button>
+                                        <Modal
+                                            open={open}
+                                            onClose={null} 
+                                            aria-labelledby="transition-modal-title"
+                                            aria-describedby="transition-modal-description"
+                                            closeAfterTransition
+                                            slots={{ backdrop: Backdrop }}
+                                            slotProps={{
+                                            backdrop: {
+                                                timeout: 500,
+                                            },
+                                            }}
+                                        >
+                                            <Fade in={open}>
+                                                <Box 
+                                                    sx={{ 
+                                                        position: 'absolute',
+                                                        top: '50%',
+                                                        left: '50%',
+                                                        transform: 'translate(-50%, -50%)',
+                                                        width: 450,
+                                                        bgcolor: '#fff', // Cor de fundo branco puro para contraste
+                                                        borderRadius: 3, // Cantos arredondados
+                                                        boxShadow: '0px 10px 30px rgba(0, 0, 0, 0.1)', // Sombra suave e moderna
+                                                        p: 4,
+
+                                                    }}
+                                                >
+                                                    <Typography id="modal-modal-title" variant="h4" component="h2">
+                                                        Deseja realmente deletar esta propriedade?
+                                                    </Typography>
+                                                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                                                        Ao fazer isso, esteja ciente que:
+                                                        <ul>
+                                                            <li>Essa ação não pode ser revertida;</li>
+                                                            <li>Ao deletar a propriedade, as glebas e safras correspondentes também serão apagadas.</li>
+                                                        </ul>
+                                                    </Typography>
+                                                    
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Checkbox
+                                                                checked={isChecked}
+                                                                onChange={handleCheckboxChange} 
+                                                            />
+                                                        }
+                                                        label="Estou ciente e quero continuar."
+                                                        sx={{ mt: 2 }}
+                                                    />
+                                                    
+                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
+                                                        <Button 
+                                                            onClick={handleClose} 
+                                                            sx={{
+                                                                color: colors.redAccent[500]
+                                                            }}
+                                                        >
+                                                            Cancelar
+                                                        </Button>
+                                                        <Button 
+                                                            onClick={handleDelete} 
+                                                            variant="contained" 
+                                                            sx={{ backgroundColor:  colors.redAccent[500],
+                                                                "&:hover": {
+                                                                    backgroundColor: colors.grey[700], 
+                                                                },
+                                                            }}
+                                                            disabled={!isChecked} 
+                                                        >
+                                                            Deletar
+                                                        </Button>
+                                                    </Box>
+                                                </Box>
+                                            </Fade>
+                                        </Modal>
                                         <Button 
                                             variant="contained" 
-                                            onClick={() => handleEdit(params.row)} 
+                                            onClick={() => handleEdit()} 
                                             sx={{ml:2,
                                                 backgroundColor:colors.myorange[500],
                                                 "&:hover": {
