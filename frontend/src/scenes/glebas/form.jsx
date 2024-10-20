@@ -153,7 +153,7 @@ const GlebasForm = () => {
                 <TextField
                   fullWidth
                   variant="filled"
-                  type="text"
+                  type="number"
                   label="Área"
                   onBlur={handleBlur}
                   onChange={handleChange}
@@ -225,7 +225,7 @@ const GlebasForm = () => {
 
 const checkoutSchema = yup.object().shape({
     nameGleba: yup.string().required("Campo de preenchimento obrigatório"),
-    area: yup.string().required("Campo de preenchimento obrigatório"),
+    area: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
     propertie: yup.string().required("Campo de preenchimento obrigatório"),
 
 });

@@ -88,7 +88,7 @@ const PropertiesForm = () => {
                 <TextField
                 fullWidth
                 variant="filled"
-                    type="text"
+                    type="number"
                     label="Área"
                     onBlur={handleBlur}
                     onChange={handleChange}
@@ -140,7 +140,7 @@ const PropertiesForm = () => {
 
 const checkoutSchema = yup.object().shape({
     namePropertie: yup.string().required("Campo de preenchimento obrigatório"),
-    area: yup.string().required("Campo de preenchimento obrigatório"),
+    area: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
     city: yup.string().required("Campo de preenchimento obrigatório"),
 
 });

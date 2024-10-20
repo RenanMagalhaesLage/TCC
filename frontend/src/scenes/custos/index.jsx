@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Box, Typography, useTheme, Button, useMediaQuery,Snackbar, Alert} from "@mui/material";
 import { useNavigate,useLocation } from 'react-router-dom';
-import secureLocalStorage from 'react-secure-storage';
-import axios from "axios";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import { mockDataFazenda } from "../../data/mockData";
@@ -11,10 +9,11 @@ import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import Header from "../../components/Header";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import secureLocalStorage from 'react-secure-storage';
+import axios from "axios";
 
 
-
-const Glebas = () => {
+const Custos = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const isMobile = useMediaQuery("(max-width: 800px)");
@@ -48,75 +47,14 @@ const Glebas = () => {
         }
       }, [message]);
 
-    const columns = [
+      const columns = [
         { field: "name", headerName: "Nome", flex: 1, cellClassName: "name-column--cell", resizable: false },
         { field: "propertie", headerName: "Propriedade", flex: 1, cellClassName: "propertie-column--cell", resizable: false },
-        { field: "area", headerName: "Área", type: "number", flex: 1,headerAlign: "left", align: "left", resizable: false },
-        {
-            field: "access",
-            headerName: "Nível de Acesso",
-            flex: 1,
-            headerAlign: "center",
-            resizable: false,
-            renderCell: ({ row: { access } }) => {
-                return (
-                    <Box
-                        width="60%"
-                        m="10px auto"
-                        p="5px"
-                        display="flex"
-                        justifyContent="center"
-                        backgroundColor={
-                            access === "owner" ? colors.myorange[500] : colors.myorange[400]
-                        }
-                        borderRadius="4px"
-                    >
-                        {access === "owner" && <AdminPanelSettingsOutlinedIcon />}
-                        {access === "permission" && <LockOpenOutlinedIcon />}
-                        {!isSmallDivice && (
-                            <Typography
-                                sx={{ ml: "5px", fontWeight: "bold", color: theme.palette.mode === 'dark' ? "#FFFFFF" : colors.grey[100] }}
-                            >
-                                {access.charAt(0).toUpperCase() + access.slice(1)}
-                            </Typography>
-                        )}
-                    </Box>
-                );
-            }
-        },
-        {
-            field: "actions",
-            headerName: "Ações",
-            flex: 1,
-            renderCell: (params) => {
-                const { id } = params.row;
+        { field: "gleba", headerName: "Gleba", flex: 1, cellClassName: "gleba-column--cell", resizable: false },
+        { field: "type", headerName: "Tipo", flex: 1, resizable: false },
 
-                return (
-                    <Box 
-                        display="flex" 
-                        justifyContent="center" 
-                        width="100%"
-                        m="10px auto"
-                    >
-                        <Button 
-                            variant="contained" 
-                            sx={{ backgroundColor: colors.greenAccent[500],
-                                "&:hover": {
-                                    backgroundColor: colors.grey[700], 
-                                },
-                             }} 
-                             onClick={() => handleView(id)}
-                        >
-                            <VisibilityIcon />
-                        </Button>
-
-                    </Box>
-                );
-            },
-            headerAlign: "center"
-        },
-        
     ];
+    
     
     useEffect(() => {
         const storedUser = secureLocalStorage.getItem('userData'); 
@@ -157,25 +95,25 @@ const Glebas = () => {
 
     const navigate = useNavigate(); 
     const handleView = (id) => {
-        navigate(`/glebas/${id}`);
+        navigate(`/custos/${id}`);
     };
 
     const handleAdd = () =>{
-        navigate(`/glebas/add`);
+        navigate(`/custos/add`);
     }
 
     const handleCloseSnackbar = (event, reason) => {
         if (reason === 'clickaway') {
             return;
         }
-        setOpenSnackbar(false); // Fecha o Snackbar
+        setOpenSnackbar(false); 
     };
 
     return (
         <Box m="20px">
             <Box display="flex" justifyContent="space-between" alignItems="center">
 
-                <Header title="Glebas" subtitle="Gerencie as suas glebas" />
+                <Header title="Custos" subtitle="Gerencie os seus custos" />
                 <Box>
                     <Button
                         sx={{
@@ -188,7 +126,7 @@ const Glebas = () => {
                         onClick={() => handleAdd()}
                     >
                         <AddCircleOutlineIcon sx={{ mr: isMobile? "0px" :"10px" }} />
-                        {!isMobile && ("Adicionar Gleba")}
+                        {!isMobile && ("Adicionar Custo")}
                     </Button>
                 </Box>
             </Box>
@@ -222,7 +160,7 @@ const Glebas = () => {
                 <DataGrid
                     rows={glebas}
                     columns={columns}
-                    localeText={{ noRowsLabel: <b>Nenhuma gleba encontrada.</b> }}
+                    localeText={{ noRowsLabel: <b>Nenhum custo encontrado.</b> }}
                 />
             </Box>
             <div>
@@ -255,4 +193,4 @@ const Glebas = () => {
     );
 };
 
-export default Glebas;
+export default Custos;

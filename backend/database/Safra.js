@@ -2,6 +2,17 @@ const Sequelize = require("sequelize");
 const connection = require("./database");
 
 const Safra = connection.define('safras',{
+    type:{
+        type: Sequelize.STRING,
+        allowNull: false,
+        validate: {
+            isIn: [['Planejado', 'Realizado']] 
+        }
+    },
+    status:{
+        type: Sequelize.BOOLEAN, //Safra finalizada ? Sim --> true
+        allowNull: false,
+    },
     cultivo:{
         type: Sequelize.STRING,
         allowNull: false

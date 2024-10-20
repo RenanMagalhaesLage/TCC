@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { Box, Typography, useTheme, Button, useMediaQuery,Snackbar, Alert  } from "@mui/material";
-import { useNavigate,useLocation } from 'react-router-dom';
-import axios from "axios";
-import secureLocalStorage from 'react-secure-storage';
+import { Box, Typography, useTheme, Button, useMediaQuery  } from "@mui/material";
 import { DataGrid,GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
+import { useNavigate,useLocation } from 'react-router-dom';
 import { mockDataFazenda, mockDataSafra } from "../../data/mockData";
+import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
+import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
+import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import Header from "../../components/Header";
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import EqualizerIcon from '@mui/icons-material/Equalizer';
@@ -14,25 +16,16 @@ import TimelineIcon from '@mui/icons-material/Timeline';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 
-const Safras = () => {
+const SafrasHistory = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const isMobile = useMediaQuery("(max-width: 800px)");
     const isSmallDivice = useMediaQuery("(max-width: 1300px)");
 
-    const [safras, setSafras] = useState([]);
-    const [userData, setUserData] = useState(null);
-
-    const location = useLocation();
-    const query = new URLSearchParams(location.search);
-    const message = Number(query.get('message'));
-    const [openSnackbar, setOpenSnackbar] = useState(!!message);
-    const [snackbarMessage, setSnackbarMessage] = useState(""); 
-
     const columns = [
         { field: "propertie", headerName: "Propriedade", flex: 1, minWidth: 150, cellClassName: "name-column--cell", resizable: false },
         { field: "gleba", headerName: "Gleba", flex: 2, minWidth: 150, cellClassName: "name-column--cell", resizable: false },
-        { field: "area", headerName: "Área da Gleba", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
+        { field: "area", headerName: "Área", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
         {
             field: "type",
             headerName: "Tipo",
@@ -249,66 +242,6 @@ const Safras = () => {
         },  
     ];
 
-    useEffect(() => {
-        const storedUser = secureLocalStorage.getItem('userData'); 
-        if (storedUser) {
-            setUserData(JSON.parse(storedUser));
-        }
-    }, []);
-
-    useEffect(() => {
-        if (userData && userData.email) { 
-            const fetchSafras = async () => {
-                try {
-                    const response = await axios.get(`http://localhost:3000/searchSafras/${userData.email}`);
-                    const linhasDaTabela = response.data.flatMap(fazenda => {
-                        return fazenda.glebas.flatMap(gleba => { 
-                            return gleba.safras.map(safra => ({  
-                                id: safra.id,   
-                                gleba: gleba.name,
-                                propertie: fazenda.name,
-                                area: gleba.area,
-                                type: safra.type,  
-                                status: safra.status,
-                                cultivo: safra.cultivo,
-                                semente: safra.semente, 
-                                metroLinear: safra.metroLinear, 
-                                dosagem: safra.dosagem, 
-                                toneladas: safra.toneladas, 
-                                adubo: safra.adubo, 
-                                dataFimPlantio: safra.dataFimPlantio, 
-                                dataFimColheita: safra.dataFimColheita, 
-                                tempoLavoura: safra.tempoLavoura, 
-                                precMilimetrica: safra.precMilimetrica, 
-                                umidade: safra.umidade, 
-                                impureza: safra.impureza, 
-                                graosAvariados: safra.graosAvariados, 
-                                graosEsverdeados: safra.graosEsverdeados, 
-                                graosQuebrados: safra.graosQuebrados, 
-                                prodTotal: safra.prodTotal, 
-                                prodPrevista: safra.prodPrevista, 
-                                prodRealizada: safra.prodRealizada, 
-                                porcentHect: safra.porcentHect,
-                                access: fazenda.access
-                            }));
-                        });
-                    });
-
-                    setSafras(linhasDaTabela);
-
-                    
-                } catch (error) {
-                    console.log("ERRO - ao buscar as glebas.");
-                }
-            };
-            fetchSafras();
-        }
-    }, [userData]);  
-
-    useEffect(() => {
-        //console.log(glebas); 
-    }, [safras]);
-
     const navigate = useNavigate(); 
     const handleView = (id) => {
         navigate(`/safras/${id}`);
@@ -320,22 +253,7 @@ const Safras = () => {
     return (
         <Box m="20px">
             <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Header title="Safras" subtitle="Gerencie as suas safras" />
-                <Box>
-                    <Button
-                        sx={{
-                        backgroundColor: colors.mygreen[400],
-                        color: colors.grey[100],
-                        fontSize: "14px",
-                        fontWeight: "bold",
-                        padding: "10px 20px",
-                        }}
-                        onClick={() => handleAdd()}
-                    >
-                        <AddCircleOutlineIcon sx={{ mr: isMobile? "0px" :"10px" }} />
-                        {!isMobile && ("Adicionar Safra")}
-                    </Button>
-                </Box>
+                <Header title="Histórico Safras" subtitle="Gerencie as suas safras já finalizadas" />
             </Box>
             <Box m="20px 0 0 0" height="75vh" maxWidth="1600px" mx="auto"
                 sx={{
@@ -364,7 +282,7 @@ const Safras = () => {
                     },
                 }}>
                 <DataGrid
-                    rows={safras}
+                    rows={mockDataSafra}
                     columns={columns}
                     slots={{ toolbar: GridToolbar, }}
                 />
@@ -373,4 +291,4 @@ const Safras = () => {
     );
 };
 
-export default Safras;
+export default SafrasHistory;

@@ -23,8 +23,8 @@ import GrassIcon from '@mui/icons-material/Grass';
 import Avatar from '@mui/material/Avatar';
 import Divider from '@mui/material/Divider';
 import WarehouseIcon from '@mui/icons-material/Warehouse';
-
-
+import PendingActionsIcon from '@mui/icons-material/PendingActions';
+import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 
 const Item = ({ title, to, icon, selected, setSelected, onClick }) => {
   const theme = useTheme();
@@ -140,10 +140,17 @@ const Sidebar = ({ onLogout }) => {
               selected={selected}
               setSelected={setSelected}
             />
+            <Item
+              title="Convites"
+              to="/"
+              icon={<EmailOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
             <Typography
               variant="h6"
               color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
+              sx={{ m: "15px 0 5px 15px" }}
             >
               Pessoal
             </Typography>
@@ -168,6 +175,13 @@ const Sidebar = ({ onLogout }) => {
               selected={selected}
               setSelected={setSelected}
             />
+            <Item
+              title="Histórico Safras"
+              to="/history"
+              icon={<PendingActionsIcon/>}
+              selected={selected}
+              setSelected={setSelected}
+            />
 
             <Typography
               variant="h6"
@@ -175,6 +189,28 @@ const Sidebar = ({ onLogout }) => {
               sx={{ m: "15px 0 5px 20px" }}
             >
               {isCollapsed ? "Custo" : "Custo Agrícola"}
+            </Typography>
+            <Item
+              title="Custos"
+              to="/custos"
+              icon={<ReceiptOutlinedIcon/>}
+              selected={selected}
+              setSelected={setSelected}
+            />
+
+            <Item
+              title="Custo Total"
+              to="/contacts"
+              icon={<AttachMoneyIcon/>}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Typography
+              variant="h6"
+              color={colors.grey[300]}
+              sx={{ m: "15px 0 5px 15px" }}
+            >
+              Painéis
             </Typography>
             <Item
               title="Projetado"
@@ -190,20 +226,7 @@ const Sidebar = ({ onLogout }) => {
               selected={selected}
               setSelected={setSelected}
             />
-            <Item
-              title="Dados Plantio"
-              to="/team"
-              icon={<ReceiptOutlinedIcon/>}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Custo Total"
-              to="/contacts"
-              icon={<AttachMoneyIcon/>}
-              selected={selected}
-              setSelected={setSelected}
-            />
+            
 
             <Typography
               variant="h6"

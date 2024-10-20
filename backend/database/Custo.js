@@ -2,6 +2,10 @@ const Sequelize = require("sequelize");
 const connection = require("./database");
 
 const Custo = connection.define('custos',{
+    status:{
+        type: Sequelize.BOOLEAN, //Safra finalizada ? Sim --> true
+        allowNull: false,
+    },
     name:{
         type: Sequelize.STRING,
         allowNull: false
@@ -13,9 +17,6 @@ const Custo = connection.define('custos',{
         allowNull: false
     },preco:{
         type: Sequelize.DOUBLE,
-        allowNull: false
-    },tipo:{ //orçado/realizado
-        type: Sequelize.STRING,
         allowNull: false
     },categoria:{
         type: Sequelize.STRING,

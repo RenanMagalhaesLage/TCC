@@ -23,20 +23,24 @@ import Gleba from './scenes/glebas/gleba';
 import GlebasForm from './scenes/glebas/form';
 import GlebasEditForm from './scenes/glebas/editForm';
 import Safras from './scenes/safras'
+import Safra from './scenes/safras/safra';
+import SafrasForm from './scenes/safras/form';
+import Custos from './scenes/custos';
+import SafrasHistory from './scenes/safras/history';
 
 
 function App() {
   const [theme, colorMode] = useMode();
-  const [conect, setConect] = useState(false); // Inicialmente, o usuário não está conectado
-  const navigate = useNavigate(); // Hook para navegação
+  const [conect, setConect] = useState(false); 
+  const navigate = useNavigate(); 
 
   const handleLogin = () => {
     setConect(true);
-    navigate('/'); // Redireciona para a página inicial
+    navigate('/'); 
   };
 
   const handleLogout = () => {
-    setConect(false); // Define o estado de conexão como falso
+    setConect(false); 
   };
 
   return (
@@ -68,6 +72,11 @@ function App() {
                   <Route path="/glebas/add/:id?" element={<GlebasForm />} />
                   <Route path="/glebas/edit/:id" element={<GlebasEditForm />} />
                   <Route path="/safras" element={<Safras />} />
+                  <Route path="/safras/:id" element={<Safra />} />
+                  <Route path="/safras/add" element={<SafrasForm />} />
+                  <Route path="/safras/add/:id?" element={<SafrasForm />} />
+                  <Route path="/custos" element={<Custos />} />
+                  <Route path="/history" element={<SafrasHistory />} />
                 </Routes>
               </main>
             </>

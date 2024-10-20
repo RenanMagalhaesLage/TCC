@@ -2,67 +2,77 @@ import React, { useState, useEffect } from "react";
 import { useNavigate,useParams } from 'react-router-dom';
 import secureLocalStorage from 'react-secure-storage';
 import axios from "axios";
-import { Box, Typography, useTheme, Button, useMediaQuery,Checkbox, FormControlLabel, Modal, Backdrop, Fade } from "@mui/material";
+import { Box, Typography, useTheme, Button, useMediaQuery,Checkbox, FormControlLabel, Modal, Backdrop, Fade, Chip } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
-import { mockDataUsers, mockDataGlebas } from "../../data/mockData";
+import { mockDataSafra, mockDataGlebas } from "../../data/mockData";
 import Header from "../../components/Header";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import DoneIcon from '@mui/icons-material/Done';
 
-const Gleba = () => {
+
+const Safra = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const isMobile = useMediaQuery("(max-width: 800px)");
+    const isMobile = useMediaQuery("(max-width: 1000px)");
     const [owner, setOwner] = useState("");
     const { id } = useParams();
     const [userData, setUserData] = useState(null);
     const [propriedade, setPropriedade] = useState("");
+    const [safra, setSafra] = useState("");
     const [gleba, setGleba] = useState("");
-    const [safrasPlanejadas,setSafrasPlanejadas] = useState([]);
-    const [safrasRealizadas,setSafrasRealizadas] = useState([]);
+    const [custos,setCustos] = useState([]);
     const [open, setOpen] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
 
+    const headerNames = [
+        "Cultivo",
+        "Semente",
+        "Metro Linear",
+        "Dosagem",
+        "Toneladas",
+        "Adubo",
+        "Fim Plantio",
+        "Fim Colheita",
+        "Tempo Lavoura",
+        "Preção Milimetrica",
+        "Umidade",
+        "Impureza",
+        "Grãos Avariados",
+        "Grãos Esverdeados",
+        "Grãos Quebrados",
+        "Prod. Total",
+        "Prod. Prevista",
+        "Prod. Realizada",
+        "Comparativo",
+        "Porcentagem / HA",
+    ];
 
-    const columnsSafras = [
-        { field: "cultivo", headerName: "Cultivo", flex: 1, cellClassName: "city-column--cell", resizable: false },
-        { field: "semente", headerName: "Semente", type: "number", headerAlign: "left", align: "left", flex: 1,resizable: false },
-        { field: "dataFimPlantio", headerName: "Fim Plantio", type: "number", headerAlign: "left", align: "left", flex: 1, resizable: false },
-        { field: "dataFimColheita", headerName: "Fim Colheita", type: "number", headerAlign: "left", align: "left", flex: 1, resizable: false },
-        {
-            field: "actions",
-            headerName: "Ações",
-            flex: 1,
-            renderCell: (params) => {
-                const { access } = params.row;
-
-                return (
-                    <Box 
-                        display="flex" 
-                        justifyContent="center" 
-                        width="100%"
-                        m="10px auto"
-                    >
-                        <Button 
-                            variant="contained" 
-                            sx={{ backgroundColor: colors.greenAccent[500],
-                                "&:hover": {
-                                    backgroundColor: colors.grey[700], 
-                                },
-                             }} 
-                            onClick={() => handleView(params.row)}
-                        >
-                            <VisibilityIcon />
-                        </Button>                      
-
-                    </Box>
-                );
-            },
-            headerAlign: "center"
-        },
+    const fieldNames = [
+        "cultivo",
+        "semente",
+        "metroLinear",
+        "dosagem",
+        "toneladas",
+        "adubo",
+        "dataFimPlantio",
+        "dataFimColheita",
+        "tempoLavoura",
+        "precMilimetrica",
+        "umidade",
+        "impureza",
+        "graosAvariados",
+        "graosEsverdeados",
+        "graosQuebrados",
+        "prodTotal",
+        "prodPrevista",
+        "prodRealizada",
+        "comparativo",
+        "porcentHect",
+        "actions"
     ];
 
 
@@ -77,8 +87,9 @@ const Gleba = () => {
         if (userData && userData.email) { 
             const fetchGlebas = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:3000/gleba/${id}`);
-                    const { gleba, propriedade, owner } = response.data;
+                    const response = await axios.get(`http://localhost:3000/safra/${id}`);
+                    const {safra, gleba, propriedade, owner } = response.data;
+                    setSafra(safra)
                     setGleba(gleba);
                     setPropriedade(propriedade);
                     setOwner(owner);
@@ -93,7 +104,7 @@ const Gleba = () => {
     const navigate = useNavigate(); 
 
     const handleEdit = () => {
-        navigate(`/glebas/edit/${id}`);
+        navigate(`/safras/edit/${id}`);
     }
 
     const handleOpen = () => setOpen(true);
@@ -110,10 +121,32 @@ const Gleba = () => {
         setIsChecked(event.target.checked);
     };
 
+    const handleChip = () => {
+        //console.info('You clicked the Chip.');
+    };  
+
 
     return (
         <Box m="20px">
-            <Header title="Gleba" subtitle="Informações da gleba" />
+            <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Header title="Safra" subtitle="Informações da safra" />
+                <Box>
+                        <Button
+                            sx={{
+                            backgroundColor: colors.mygreen[400],
+                            color: colors.grey[100],
+                            fontSize: "14px",
+                            fontWeight: "bold",
+                            padding: "10px 20px",
+                            }}
+                            onClick={() => handleAdd()}
+                        >
+                            <AddCircleOutlineIcon sx={{ mr: isMobile? "0px" :"10px" }} />
+                            {!isMobile && ("Adicionar Custo")}
+                        </Button>
+                </Box>
+            </Box>
+            
             <Box m="40px 0 0 0" height="75vh" maxWidth="1600px" mx="auto"
                 sx={{
                     "& .MuiDataGrid-root": {
@@ -145,8 +178,32 @@ const Gleba = () => {
                         gridTemplateColumns="repeat(12, 1fr)"
                         gridAutoRows="140px"
                         gap="20px"
-                        
                     >
+                        <Box
+                            gridColumn="span 12"
+                            display="grid"
+                            gridTemplateColumns={isMobile ? "1fr" : "repeat(2, 1fr)"}
+                            padding="25px 0px"
+                            marginTop={"-60px"}
+                        >
+                            <Box display="flex" flexWrap="wrap" gap="10px"> 
+                                <Chip
+                                    label={safra.status ? "Finalizada" : "Em Andamento"}
+                                    deleteIcon={<DoneIcon />}
+                                    onClick={handleChip}
+                                    onDelete={handleChip}
+                                    sx={{ padding: "10px", fontWeight: "bold", flexShrink: 0 }} 
+                                />
+                                <Chip
+                                    label={safra.type}
+                                    deleteIcon={<DoneIcon />}
+                                    onClick={handleChip}
+                                    onDelete={handleChip}
+                                    sx={{ padding: "10px", fontWeight: "bold", flexShrink: 0 }} 
+                                />
+                            </Box>
+                        </Box>
+                        
                         <Box
                             gridColumn="span 12"
                             backgroundColor={colors.primary[400]}
@@ -154,27 +211,30 @@ const Gleba = () => {
                             gridTemplateColumns={isMobile ? "1fr" : "repeat(2, 1fr)"} 
                             padding="25px 35px 30px 35px"
                             height={isMobile ? "auto" : "initial"} 
-                            minHeight={isMobile ? "260px" : "auto"} 
+                            minHeight={isMobile ? "220px" : "auto"} 
+                            marginBottom={isMobile ? "0px" :"118px"}
+                            marginTop={"-130px"}
+                            sx={{boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.07)",}}
                         >
-                            
-                            <Box display="flex" flexDirection="column" alignItems="flex-start">
+                            {/* Primeira Coluna */}
+                            <Box display="flex" flexDirection="column" alignItems="flex-start" >
                                 <Box display="flex" alignItems="center" marginBottom="15px">
                                     <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
-                                    Nome da Gleba:
+                                    Nome da Fazenda:
                                     </Typography>
                                     <Typography variant="body1" color={colors.grey[300]}>
-                                    {gleba.name}
+                                    {propriedade.name}
                                     </Typography>
                                 </Box>
                                 <Box display="flex" alignItems="center" marginBottom="15px">
                                     <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
-                                    Área:
+                                    Cidade:
                                     </Typography>
                                     <Typography variant="body1" color={colors.grey[300]}>
-                                    {gleba.area}
+                                    {propriedade.city}
                                     </Typography>
-                                </Box>
-                                <Box display="flex" alignItems="center" marginBottom={isMobile ? "15px" : "0px"}>
+                                </Box>  
+                                <Box display="flex" alignItems="center" marginBottom="15px">
                                     <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
                                     Nome do Dono:
                                     </Typography>
@@ -187,27 +247,68 @@ const Gleba = () => {
 
                             {/* Segunda Coluna */}
                             <Box display="flex" flexDirection="column" alignItems="flex-start">
-                                <Box display="flex" alignItems="center" marginBottom="15px">
+                                <Box display="flex" alignItems="center" marginBottom="15px" >
                                     <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
-                                    Nome da Fazenda:
+                                    Nome da Gleba:
                                     </Typography>
                                     <Typography variant="body1" color={colors.grey[300]}>
-                                    {propriedade.name}
+                                    {gleba.name}
                                     </Typography>
                                 </Box>
+                                <Box display="flex" alignItems="center" >
+                                    <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
+                                    Área da Gleba:
+                                    </Typography>
+                                    <Typography variant="body1" color={colors.grey[300]}>
+                                    {gleba.area}
+                                    </Typography>
+                                </Box>
+                            </Box>   
+                        </Box>
 
-                                <Box display="flex" alignItems="center" marginBottom={isMobile ? "15px": "0px"}>
-                                    <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
-                                    Cidade:
-                                    </Typography>
-                                    <Typography variant="body1" color={colors.grey[300]}>
-                                    {propriedade.city}
-                                    </Typography>
-                                </Box>
+                        <Box
+                            gridColumn="span 12"
+                            backgroundColor={colors.primary[400]}
+                            display="grid"
+                            gridTemplateColumns={isMobile ? "1fr" : "repeat(2, 1fr)"} 
+                            padding="25px 35px 30px 35px"
+                            height={isMobile ? "auto" : "initial"} 
+                            minHeight={isMobile ? "900px" : "550px"} 
+                            marginBottom={isMobile ?"0px" :"80px"}
+                            marginTop={isMobile ? "10px":"-110px"}
+                            sx={{boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.07)",}}
+                        >
+                            {/* Primeira Coluna */}
+                            <Box display="flex" flexDirection="column" alignItems="flex-start">
+                                {headerNames.slice(0, Math.ceil(headerNames.length / 2)).map((headerName, index) => (
+                                        <Box display="flex" alignItems="center" marginBottom="15px" key={index}>
+                                            <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
+                                                {headerName}:
+                                            </Typography>
+                                            <Typography variant="body1" color={colors.grey[300]}>
+                                                {safra[fieldNames[index]]} 
+                                            </Typography>
+                                        </Box>
+                                ))}
+                                
+                            </Box>
+
+                            {/* Segunda Coluna */}
+                            <Box display="flex" flexDirection="column" alignItems="flex-start">
+                                {headerNames.slice(Math.ceil(headerNames.length / 2)).map((headerName, index) => (
+                                    <Box display="flex" alignItems="center" marginBottom="15px" key={index + Math.ceil(headerNames.length / 2)}>
+                                        <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
+                                            {headerName}:
+                                        </Typography>
+                                        <Typography variant="body1" color={colors.grey[300]}>
+                                        {safra[fieldNames[index+10]]} 
+                                        </Typography>
+                                    </Box>
+                                ))}
                                 {userData && owner && userData.email === owner.email &&  (
                                     <Box 
                                         display="flex" 
-                                        justifyContent="flex-end" 
+                                        justifyContent= {isMobile ? "flex-start" : "flex-end"} 
                                         alignItems="flex-end" 
                                         flexGrow={1} 
                                         width="100%"
@@ -255,13 +356,13 @@ const Gleba = () => {
                                                     }}
                                                 >
                                                     <Typography id="modal-modal-title" variant="h4" component="h2">
-                                                        Deseja realmente deletar esta gleba?
+                                                        Deseja realmente deletar esta safra?
                                                     </Typography>
                                                     <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                                                         Ao fazer isso, esteja ciente que:
                                                         <ul>
                                                             <li>Essa ação não pode ser revertida;</li>
-                                                            <li>Ao deletar a gleba, as safras correspondentes também serão apagadas.</li>
+                                                            <li>Ao deletar a safra, os custos correspondentes também serão apagados.</li>
                                                         </ul>
                                                     </Typography>
                                                     
@@ -310,13 +411,11 @@ const Gleba = () => {
                                                     backgroundColor: colors.grey[700], 
                                                 },
                                             }}
-
                                         >
                                             <EditIcon />
                                         </Button>
                                     </Box>
                                 )}
-                                
                             </Box>   
                         </Box>
                         {/*Tabelas*/}
@@ -326,10 +425,10 @@ const Gleba = () => {
                             alignItems="center"  
                             justifyContent="left"  
                             height="50px"
-                            mt={isMobile ? "120px": "0px"}
+                            mt={isMobile ? "770px": "300px"}
                         >
                             <Typography variant="h4" fontWeight="bold" color={colors.grey[100]}>
-                                Safras Planejadas
+                                Custos da Safra
                             </Typography>
                         </Box>
                         <Box
@@ -339,9 +438,10 @@ const Gleba = () => {
                             alignItems="center"
                             justifyContent="center"
                             minHeight="475px"
-                            mt={isMobile ? "30px": -12}
+                            mt={isMobile ? "670px": "205px"}
+                            sx={{boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.07)",}}
                         >
-                            {safrasPlanejadas.length === 0 ? (
+                            {custos.length === 0 ? (
                                 <Box
                                     display="flex"
                                     flexDirection= "column"
@@ -350,7 +450,7 @@ const Gleba = () => {
                                     gap="20px"
                                 >
                                     <Typography variant={isMobile ? "h6": "h5"} fontWeight="bold" color={colors.grey[100]}>
-                                        Nenhuma safra planejada da gleba foi encontrada.
+                                        Nenhum custo da safra foi encontrado.
                                     </Typography>
                                     <Button
                                         sx={{
@@ -363,7 +463,7 @@ const Gleba = () => {
                                         onClick={() => handleAdd()}
                                     >
                                         <AddCircleOutlineIcon sx={{ mr: "10px" }} />
-                                        {("Adicionar Safra")}
+                                        {("Adicionar Custo")}
                                     </Button>
                                 </Box>
                             ):(
@@ -373,61 +473,6 @@ const Gleba = () => {
                                     columns={columnsSafras}
                                 />
                             )}
-                        </Box>        
-                        <Box
-                            gridColumn="span 12"
-                            display="flex"
-                            alignItems="center"  
-                            justifyContent="left"  
-                            height="50px"
-                            mt={isMobile ? "370px": 30}
-                        >                       
-                            <Typography variant="h4" fontWeight="bold" color={colors.grey[100]}>
-                                Safras Realizadas
-                            </Typography>
-                        </Box>        
-                        <Box
-                            gridColumn="span 12"
-                            backgroundColor={colors.primary[400]}
-                            display="flex"
-                            alignItems="center"
-                            justifyContent="center"
-                            minHeight="475px" 
-                            mt={isMobile ? "290px": "155px"}
-                            mb="10000px"
-                        >
-                            {safrasPlanejadas.length === 0 ? (
-                                <Box
-                                    display="flex"
-                                    flexDirection= "column"
-                                    alignItems="center"  
-                                    justifyContent="center"
-                                    gap="20px"
-                                >
-                                    <Typography variant={isMobile ? "h6": "h5"} fontWeight="bold" color={colors.grey[100]}>
-                                        Nenhuma safra planejada da gleba foi encontrada.
-                                    </Typography>
-                                    <Button
-                                        sx={{
-                                        backgroundColor: colors.mygreen[400],
-                                        color: colors.grey[100],
-                                        fontSize: "14px",
-                                        fontWeight: "bold",
-                                        padding: "10px 20px",
-                                        }}
-                                        onClick={() => handleAdd()}
-                                    >
-                                        <AddCircleOutlineIcon sx={{ mr: "10px" }} />
-                                        {("Adicionar Safra")}
-                                    </Button>
-                                </Box>
-                            ):(
-                                <DataGrid
-                                    rows={mockDataGlebas}
-                                    columns={columnsSafras}
-                                    sx={{mb:"20px"}}
-                                />
-                            )}
                         </Box>
                     </Box>
             </Box>
@@ -435,4 +480,4 @@ const Gleba = () => {
     );
 };
 
-export default Gleba;
+export default Safra;

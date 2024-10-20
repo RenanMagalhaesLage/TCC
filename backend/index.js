@@ -4,6 +4,7 @@ const express = require("express");
 const {OAuth2Client} = require('google-auth-library');
 require('dotenv').config();
 const client = new OAuth2Client();
+//const nodemailer = require('nodemailer');
 
 const app = express();
 const connection = require("./database/database");
@@ -15,15 +16,18 @@ app.use(cors({
     credentials: true,
 }));
 
-
-/*  Models  */
+/*-------------------------------
+            Models
+---------------------------------*/
 const Usuario = require("./database/Usuario");
 const Propriedade = require("./database/Propriedade");
 const UsuarioPropriedade = require("./database/UsuarioPropriedade");
 const Gleba = require("./database/Gleba");
-//const PropriedadeGleba = require("./database/PropriedadeGleba"); 
+const Safra = require("./database/Safra")
 
-/* Relacionamentos dos modelos */
+/*--------------------------------
+    Relacionamentos dos Models
+----------------------------------*/
 Usuario.belongsToMany(Propriedade, { through: UsuarioPropriedade, onDelete: 'CASCADE', onUpdate: 'CASCADE' });
 Propriedade.belongsToMany(Usuario, { through: UsuarioPropriedade, onDelete: 'CASCADE', onUpdate: 'CASCADE' });
 
@@ -32,14 +36,28 @@ Propriedade.hasMany(Gleba, {
     as: 'glebas',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'  
-  });
+});
 
 Gleba.belongsTo(Propriedade,  {
     foreignKey: 'propriedadeId',
     as: 'propriedade',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE' 
-  });
+});
+
+Gleba.hasMany(Safra, {
+    foreignKey: 'glebaId',
+    as: 'safras',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'  
+});
+
+Safra.belongsTo(Gleba,  {
+    foreignKey: 'glebaId',
+    as: 'safra',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE' 
+});
 
 /*
 const syncModels = async () => {
@@ -470,7 +488,146 @@ app.get('/gleba/:id', async (req, res) => {
 /*------------------------
         ROTAS SAFRAS
 --------------------------*/
+/* Rota para --> BUSCA DE SAFRAS */
+app.get('/searchSafras/:email', async (req, res) => {
+    const { email } = req.params;
 
+    try {
+        const user = await Usuario.findOne({ where: { email: email } });
+        if (!user) {
+            return res.status(404).json({ error: 'Usuário não encontrado' });
+        }
+
+        /* Busca todas as propriedades associadas ao usuário e seus níveis de acesso*/
+        const usuarioPropriedades = await UsuarioPropriedade.findAll({
+            where: { usuarioId: user.id },
+            attributes: ['propriedadeId', 'access']
+        });
+        
+        const propriedadeIds = usuarioPropriedades.map(up => up.propriedadeId);
+        const acessos = usuarioPropriedades.map(up => up.access);
+        
+        const propriedades = await Propriedade.findAll({
+            where: {
+                id: propriedadeIds
+            },
+            include: {
+                model: Gleba, as: 'glebas', 
+                include: {
+                    model: Safra,
+                    as: 'safras'  
+                }
+            }
+        });
+        
+        const propriedadesComAcesso = propriedades.map((propriedade, index) => ({
+            ...propriedade.toJSON(),
+            access: acessos[index]
+        }));
+        
+        //console.log(propriedadesComAcesso);
+
+        if (propriedades.length === 0) {
+            return res.status(404).json({ message: 'Nenhuma propriedade cadastrada para este usuário.' });
+        }
+        const resultado = propriedadesComAcesso.map(propriedade => {
+            const glebas = (propriedade.glebas || []).map(gleba => {
+                const safras = gleba.safras || [];  // Acessa as safras relacionadas à gleba
+                return {
+                    ...gleba,
+                    safras
+                };
+            });
+        
+            return {
+                ...propriedade,  // Converte a propriedade em um objeto simples
+                glebas
+            };
+        });
+
+        return res.status(200).json(resultado);
+    } catch (error) {
+        console.error('Erro ao buscar glebas do usuário:', error);
+        return res.status(500).json({ error: 'Erro ao buscar glebas do usuário' });
+    }
+});
+
+/*  Rota para --> BUSCA POR DETERMINADA SAFRA */
+app.get('/safra/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const safra = await Safra.findByPk(id);
+        if (!safra) {
+            return res.status(404).json({ error: 'Sfra não encontrada' });
+        }
+
+        //Recebendo dados da gleba
+        const gleba = await Gleba.findByPk(safra.glebaId);
+
+        //Recebendo dados da propriedade
+        const propriedade = await Propriedade.findByPk(gleba.propriedadeId);
+
+        //Procurar dono da propriedade
+        const ownerPropriedade = await UsuarioPropriedade.findOne({
+            where: { propriedadeId: gleba.propriedadeId },
+            attributes: ['usuarioId', 'access']
+        }); 
+        
+        const userId = ownerPropriedade?.usuarioId
+
+        const owner = await Usuario.findByPk(userId);
+        if (!owner) {
+            return res.status(404).json({ error: 'Dono da gleba não encontrado' });
+        }
+        
+        const resposta = {
+            safra: safra,
+            gleba: gleba,
+            propriedade: propriedade,
+            owner: owner
+        };
+
+        return res.status(200).json(resposta);
+    } catch (error) {
+        console.error('Erro ao buscar gleba:', error);
+        return res.status(500).json({ error: 'Erro ao buscar gleba' });
+    }
+});
+
+
+
+/*------------------------
+        ENVIO DE EMAIL
+--------------------------*/
+
+/*
+
+npm install nodemailer --> https://www.w3schools.com/nodejs/nodejs_email.asp
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.GMAIL_USER, 
+    pass: process.env.GMAIL_PASS 
+  }
+});
+
+const mailOptions = {
+  from: process.env.GMAIL_USER,
+  to: 'yourfriend@email.com',
+  subject: 'Sending Email using Node.js with Gmail',
+  text: 'That was easy!'
+};
+
+transporter.sendMail(mailOptions, function(error, info){
+  if (error) {
+    console.log('Error:', error);
+  } else {
+    console.log('Email sent:', info.response);
+  }
+});
+*/
 
 
 app.listen(port,()=>{

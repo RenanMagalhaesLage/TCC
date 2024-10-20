@@ -312,18 +312,20 @@ const Propertie = () => {
                                         >
                                             <Fade in={open}>
                                                 <Box 
+                                                    color={colors.grey[100]}
+                                                    backgroundColor={colors.primary[400]}
                                                     sx={{ 
                                                         position: 'absolute',
                                                         top: '50%',
                                                         left: '50%',
                                                         transform: 'translate(-50%, -50%)',
                                                         width: 450,
-                                                        bgcolor: '#fff', // Cor de fundo branco puro para contraste
-                                                        borderRadius: 3, // Cantos arredondados
-                                                        boxShadow: '0px 10px 30px rgba(0, 0, 0, 0.1)', // Sombra suave e moderna
+                                                        borderRadius: 3, 
+                                                        boxShadow: '0px 10px 30px rgba(0, 0, 0, 0.1)',
                                                         p: 4,
 
                                                     }}
+
                                                 >
                                                     <Typography id="modal-modal-title" variant="h4" component="h2">
                                                         Deseja realmente deletar esta propriedade?
