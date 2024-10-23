@@ -363,12 +363,53 @@ const Safras = () => {
                         color: `${colors.mygreen[200]} !important`,
                     },
                 }}>
-                <DataGrid
-                    rows={safras}
-                    columns={columns}
-                    slots={{ toolbar: GridToolbar, }}
-                />
+                {safras.length === 0 ? (
+                        <Box
+                            display="flex"
+                            flexDirection= "column"
+                            alignItems="center"  
+                            justifyContent="center"
+                            gap="20px"
+                            mt="50px"
+                        >
+                            <Typography variant={isMobile ? "h6": "h5"} fontWeight="bold" color={colors.grey[100]}>
+                                Nenhuma safra encontrada.
+                            </Typography>
+                        </Box>
+                ) : (
+                    <DataGrid
+                        rows={safras}
+                        columns={columns}
+                        slots={{ toolbar: GridToolbar, }}
+                    />
+                )}
             </Box>
+            <div>
+                {message !== 0 && (
+                    <Snackbar 
+                    open={openSnackbar} 
+                    autoHideDuration={2500} 
+                    onClose={handleCloseSnackbar}
+                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }} 
+                >
+                    <Alert
+                        onClose={handleCloseSnackbar}
+                        severity="success"
+                        variant="filled"
+                        sx={{ 
+                        width:'450px',
+                        fontSize:'20px',
+                        height: '60px',
+                        display: 'flex', 
+                        alignItems: 'center',
+                        justifyContent: 'center', 
+                    }}
+                    >
+                        {snackbarMessage}
+                    </Alert>
+                </Snackbar>
+                )}
+            </div>
         </Box>
     );
 };

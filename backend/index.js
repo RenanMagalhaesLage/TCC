@@ -19,28 +19,29 @@ app.use(cors({
 /*-------------------------------
             Models
 ---------------------------------*/
-const Usuario = require("./database/Usuario");
-const Propriedade = require("./database/Propriedade");
-const UsuarioPropriedade = require("./database/UsuarioPropriedade");
+const User = require("./database/User");
+const Property = require("./database/Property");
+const UserProperty = require("./database/UserProperty");
 const Gleba = require("./database/Gleba");
-const Safra = require("./database/Safra")
+const Safra = require("./database/Safra");
+const Invite = require("./database/Invite");
 
 /*--------------------------------
     Relacionamentos dos Models
 ----------------------------------*/
-Usuario.belongsToMany(Propriedade, { through: UsuarioPropriedade, onDelete: 'CASCADE', onUpdate: 'CASCADE' });
-Propriedade.belongsToMany(Usuario, { through: UsuarioPropriedade, onDelete: 'CASCADE', onUpdate: 'CASCADE' });
+User.belongsToMany(Property, { through: UserProperty, onDelete: 'CASCADE', onUpdate: 'CASCADE' });
+Property.belongsToMany(User, { through: UserProperty, onDelete: 'CASCADE', onUpdate: 'CASCADE' });
 
-Propriedade.hasMany(Gleba, {
-    foreignKey: 'propriedadeId',
+Property.hasMany(Gleba, { 
+    foreignKey: 'propertyId',
     as: 'glebas',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'  
 });
 
-Gleba.belongsTo(Propriedade,  {
-    foreignKey: 'propriedadeId',
-    as: 'propriedade',
+Gleba.belongsTo(Property,  {
+    foreignKey: 'propertyId',
+    as: 'property',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE' 
 });
@@ -59,6 +60,19 @@ Safra.belongsTo(Gleba,  {
     onUpdate: 'CASCADE' 
 });
 
+Invite.belongsTo(Property, {
+    foreignKey: 'propertyId', 
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE' 
+});
+
+Property.hasMany(Invite, {
+    foreignKey: 'propertyId',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'  
+});
+
+
 /*
 const syncModels = async () => {
     await connection.sync({ force: true }); // Cuidado: isso irá apagar dados existentes
@@ -69,7 +83,6 @@ syncModels().then(() => {
 }).catch((error) => {
     console.error("Erro ao sincronizar tabelas:", error);
 });*/
-
 
 connection
     .authenticate()
@@ -128,10 +141,10 @@ app.post("/protegida", verificaTokens,async(req,res) =>{
     const userEmail = req.user.email
     const userPicture = req.user.picture
     try {
-        const existingUser = await Usuario.findOne({ where: { email: userEmail } });
+        const existingUser = await User.findOne({ where: { email: userEmail } });
 
         if (!existingUser) {
-           const newUser = await Usuario.create({
+           const newUser = await User.create({
                 name: userName,
                 email: userEmail,
                 picture: userPicture,
@@ -168,28 +181,28 @@ app.post("/protegida", verificaTokens,async(req,res) =>{
 app.post('/createPropriedade', async (req, res) => {
     try {
         const { name, city, area, email } = req.body;
-        const user = await Usuario.findOne({ where: { email: email } });
+        const user = await User.findOne({ where: { email: email } });
 
 
         if (!name || !city || !area || !email) {
             return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
         }
 
-        const novaPropriedade = await Propriedade.create({
+        const newProperty = await Property.create({
             name: name,
             city: city,
             area: area
         });
 
-        const usuarioPropriedade = await UsuarioPropriedade.create({
-            usuarioId: user.id, 
-            propriedadeId: novaPropriedade.id, 
+        const userProperty = await UserProperty.create({
+            userId: user.id, 
+            propertyId: newProperty.id, 
             access: "owner" 
         });
 
         return res.status(201).json({ 
-            propriedade: novaPropriedade, 
-            relacionamento: usuarioPropriedade 
+            property: newProperty, 
+            relationship: userProperty 
         });
     } catch (error) {
         console.error('Erro ao salvar propriedade:', error);
@@ -202,38 +215,37 @@ app.get('/searchPropriedades/:email', async (req, res) => {
     const { email } = req.params;
 
     try {
-        //const usuario = await Usuario.findByPk(userId);
-        const user = await Usuario.findOne({ where: { email: email } });
+        const user = await User.findOne({ where: { email: email } });
         if (!user) {
             return res.status(404).json({ error: 'Usuário não encontrado' });
         }
 
-        const usuarioPropriedades = await UsuarioPropriedade.findAll({
-            where: { usuarioId: user.id },
-            attributes: ['propriedadeId', 'access']
+        const userProperty = await UserProperty.findAll({
+            where: { userId: user.id },
+            attributes: ['propertyId', 'access']
         });
         
-        const propriedadeIds = usuarioPropriedades.map(up => up.propriedadeId);
-        const acessos = usuarioPropriedades.map(up => up.access);
+        const propertyIds = userProperty.map(up => up.propertyId);
+        const access = userProperty.map(up => up.access);
         
-        const propriedades = await Propriedade.findAll({
+        const properties = await Property.findAll({
             where: {
-                id: propriedadeIds
+                id: propertyIds
             }
         });
         
-        const propriedadesComAcesso = propriedades.map((propriedade, index) => ({
-            ...propriedade.toJSON(),
-            access: acessos[index]
+        const propertiesWithAccess = properties.map((property, index) => ({
+            ...property.toJSON(),
+            access: access[index]
         }));
         
         //console.log(propriedadesComAcesso);
 
-        if (propriedades.length === 0) {
+        if (properties.length === 0) {
             return res.status(404).json({ message: 'Nenhuma propriedade cadastrada para este usuário.' });
         }
 
-        return res.status(200).json(propriedadesComAcesso);
+        return res.status(200).json(propertiesWithAccess);
     } catch (error) {
         console.error('Erro ao buscar propriedades do usuário:', error);
         return res.status(500).json({ error: 'Erro ao buscar propriedades do usuário' });
@@ -244,14 +256,14 @@ app.get('/searchPropriedades/:email', async (req, res) => {
 app.put('/editPropriedade/:id', async (req, res) => {
     try {
         const { name, area, city } = req.body;
-        const [updated] = await Propriedade.update(
+        const [updated] = await Property.update(
             { name, area, city},
             { where: { id: req.params.id } }
         );
 
 
         if (updated) {
-            const updatedProperty = await Propriedade.findByPk(req.params.id);
+            const updatedProperty = await Property.findByPk(req.params.id);
             return res.json(updatedProperty);
         }
 
@@ -261,65 +273,65 @@ app.put('/editPropriedade/:id', async (req, res) => {
     }
 });
 
-/* Rota para --> REMOVER DE PROPRIEDADE */
+/* Rota para --> REMOVER PROPRIEDADE */
 
 /* Rota para --> BUSCA POR DETERMINADA PROPRIEDADE E SEUS USUÁRIOS E SUAS GLEBAS */
 app.get('/propriedades/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
-        const propriedade = await Propriedade.findByPk(id);
-        if (!propriedade) {
+        const property = await Property.findByPk(id);
+        if (!property) {
             return res.status(404).json({ error: 'Propriedade não encontrada' });
         }
 
         const glebas =  await Gleba.findAll({
-            where: {propriedadeId: id},
+            where: {propertyId: id},
         })        
 
         //Procurando todos os usuários dessa propriedade
-        const usuariosPropriedade = await UsuarioPropriedade.findAll({
-            where: { propriedadeId: id },
-            attributes: ['usuarioId', 'access']
+        const usersProperty = await UserProperty.findAll({
+            where: { propertyId: id },
+            attributes: ['userId', 'access']
         });
 
-        const usuarioIds = usuariosPropriedade.map(up => up.usuarioId);
+        const userIds = usersProperty.map(up => up.userId);
 
         //Procurando dados dos usuários
-        const usuariosDados = await Usuario.findAll({
+        const users = await User.findAll({
             where: {
-                id: usuarioIds
+                id: userIds
             },
             attributes: ['id', 'name', 'email'] 
         });
 
         //Juntando as informações dos usuários
-        const usuariosCompletos = usuariosPropriedade.map(up => {
-            const usuarioDados = usuariosDados.find(u => u.id === up.usuarioId);
+        const usersData = usersProperty.map(up => {
+            const user = users.find(u => u.id === up.userId);
             return {
-                id: up.usuarioId,
+                id: up.userId,
                 access: up.access,
-                name: usuarioDados?.name,
-                email: usuarioDados?.email
+                name: user?.name,
+                email: user?.email
             };
         });
 
-        const owner = usuariosCompletos.find(usuario => usuario.access === "owner");
+        const owner = usersData.find(user => user.access === "owner");
         
-        const resposta = {
-            propriedade: {
-                id: propriedade.id,
-                name: propriedade.name,
-                city: propriedade.city,
-                area: propriedade.area 
+        const result = {
+            property: {
+                id: property.id,
+                name: property.name,
+                city: property.city,
+                area: property.area 
             },
-            usuarios: usuariosCompletos, 
+            users: usersData, 
             owner: owner ? { name: owner.name, email: owner.email } : null,
             glebas: glebas
 
         };
 
-        return res.status(200).json(resposta);
+        return res.status(200).json(result);
     } catch (error) {
         //console.error('Erro ao buscar propriedade:', error);
         return res.status(500).json({ error: 'Erro ao buscar propriedade' });
@@ -329,11 +341,11 @@ app.get('/propriedades/:id', async (req, res) => {
 /* Rota para --> OBTER UMA PROPRIEDADE PELO ID */
 app.get('/propriedade/:id', async (req, res) => {
     try {
-        const propriedade = await Propriedade.findByPk(req.params.id);
-        if (!propriedade) {
+        const property = await Property.findByPk(req.params.id);
+        if (!property) {
             return res.status(404).json({ message: 'Propriedade não encontrada' });
         }
-        res.json(propriedade);
+        res.json(property);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -346,23 +358,23 @@ app.get('/propriedade/:id', async (req, res) => {
 /* Rota para --> CADASTRO DE GLEBA*/
 app.post('/createGleba', async (req, res) => {
     try {
-        const { name, propertieId, area, email } = req.body;
-        const user = await Usuario.findOne({ where: { email: email } });
+        const { name, propertyId, area, email } = req.body;
+        const user = await User.findOne({ where: { email: email } });
 
 
-        if (!name || !propertieId || !area || !email) {
+        if (!name || !propertyId || !area || !email) {
             return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
         }
 
-        const novaGleba = await Gleba.create({
+        const newGleba = await Gleba.create({
             name: name,
             area: area,
-            propriedadeId: propertieId
+            propertyId: propertyId
         });
 
 
         return res.status(201).json({ 
-            gleba: novaGleba
+            gleba: newGleba
         });
     } catch (error) {
         console.error('Erro ao salvar gleba:', error);
@@ -375,48 +387,48 @@ app.get('/searchGlebas/:email', async (req, res) => {
     const { email } = req.params;
 
     try {
-        const user = await Usuario.findOne({ where: { email: email } });
+        const user = await User.findOne({ where: { email: email } });
         if (!user) {
             return res.status(404).json({ error: 'Usuário não encontrado' });
         }
 
         /* Busca todas as propriedades associadas ao usuário e seus níveis de acesso*/
-        const usuarioPropriedades = await UsuarioPropriedade.findAll({
-            where: { usuarioId: user.id },
-            attributes: ['propriedadeId', 'access']
+        const userProperties = await UserProperty.findAll({
+            where: { userId: user.id },
+            attributes: ['propertyId', 'access']
         });
         
-        const propriedadeIds = usuarioPropriedades.map(up => up.propriedadeId);
-        const acessos = usuarioPropriedades.map(up => up.access);
+        const propertyIds = userProperties.map(up => up.propertyId);
+        const access = userProperties.map(up => up.access);
         
-        const propriedades = await Propriedade.findAll({
+        const properties = await Property.findAll({
             where: {
-                id: propriedadeIds
+                id: propertyIds
             },
             include: {
                 model: Gleba, as: 'glebas', 
             }
         });
         
-        const propriedadesComAcesso = propriedades.map((propriedade, index) => ({
-            ...propriedade.toJSON(),
-            access: acessos[index]
+        const propertiesWithAccess = properties.map((property, index) => ({
+            ...property.toJSON(),
+            access: access[index]
         }));
         
         //console.log(propriedadesComAcesso);
 
-        if (propriedades.length === 0) {
+        if (properties.length === 0) {
             return res.status(404).json({ message: 'Nenhuma propriedade cadastrada para este usuário.' });
         }
-        const resultado = propriedadesComAcesso.map(propriedade => {
-            const glebas = propriedade.glebas || [];
+        const result = propertiesWithAccess.map(property => {
+            const glebas = property.glebas || [];
             return {
-                ...propriedade,
+                ...property,
                 glebas
             };
         });
 
-        return res.status(200).json(resultado);
+        return res.status(200).json(result);
     } catch (error) {
         console.error('Erro ao buscar glebas do usuário:', error);
         return res.status(500).json({ error: 'Erro ao buscar glebas do usuário' });
@@ -457,28 +469,36 @@ app.get('/gleba/:id', async (req, res) => {
         }
 
         //Recebendo dados da propriedade
-        const propriedade = await Propriedade.findByPk(gleba.propriedadeId);
+        const property = await Property.findByPk(gleba.propertyId);
 
         //Procurar dono da propriedade
-        const ownerPropriedade = await UsuarioPropriedade.findOne({
-            where: { propriedadeId: gleba.propriedadeId },
-            attributes: ['usuarioId', 'access']
+        const ownerProperty = await UserProperty.findOne({
+            where: { propertyId: gleba.propertyId },
+            attributes: ['userId', 'access']
         }); 
         
-        const userId = ownerPropriedade?.usuarioId
+        const userId = ownerProperty?.userId
 
-        const owner = await Usuario.findByPk(userId);
+        const owner = await User.findByPk(userId);
         if (!owner) {
             return res.status(404).json({ error: 'Dono da gleba não encontrado' });
         }
+
+        const safras = await Safra.findAll({
+            where:{glebaId: gleba.id}
+        })
+        const safrasPlanned = safras.filter(safra => safra.type === 'Planejado');
+        const safrasAchieved = safras.filter(safra => safra.type === 'Realizado');
         
-        const resposta = {
+        const result = {
             gleba: gleba,
-            propriedade: propriedade,
-            owner: owner
+            property: property,
+            owner: owner,
+            safrasPlanned: safrasPlanned,
+            safrasAchieved: safrasAchieved
         };
 
-        return res.status(200).json(resposta);
+        return res.status(200).json(result);
     } catch (error) {
         console.error('Erro ao buscar gleba:', error);
         return res.status(500).json({ error: 'Erro ao buscar gleba' });
@@ -493,23 +513,23 @@ app.get('/searchSafras/:email', async (req, res) => {
     const { email } = req.params;
 
     try {
-        const user = await Usuario.findOne({ where: { email: email } });
+        const user = await User.findOne({ where: { email: email } });
         if (!user) {
             return res.status(404).json({ error: 'Usuário não encontrado' });
         }
 
         /* Busca todas as propriedades associadas ao usuário e seus níveis de acesso*/
-        const usuarioPropriedades = await UsuarioPropriedade.findAll({
-            where: { usuarioId: user.id },
-            attributes: ['propriedadeId', 'access']
+        const userProperties = await UserProperty.findAll({
+            where: { userId: user.id },
+            attributes: ['propertyId', 'access']
         });
         
-        const propriedadeIds = usuarioPropriedades.map(up => up.propriedadeId);
-        const acessos = usuarioPropriedades.map(up => up.access);
+        const propertyIds = userProperties.map(up => up.propertyId);
+        const access = userProperties.map(up => up.access);
         
-        const propriedades = await Propriedade.findAll({
+        const properties = await Property.findAll({
             where: {
-                id: propriedadeIds
+                id: propertyIds
             },
             include: {
                 model: Gleba, as: 'glebas', 
@@ -520,19 +540,17 @@ app.get('/searchSafras/:email', async (req, res) => {
             }
         });
         
-        const propriedadesComAcesso = propriedades.map((propriedade, index) => ({
-            ...propriedade.toJSON(),
-            access: acessos[index]
+        const propertiesWithAccess = properties.map((property, index) => ({
+            ...property.toJSON(),
+            access: access[index]
         }));
         
-        //console.log(propriedadesComAcesso);
-
-        if (propriedades.length === 0) {
+        if (properties.length === 0) {
             return res.status(404).json({ message: 'Nenhuma propriedade cadastrada para este usuário.' });
         }
-        const resultado = propriedadesComAcesso.map(propriedade => {
-            const glebas = (propriedade.glebas || []).map(gleba => {
-                const safras = gleba.safras || [];  // Acessa as safras relacionadas à gleba
+        const result = propertiesWithAccess.map(property => {
+            const glebas = (property.glebas || []).map(gleba => {
+                const safras = gleba.safras || []; 
                 return {
                     ...gleba,
                     safras
@@ -540,12 +558,12 @@ app.get('/searchSafras/:email', async (req, res) => {
             });
         
             return {
-                ...propriedade,  // Converte a propriedade em um objeto simples
+                ...property,  
                 glebas
             };
         });
 
-        return res.status(200).json(resultado);
+        return res.status(200).json(result);
     } catch (error) {
         console.error('Erro ao buscar glebas do usuário:', error);
         return res.status(500).json({ error: 'Erro ao buscar glebas do usuário' });
@@ -559,36 +577,36 @@ app.get('/safra/:id', async (req, res) => {
     try {
         const safra = await Safra.findByPk(id);
         if (!safra) {
-            return res.status(404).json({ error: 'Sfra não encontrada' });
+            return res.status(404).json({ error: 'Safra não encontrada' });
         }
 
         //Recebendo dados da gleba
         const gleba = await Gleba.findByPk(safra.glebaId);
 
         //Recebendo dados da propriedade
-        const propriedade = await Propriedade.findByPk(gleba.propriedadeId);
+        const property = await Property.findByPk(gleba.propertyId);
 
         //Procurar dono da propriedade
-        const ownerPropriedade = await UsuarioPropriedade.findOne({
-            where: { propriedadeId: gleba.propriedadeId },
-            attributes: ['usuarioId', 'access']
+        const ownerProperty = await UserProperty.findOne({
+            where: { propertyId: gleba.propertyId },
+            attributes: ['userId', 'access']
         }); 
         
-        const userId = ownerPropriedade?.usuarioId
+        const userId = ownerProperty?.userId
 
-        const owner = await Usuario.findByPk(userId);
+        const owner = await User.findByPk(userId);
         if (!owner) {
             return res.status(404).json({ error: 'Dono da gleba não encontrado' });
         }
         
-        const resposta = {
+        const result = {
             safra: safra,
             gleba: gleba,
-            propriedade: propriedade,
+            property: property,
             owner: owner
         };
 
-        return res.status(200).json(resposta);
+        return res.status(200).json(result);
     } catch (error) {
         console.error('Erro ao buscar gleba:', error);
         return res.status(500).json({ error: 'Erro ao buscar gleba' });

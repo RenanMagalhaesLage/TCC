@@ -12,6 +12,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DoneIcon from '@mui/icons-material/Done';
+import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
+import DoneAllIcon from '@mui/icons-material/DoneAll';
 
 
 const Safra = () => {
@@ -88,10 +90,10 @@ const Safra = () => {
             const fetchGlebas = async () => {
                 try {
                     const response = await axios.get(`http://localhost:3000/safra/${id}`);
-                    const {safra, gleba, propriedade, owner } = response.data;
+                    const {safra, gleba, property, owner } = response.data;
                     setSafra(safra)
                     setGleba(gleba);
-                    setPropriedade(propriedade);
+                    setPropriedade(property);
                     setOwner(owner);
                 } catch (error) {
                     console.log("ERROR - ao buscar a gleba.");
@@ -189,14 +191,14 @@ const Safra = () => {
                             <Box display="flex" flexWrap="wrap" gap="10px"> 
                                 <Chip
                                     label={safra.status ? "Finalizada" : "Em Andamento"}
-                                    deleteIcon={<DoneIcon />}
+                                    deleteIcon={safra.status ? <DoneIcon /> : <HourglassBottomIcon/>}
                                     onClick={handleChip}
                                     onDelete={handleChip}
                                     sx={{ padding: "10px", fontWeight: "bold", flexShrink: 0 }} 
                                 />
                                 <Chip
                                     label={safra.type}
-                                    deleteIcon={<DoneIcon />}
+                                    deleteIcon={safra.type === "Planejado" ? <DoneIcon /> : <DoneAllIcon/>}
                                     onClick={handleChip}
                                     onDelete={handleChip}
                                     sx={{ padding: "10px", fontWeight: "bold", flexShrink: 0 }} 

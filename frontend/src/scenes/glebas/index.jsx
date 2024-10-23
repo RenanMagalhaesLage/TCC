@@ -219,14 +219,35 @@ const Glebas = () => {
                         color: `${colors.mygreen[200]} !important`,
                     },
                 }}>
-                <DataGrid
-                    rows={glebas}
-                    columns={columns}
-                    localeText={{ noRowsLabel: <b>Nenhuma gleba encontrada.</b> }}
-                />
+                {glebas.length === 0 ? (
+                        <Box
+                            display="flex"
+                            flexDirection= "column"
+                            alignItems="center"  
+                            justifyContent="center"
+                            gap="20px"
+                            mt="50px"
+                        >
+                            <Typography variant={isMobile ? "h6": "h5"} fontWeight="bold" color={colors.grey[100]}>
+                                Nenhuma gleba encontrada.
+                            </Typography>
+                        </Box>
+                ) : (
+                    <DataGrid
+                        rows={glebas}
+                        columns={columns}
+                        localeText={{ noRowsLabel: <b>Nenhuma gleba encontrada.</b> }}
+                        initialState={{
+                            ...glebas.initialState,
+                            pagination: { paginationModel: { pageSize: 15 } },
+                          }}
+                        pageSizeOptions={[15, 20, 30]}
+                    />
+                )}
+                
             </Box>
             <div>
-                {message && (
+                {message !== 0 && (
                     <Snackbar 
                     open={openSnackbar} 
                     autoHideDuration={2500} 
@@ -238,12 +259,12 @@ const Glebas = () => {
                         severity="success"
                         variant="filled"
                         sx={{ 
-                        width: '450px', 
+                        width:'450px',
+                        fontSize:'20px',
                         height: '60px',
                         display: 'flex', 
                         alignItems: 'center',
                         justifyContent: 'center', 
-                        fontSize: '20px',
                     }}
                     >
                         {snackbarMessage}

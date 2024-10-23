@@ -27,6 +27,8 @@ import Safra from './scenes/safras/safra';
 import SafrasForm from './scenes/safras/form';
 import Custos from './scenes/custos';
 import SafrasHistory from './scenes/safras/history';
+import SafrasEditForm from './scenes/safras/editForm';
+import Invite from './scenes/invites';
 
 
 function App() {
@@ -75,8 +77,10 @@ function App() {
                   <Route path="/safras/:id" element={<Safra />} />
                   <Route path="/safras/add" element={<SafrasForm />} />
                   <Route path="/safras/add/:id?" element={<SafrasForm />} />
+                  <Route path="/safras/edit/:id" element={<SafrasEditForm />} />
                   <Route path="/custos" element={<Custos />} />
                   <Route path="/history" element={<SafrasHistory />} />
+                  <Route path="/invites" element={<Invite />} />
                 </Routes>
               </main>
             </>

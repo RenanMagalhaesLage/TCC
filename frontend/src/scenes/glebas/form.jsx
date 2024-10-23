@@ -44,10 +44,8 @@ const GlebasForm = () => {
             if(id){
               const fetchPropertyData = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:3000/gleba/${id}`);
-                    const { gleba, propriedade, owner } = response.data;
-                    setPropertie(propriedade);
-                    //console.log("info --> " + propriedade.name + " " + gleba.name )
+                    const response = await axios.get(`http://localhost:3000/propriedade/${id}`);
+                    setPropertie(response.data);
                     setLoading(false); 
                 } catch (error) {
                     console.error("Erro ao buscar dados da gleba:", error);
@@ -65,18 +63,20 @@ const GlebasForm = () => {
       };
       fetchPropriedades();
     }
-  }, [userData]);
+  }, [userData,id]);
 
   const initialValues = {
     nameGleba: "",
     area: "",
-    propertie: propertie? propertie.name :"" 
+    propertie: propertie? propertie.name :""   
   }
-
-  
 
   const navigate = useNavigate(); 
   const handleFormSubmit = async (values) => {
+    console.log("Valores do formulário:", values);
+    if(id){
+      values.propertie = propertie.name
+    }
     try {
       const index = optionsPropertieId.findIndex(item => item.name === values.propertie);
 
@@ -91,7 +91,7 @@ const GlebasForm = () => {
       // Realizar a requisição POST para o backend usando axios
       const response = await axios.post("http://localhost:3000/createGleba", {
         name: values.nameGleba,
-        propertieId: propriedadeId,          
+        propertyId: propriedadeId,          
         area: values.area,          
         email: userData.email
       });
@@ -117,7 +117,7 @@ const GlebasForm = () => {
       <Formik
         onSubmit={handleFormSubmit}
         initialValues={initialValues}
-        validationSchema={checkoutSchema}
+        validationSchema={id ? checkoutSchema2 : checkoutSchema}
       >
         {({
           values,
@@ -163,11 +163,13 @@ const GlebasForm = () => {
                   helperText={touched.area && errors.area}
                   sx={{ gridColumn: "span 2" }}
                 />
-                {propertie ? (
+                {propertie ?(
                   <TextField
+                    id="properties"
                     fullWidth
                     variant="filled"
-                    label="Propriedades"
+                    label="Propriedade"
+                    name="propertie"
                     value={propertie.name}
                     disabled 
                     sx={{ gridColumn: "span 2" }}
@@ -186,7 +188,7 @@ const GlebasForm = () => {
                     renderInput={(params) => (
                       <TextField 
                         {...params} 
-                        label="Propriedades"
+                        label="Propriedade"
                         variant="filled"
                         name="propertie"
                         error={!!touched.propertie && !!errors.propertie }
@@ -203,13 +205,13 @@ const GlebasForm = () => {
               <Button 
                     type="submit"
                     sx={{ 
-                            backgroundColor: colors.mygreen[400],
-                            color: colors.grey[100],
-                            fontSize: "12px",
-                            fontWeight: "bold",
-                            "&:hover": {
-                                    backgroundColor: colors.grey[700], 
-                                },
+                        backgroundColor: colors.mygreen[400],
+                        color: colors.grey[100],
+                        fontSize: "12px",
+                        fontWeight: "bold",
+                        "&:hover": {
+                          backgroundColor: colors.grey[700], 
+                        },
                     }} 
                     variant="contained">
                 Adicionar
@@ -227,6 +229,13 @@ const checkoutSchema = yup.object().shape({
     nameGleba: yup.string().required("Campo de preenchimento obrigatório"),
     area: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
     propertie: yup.string().required("Campo de preenchimento obrigatório"),
+
+});
+
+const checkoutSchema2 = yup.object().shape({
+  nameGleba: yup.string().required("Campo de preenchimento obrigatório"),
+  area: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+  //propertie: yup.string().required("Campo de preenchimento obrigatório"),
 
 });
 export default GlebasForm;

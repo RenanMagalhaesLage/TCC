@@ -47,9 +47,6 @@ const SafrasForm = () => {
     { name: "porcentHect", label: "Porcentagem / HA", type: "number" },
   ];
   
- 
-
-
   useEffect(() => {
     const storedUser = secureLocalStorage.getItem('userData'); 
     if (storedUser) {
@@ -182,7 +179,7 @@ const SafrasForm = () => {
                     renderInput={(params) => (
                       <TextField 
                         {...params} 
-                        label="Propriedades"
+                        label="Propriedade"
                         variant="filled"
                         name="propertie"
                         error={!!touched.propertie && !!errors.propertie }
@@ -216,7 +213,7 @@ const SafrasForm = () => {
                     renderInput={(params) => (
                       <TextField 
                         {...params} 
-                        label="Glebas"
+                        label="Gleba"
                         variant="filled"
                         name="nameGleba"
                         error={!!touched.nameGleba && !!errors.nameGleba}
@@ -246,7 +243,7 @@ const SafrasForm = () => {
                               renderInput={(params) => (
                                 <TextField
                                   {...params}
-                                  label="Types"
+                                  label="Tipo"
                                   variant="filled"
                                   error={!!touched.type && !!errors.type}
                                   helperText={touched.type && errors.type}

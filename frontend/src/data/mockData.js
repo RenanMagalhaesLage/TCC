@@ -1608,3 +1608,126 @@ export const mockDataSafra = [
     "porcentHect": 92.0
   }
 ];
+
+export const mockDataInvites = [
+  {
+    id: 1,
+    remetente: "João Silva",
+    emailRemetente: "joao.silva@example.com",
+    propertyName: "Fazenda do Vale",
+  },
+  {
+    id: 2,
+    remetente: "Maria Oliveira",
+    emailRemetente: "maria.oliveira@example.com",
+    propertyName: "Sítio das Flores",
+  },
+  {
+    id: 3,
+    remetente: "Carlos Santos",
+    emailRemetente: "carlos.santos@example.com",
+    propertyName: "Chácara dos Sonhos",
+  },
+  {
+    id: 4,
+    remetente: "Ana Costa",
+    emailRemetente: "ana.costa@example.com",
+    propertyName: "Propriedade da Luz",
+  },
+  {
+    id: 5,
+    remetente: "Lucas Pereira",
+    emailRemetente: "lucas.pereira@example.com",
+    propertyName: "Terra da Esperança",
+  },
+  {
+    id: 6,
+    remetente: "Fernanda Lima",
+    emailRemetente: "fernanda.lima@example.com",
+    propertyName: "Fazenda Nova",
+  },
+  {
+    id: 7,
+    remetente: "Ricardo Gomes",
+    emailRemetente: "ricardo.gomes@example.com",
+    propertyName: "Sítio Verdejante",
+  },
+  {
+    id: 8,
+    remetente: "Patrícia Ribeiro",
+    emailRemetente: "patricia.ribeiro@example.com",
+    propertyName: "Propriedade das Águas",
+  },
+  {
+    id: 9,
+    remetente: "Roberto Alves",
+    emailRemetente: "roberto.alves@example.com",
+    propertyName: "Chácara do Sol",
+  },
+  {
+    id: 10,
+    remetente: "Isabella Martins",
+    emailRemetente: "isabella.martins@example.com",
+    propertyName: "Fazenda do Campo",
+  },
+  {
+    id: 11,
+    remetente: "João Silva",
+    emailRemetente: "joao.silva@example.com",
+    propertyName: "Fazenda do Vale",
+  },
+  {
+    id: 12,
+    remetente: "Maria Oliveira",
+    emailRemetente: "maria.oliveira@example.com",
+    propertyName: "Sítio das Flores",
+  },
+  {
+    id: 13,
+    remetente: "Carlos Santos",
+    emailRemetente: "carlos.santos@example.com",
+    propertyName: "Chácara dos Sonhos",
+  },
+  {
+    id: 14,
+    remetente: "Ana Costa",
+    emailRemetente: "ana.costa@example.com",
+    propertyName: "Propriedade da Luz",
+  },
+  {
+    id: 15,
+    remetente: "Lucas Pereira",
+    emailRemetente: "lucas.pereira@example.com",
+    propertyName: "Terra da Esperança",
+  },
+  {
+    id: 16,
+    remetente: "Fernanda Lima",
+    emailRemetente: "fernanda.lima@example.com",
+    propertyName: "Fazenda Nova",
+  },
+  {
+    id: 17,
+    remetente: "Ricardo Gomes",
+    emailRemetente: "ricardo.gomes@example.com",
+    propertyName: "Sítio Verdejante",
+  },
+  {
+    id: 18,
+    remetente: "Patrícia Ribeiro",
+    emailRemetente: "patricia.ribeiro@example.com",
+    propertyName: "Propriedade das Águas",
+  },
+  {
+    id: 19,
+    remetente: "Roberto Alves",
+    emailRemetente: "roberto.alves@example.com",
+    propertyName: "Chácara do Sol",
+  },
+  {
+    id: 20,
+    remetente: "Isabella Martins",
+    emailRemetente: "isabella.martins@example.com",
+    propertyName: "Fazenda do Campo",
+  },
+];

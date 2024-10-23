@@ -142,7 +142,7 @@ const Sidebar = ({ onLogout }) => {
             />
             <Item
               title="Convites"
-              to="/"
+              to="/invites"
               icon={<EmailOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}

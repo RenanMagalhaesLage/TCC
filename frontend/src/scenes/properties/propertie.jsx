@@ -150,9 +150,9 @@ const Propertie = () => {
             const fetchPropriedades = async () => {
                 try {
                     const response = await axios.get(`http://localhost:3000/propriedades/${id}`);
-                    const { propriedade, usuarios, owner, glebas } = response.data;
-                    setPropriedade(propriedade);
-                    setUsuarios(usuarios); 
+                    const { property, users, owner, glebas } = response.data;
+                    setPropriedade(property);
+                    setUsuarios(users); 
                     setOwner(owner);
                     setGlebas(glebas)
                 } catch (error) {
@@ -192,8 +192,26 @@ const Propertie = () => {
 
     return (
         <Box m="20px">
-            <Header title="Propriedade" subtitle="Informações da propriedade" />
-            <Box m="40px 0 0 0" height="75vh" maxWidth="1600px" mx="auto"
+            <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Header title="Propriedade" subtitle="Informações da propriedade" />
+                <Box>
+                    <Button
+                        sx={{
+                        backgroundColor: colors.mygreen[400],
+                        color: colors.grey[100],
+                        fontSize: "14px",
+                        fontWeight: "bold",
+                        padding: "10px 20px",
+                        }}
+                        onClick={() => handleAdd()}
+                    >
+                        <AddCircleOutlineIcon sx={{ mr: isMobile? "0px" :"10px" }} />
+                        {!isMobile && ("Adicionar Gleba")}
+                    </Button>
+                </Box>
+            </Box>
+            
+            <Box m="20px 0 0 0" height="75vh" maxWidth="1600px" mx="auto"
                 sx={{
                     "& .MuiDataGrid-root": {
                         border: "none",
@@ -219,8 +237,6 @@ const Propertie = () => {
                         color: `${colors.mygreen[400]} !important`,
                     },
                 }}>
-                    
-
                     <Box
                         display="grid"
                         gridTemplateColumns="repeat(12, 1fr)"
@@ -236,6 +252,7 @@ const Propertie = () => {
                             padding="25px 35px 30px 35px"
                             height={isMobile ? "auto" : "initial"} 
                             minHeight={isMobile ? "260px" : "auto"} 
+                            sx={{boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.07)",}}
                         >
                             {/* Primeira Coluna */}
                             <Box display="flex" flexDirection="column" alignItems="flex-start">
@@ -420,7 +437,7 @@ const Propertie = () => {
                         </Box>
                         <Box
                             gridColumn="span 12"
-                            backgroundColor={colors.primary[400]}
+                            backgroundColor={glebas.length === 0 ? "":colors.primary[400]}
                             display="flex"
                             alignItems="center"
                             justifyContent="center"

@@ -16,7 +16,7 @@ const GlebasEditForm = () => {
   const [optionsPropertie, setOptionsPropertie] = useState([]);
   const [optionsPropertieId, setOptionsPropertieId] = useState([]);
   const [userData, setUserData] = useState(null);
-  const [propertie, setPropertie] = useState("");
+  const [property, setProperty] = useState("");
   const [gleba, setGleba] = useState("");
   const [loading, setLoading] = useState(true);
   const { id } = useParams(); 
@@ -34,9 +34,9 @@ const GlebasEditForm = () => {
         const fetchPropertyData = async () => {
             try {
                 const response = await axios.get(`http://localhost:3000/gleba/${id}`);
-                const { gleba, propriedade, owner } = response.data;
+                const { gleba, property, owner } = response.data;
                 setGleba(gleba);
-                setPropertie(propriedade);
+                setProperty(property);
                 setLoading(false); 
             } catch (error) {
                 console.error("Erro ao buscar dados da gleba:", error);
@@ -50,12 +50,10 @@ const GlebasEditForm = () => {
   const initialValues = {
     nameGleba: gleba? gleba.name : "",
     area: gleba ? gleba.area : "",
-    propertie: propertie? propertie.name :"" 
+    propertie: property? property.name :"" 
   }
 
   console.log(initialValues)
-
-
 
   const navigate = useNavigate(); 
   const handleFormSubmit = async (values) => {
@@ -133,40 +131,14 @@ const GlebasEditForm = () => {
                   helperText={touched.area && errors.area}
                   sx={{ gridColumn: "span 2" }}
                 />
-                {propertie ? (
                   <TextField
                     fullWidth
                     variant="filled"
                     label="Propriedade"
-                    value={propertie.name}
+                    value={property.name}
                     disabled 
                     sx={{ gridColumn: "span 2" }}
-                    
                   />
-                ) : (
-                  <Autocomplete
-                    disablePortal
-                    id="properties"
-                    options={optionsPropertie}
-                    name="propertie"
-                    value={values.propertie || null} 
-                    onChange={(event, value) => setFieldValue('propertie', value)} 
-                    onBlur={handleBlur} 
-                    sx={{ gridColumn: "span 2" }}
-                    renderInput={(params) => (
-                      <TextField 
-                        {...params} 
-                        label="Propriedade"
-                        variant="filled"
-                        name="propertie"
-                        error={!!touched.propertie && !!errors.propertie }
-                        helperText={touched.propertie &&  errors.propertie }
-                        onBlur={handleBlur} 
-                      />
-                    )}
-                    noOptionsText="Não Encontrado"
-                  />
-                )}
             
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
@@ -196,7 +168,5 @@ const GlebasEditForm = () => {
 const checkoutSchema = yup.object().shape({
     nameGleba: yup.string().required("Campo de preenchimento obrigatório"),
     area: yup.string().required("Campo de preenchimento obrigatório"),
-    propertie: yup.string().required("Campo de preenchimento obrigatório"),
-
 });
 export default GlebasEditForm;

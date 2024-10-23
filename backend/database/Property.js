@@ -1,9 +1,7 @@
 const Sequelize = require("sequelize");
 const connection = require("./database");
-const Usuario = require("./Usuario");
-const UsuarioPropriedade = require("./UsuarioPropriedade");
 
-const Propriedade = connection.define('propriedades',{
+const Property = connection.define('properties',{
     name:{
         type: Sequelize.STRING,
         allowNull: false
@@ -16,7 +14,5 @@ const Propriedade = connection.define('propriedades',{
     }
 });
 
-//Propriedade.sync({force:true});
 
-
-module.exports = Propriedade;
+module.exports = Property;

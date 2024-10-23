@@ -207,15 +207,32 @@ const Properties = () => {
                         color: `${colors.mygreen[200]} !important`,
                     },
                 }}>
-                <DataGrid
-                    rows={propriedades}
-                    columns={columns}
-                    localeText={{ noRowsLabel: <b>Nenhuma propriedade encontrada.</b> }}
 
-                />
+                    {propriedades.length === 0 ? (
+                        <Box
+                            display="flex"
+                            flexDirection= "column"
+                            alignItems="center"  
+                            justifyContent="center"
+                            gap="20px"
+                            mt="50px"
+                        >
+                            <Typography variant={isMobile ? "h6": "h5"} fontWeight="bold" color={colors.grey[100]}>
+                                Nenhuma propriedade encontrada.
+                            </Typography>
+                        </Box>
+                    ) : (
+                        <DataGrid
+                            rows={propriedades}
+                            columns={columns}
+                            localeText={{ noRowsLabel: <b>Nenhuma propriedade encontrada.</b> }}
+
+                        />
+                    )}
+                
             </Box>
             <div>
-                {message && (
+                {message !== 0  && (
                     <Snackbar 
                     open={openSnackbar} 
                     autoHideDuration={2500} 

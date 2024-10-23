@@ -78,10 +78,12 @@ const Gleba = () => {
             const fetchGlebas = async () => {
                 try {
                     const response = await axios.get(`http://localhost:3000/gleba/${id}`);
-                    const { gleba, propriedade, owner } = response.data;
+                    const { gleba, property, owner, safrasPlanned,safrasAchieved } = response.data;
                     setGleba(gleba);
-                    setPropriedade(propriedade);
+                    setPropriedade(property);
                     setOwner(owner);
+                    setSafrasPlanejadas(safrasPlanned);
+                    setSafrasRealizadas(safrasAchieved);
                 } catch (error) {
                     console.log("ERROR - ao buscar a gleba.");
                 }
@@ -113,8 +115,25 @@ const Gleba = () => {
 
     return (
         <Box m="20px">
-            <Header title="Gleba" subtitle="Informações da gleba" />
-            <Box m="40px 0 0 0" height="75vh" maxWidth="1600px" mx="auto"
+            <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Header title="Gleba" subtitle="Informações da gleba" />
+                <Box>
+                    <Button
+                        sx={{
+                        backgroundColor: colors.mygreen[400],
+                        color: colors.grey[100],
+                        fontSize: "14px",
+                        fontWeight: "bold",
+                        padding: "10px 20px",
+                        }}
+                        onClick={() => handleAdd()}
+                    >
+                        <AddCircleOutlineIcon sx={{ mr: isMobile? "0px" :"10px" }} />
+                        {!isMobile && ("Adicionar Safra")}
+                    </Button>
+                </Box>
+            </Box>
+            <Box m="20px 0 0 0" height="75vh" maxWidth="1600px" mx="auto"
                 sx={{
                     "& .MuiDataGrid-root": {
                         border: "none",
@@ -155,6 +174,7 @@ const Gleba = () => {
                             padding="25px 35px 30px 35px"
                             height={isMobile ? "auto" : "initial"} 
                             minHeight={isMobile ? "260px" : "auto"} 
+                            sx={{boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.07)",}}
                         >
                             
                             <Box display="flex" flexDirection="column" alignItems="flex-start">
@@ -334,7 +354,7 @@ const Gleba = () => {
                         </Box>
                         <Box
                             gridColumn="span 12"
-                            backgroundColor={colors.primary[400]}
+                            backgroundColor={ safrasPlanejadas.length === 0 ? "" : colors.primary[400]}
                             display="flex"
                             alignItems="center"
                             justifyContent="center"
@@ -366,10 +386,9 @@ const Gleba = () => {
                                         {("Adicionar Safra")}
                                     </Button>
                                 </Box>
-                            ):(
-                                
+                            ):(                                
                                 <DataGrid
-                                    rows={mockDataGlebas}
+                                    rows={safrasPlanejadas}
                                     columns={columnsSafras}
                                 />
                             )}
@@ -388,15 +407,14 @@ const Gleba = () => {
                         </Box>        
                         <Box
                             gridColumn="span 12"
-                            backgroundColor={colors.primary[400]}
+                            backgroundColor={safrasRealizadas.length === 0 ? "": colors.primary[400]}
                             display="flex"
                             alignItems="center"
                             justifyContent="center"
                             minHeight="475px" 
                             mt={isMobile ? "290px": "155px"}
-                            mb="10000px"
                         >
-                            {safrasPlanejadas.length === 0 ? (
+                            {safrasRealizadas.length === 0 ? (
                                 <Box
                                     display="flex"
                                     flexDirection= "column"
@@ -423,12 +441,13 @@ const Gleba = () => {
                                 </Box>
                             ):(
                                 <DataGrid
-                                    rows={mockDataGlebas}
+                                    rows={safrasRealizadas}
                                     columns={columnsSafras}
                                     sx={{mb:"20px"}}
                                 />
                             )}
                         </Box>
+                        
                     </Box>
             </Box>
         </Box>
