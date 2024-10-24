@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate,useParams } from 'react-router-dom';
 import secureLocalStorage from 'react-secure-storage';
 import axios from "axios";
-import { Box, Typography, useTheme, Button, useMediaQuery,Checkbox, FormControlLabel, Modal, Backdrop, Fade, Chip } from "@mui/material";
+import { Box, Typography, useTheme, Button, useMediaQuery,Checkbox, FormControlLabel, Modal, Backdrop, Fade, Chip,Tooltip,IconButton } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import { mockDataSafra, mockDataGlebas } from "../../data/mockData";
@@ -315,18 +315,19 @@ const Safra = () => {
                                         flexGrow={1} 
                                         width="100%"
                                     >
-                                        <Button 
-                                            variant="contained" 
-                                            onClick={handleOpen} 
-                                            sx={{ backgroundColor:  colors.redAccent[500],
-                                                "&:hover": {
-                                                    backgroundColor: colors.grey[700], 
-                                                },
-                                            }} 
-
-                                        >
-                                            <DeleteIcon />
-                                        </Button>
+                                        <Tooltip title='Deletar'>
+                                            <Button 
+                                                variant="contained" 
+                                                onClick={handleOpen} 
+                                                sx={{ backgroundColor:  colors.redAccent[500],
+                                                    "&:hover": {
+                                                        backgroundColor: colors.grey[700], 
+                                                    },
+                                                }} 
+                                            >
+                                                <DeleteIcon />
+                                            </Button>
+                                        </Tooltip>
                                         <Modal
                                             open={open}
                                             onClose={null} 
@@ -404,18 +405,21 @@ const Safra = () => {
                                                 </Box>
                                             </Fade>
                                         </Modal>
-                                        <Button 
-                                            variant="contained" 
-                                            onClick={() => handleEdit()} 
-                                            sx={{ml:2,
-                                                backgroundColor:colors.myorange[500],
-                                                "&:hover": {
-                                                    backgroundColor: colors.grey[700], 
-                                                },
-                                            }}
-                                        >
-                                            <EditIcon />
-                                        </Button>
+                                        <Tooltip title='Editar'>
+                                            <Button 
+                                                variant="contained" 
+                                                onClick={() => handleEdit()} 
+                                                sx={{ml:2,
+                                                    backgroundColor:colors.orangeAccent[500],
+                                                    "&:hover": {
+                                                        backgroundColor: colors.grey[700], 
+                                                    },
+                                                }}
+
+                                            >
+                                                <EditIcon />
+                                            </Button>
+                                        </Tooltip>
                                     </Box>
                                 )}
                             </Box>   

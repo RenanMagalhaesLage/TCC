@@ -29,3 +29,7 @@ INSERT INTO safras (type, status, cultivo, semente, metroLinear, dosagem, tonela
 ('Realizado', true, 'Arroz', 'Semente F', '600', 65, 35.0, 'Adubo T', '2024-07-01', '2025-01-01', 170, 240, 16.0, 2.2, 1.4, 1.0, 1.1, 210, 260.0, 250.0, 95.8, 6, NOW(), NOW());
 ('Planejado', false, 'Café', 'Semente G', '520', 58, 28.0, 'Adubo U', '2024-08-01', '2025-02-01', 180, 220, 14.8, 2.8, 1.6, 0.9, 1.0, 180, 230.0, 210.0, 91.0, 7, NOW(), NOW()),
 ('Realizado', true, 'Milho', 'Semente H', '680', 68, 33.0, 'Adubo V', '2024-09-01', '2025-03-01', 160, 260, 13.0, 3.1, 1.9, 1.2, 1.4, 240, 290.0, 270.5, 93.2, 8, NOW(), NOW());
+
+
+INSERT INTO invites (senderId, reciverId, propertyId,createdAt, updatedAt) VALUES
+(2, 1, 5,NOW(), NOW());  -- Exemplo de convite enviado pelo usuário 1 para o usuário 2, referente à propriedade 100

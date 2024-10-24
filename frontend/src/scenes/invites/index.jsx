@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import secureLocalStorage from 'react-secure-storage';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { Box, Typography, useTheme, Button, useMediaQuery,IconButton, Tooltip,Modal, Backdrop, Fade,FormControlLabel,Checkbox  } from "@mui/material";
+import { Box,Typography,useTheme,Button,useMediaQuery,IconButton,Tooltip,Modal,Backdrop,Fade,FormControlLabel,Checkbox,Snackbar,Alert} from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
@@ -22,15 +22,33 @@ const Invite = () => {
     const { id } = useParams(); 
     const location = useLocation();
     const query = new URLSearchParams(location.search);
-    const message = Number(query.get('message'));
-    const [openSnackbar, setOpenSnackbar] = useState(!!message);
+    const [message, setMessage] = useState(Number(query.get('message')));
+    const [openSnackbar, setOpenSnackbar] = useState(message === 0 ? false : true);
     const [snackbarMessage, setSnackbarMessage] = useState(""); 
     const [open, setOpen] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
+    const [styleSnackBar, setStyleSnackBar] = useState("success");
+
+    useEffect(() => {
+        switch (message) {
+          case 1:
+            setSnackbarMessage("Convite enviado para o destinatário.");
+            break;
+    
+          case 2:
+            setSnackbarMessage("Destinatário já possui esse convite.");
+            setStyleSnackBar("error");
+            break;
+    
+          default:
+            //console.log("Mensagem não reconhecida.");
+            break;
+        }
+      }, [message]);
 
     const columns=[
-        { field: 'remetente', headerName: 'Remetente', flex: 1,resizable: false, headerAlign: "left"},
-        { field: 'emailRemetente', headerName: 'E-mail Remetente', flex: 1 , resizable: false, headerAlign: "left"},
+        { field: 'sender', headerName: 'Remetente', flex: 1,resizable: false, headerAlign: "left"},
+        { field: 'senderEmail', headerName: 'E-mail Remetente', flex: 1 , resizable: false, headerAlign: "left"},
         { field: 'propertyName', headerName: 'Nome da Propriedade', flex: 1, resizable: false, headerAlign: "left" },
         { field: 'city', headerName: 'Cidade', flex: 1,resizable: false, headerAlign: "left"},
         {
@@ -38,7 +56,9 @@ const Invite = () => {
             headerName: 'Ações',
             headerAlign: "center",
             flex: 1,
-            renderCell: (params) => (
+            renderCell: (params) => {
+                const inviteId = params.row.id;
+                return(
                 <Box
                     display="flex" 
                     justifyContent="center" 
@@ -48,12 +68,12 @@ const Invite = () => {
                     {isMobile ? (
                         <>
                             <Tooltip title="Aceitar">
-                                <IconButton onClick={() => handleAccept(params.row.id)} sx={{ color: colors.blueAccent[500] }}>
+                                <IconButton onClick={() => handleAccept(inviteId)} sx={{ color: colors.blueAccent[500] }}>
                                     <DoneIcon />
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title="Recusar">
-                                <IconButton onClick={() => handleDecline(params.row.id)} sx={{ color: colors.redAccent[500] }}>
+                                <IconButton onClick={handleOpenModal} sx={{ color: colors.redAccent[500] }}>
                                     <ClearIcon />
                                 </IconButton>
                             </Tooltip>
@@ -63,7 +83,7 @@ const Invite = () => {
                             <Tooltip title="Aceitar">
                                 <Button
                                         variant="contained" 
-                                        onClick={() => handleAccept(params.row.id)}
+                                        onClick={() => handleAccept(inviteId)}
                                         sx={{ marginRight: "10px",
                                             backgroundColor:  colors.blueAccent[500],
                                             "&:hover": {
@@ -77,7 +97,7 @@ const Invite = () => {
                             <Tooltip title="Recusar">
                                 <Button
                                     variant="contained" 
-                                    onClick={handleOpen} 
+                                    onClick={handleOpenModal} 
                                     sx={{ backgroundColor:  colors.redAccent[500],
                                         "&:hover": {
                                             backgroundColor: colors.grey[700], 
@@ -87,7 +107,9 @@ const Invite = () => {
                                     <ClearIcon/>
                                 </Button>
                             </Tooltip>
-                            <Modal
+                        </>
+                    )}
+                    <Modal
                                 open={open}
                                 onClose={null} 
                                 aria-labelledby="transition-modal-title"
@@ -98,7 +120,8 @@ const Invite = () => {
                                     backdrop: {
                                         timeout: 500,
                                         sx: {
-                                            backgroundColor: 'rgba(0, 0, 0, 0.05)',} // Alterando a cor do background do Backdrop
+                                            //backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                                            } 
                                     },
                                 }}
                             >
@@ -144,7 +167,7 @@ const Invite = () => {
                                                 Cancelar
                                                 </Button>
                                                 <Button 
-                                                            onClick={handleDelete} 
+                                                            onClick={() => handleDecline(inviteId)} 
                                                             variant="contained" 
                                                             sx={{ backgroundColor:  colors.redAccent[500],
                                                                 "&:hover": {
@@ -159,13 +182,9 @@ const Invite = () => {
                                         </Box>
                                     </Fade>
                             </Modal>
-                        </>
-                        
-
-                    )}
                     
                 </Box>
-            )
+            )}
         },
     ];
 
@@ -176,45 +195,92 @@ const Invite = () => {
         }
     }, []);
 
-    const handleOpen = () => setOpen(true);
 
-    const handleClose = () => {
-        setOpen(false);
-        setIsChecked(false);
-    };
-
-    const handleDelete = () =>{
-        handleClose();
-    }
-
-    const handleCheckboxChange = (event) => {
-        setIsChecked(event.target.checked);
-    };
-/*
     useEffect(() => {
-        if (userData) { 
+        if (userData && userData.email) { 
             const fetchInvites = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:3000/invites/${id}`);
-                    setInvites(response.data.invites); // Supondo que a resposta contenha uma lista de convites
+                    const response = await axios.get(`http://localhost:3000/searchInvites/${userData.email}`);
+                    const linhasDaTabela = response.data.flatMap(item => {
+                        const { invite, property, sender } = item; 
+                        return {
+                            id: invite.id, 
+                            sender: sender.name, 
+                            senderEmail: sender.email,
+                            propertyName: property.name, 
+                            city: property.city
+                        };
+                    });
+                    //console.log(linhasDaTabela)
+                    setInvites(linhasDaTabela); 
                 } catch (error) {
                     console.log("ERROR - ao buscar convites.");
                 }
             };
             fetchInvites();
         }
-    }, [userData, id]);  */
+    }, [userData]);  
+
 
     const navigate = useNavigate(); 
 
-    const handleAccept = (inviteId) => {
-        // Lógica para aceitar o convite
-        console.log("Convite aceito:", inviteId);
+    const handleOpenModal = () => setOpen(true);
+
+    const handleClose = () => {
+        setOpen(false);
+        setIsChecked(false);
     };
 
-    const handleDecline = (inviteId) => {
-        // Lógica para recusar o convite
-        console.log("Convite recusado:", inviteId);
+    const handleCheckboxChange = (event) => {
+        setIsChecked(event.target.checked);
+    };
+
+    const handleAccept = async (inviteId) => {
+        setSnackbarMessage("Convite aceito!");
+        setStyleSnackBar("success")
+        setOpenSnackbar(true);
+
+        try {
+            const response = await axios.post(`http://localhost:3000/acceptInvite/${inviteId}`, {
+                answer: true, 
+            });
+    
+            if (response.status === 200) {
+                //window.location.reload();
+            } else {
+                console.error("Erro ao recusar o convite:", response.status);
+            }
+        } catch (error) {
+            console.error("Erro ao enviar a recusa do convite:", error);
+        }
+    };
+
+    const handleCloseSnackbar = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setOpenSnackbar(false);
+    };
+
+    const handleDecline = async (inviteId) => {
+        handleClose();
+        setSnackbarMessage("Convite recusado!");
+        setStyleSnackBar("error")
+        setOpenSnackbar(true);
+
+        try {
+            const response = await axios.post(`http://localhost:3000/acceptInvite/${inviteId}`, {
+                answer: false, 
+            });
+    
+            if (response.status === 200) {
+                //window.location.reload();
+            } else {
+                console.error("Erro ao recusar o convite:", response.status);
+            }
+        } catch (error) {
+            console.error("Erro ao enviar a recusa do convite:", error);
+        }
     };
 
     return (
@@ -231,7 +297,7 @@ const Invite = () => {
                                 fontWeight: "bold",
                                 padding: "10px 20px",
                             }}
-                            onClick={() => navigate(``)}
+                            onClick={() => navigate(`/invites/add`)}
                         >
                             <PersonAddAlt1Icon sx={{ mr: isMobile ? "0px" : "10px" }} />
                             {!isMobile && ("Enviar Convite")}
@@ -268,7 +334,7 @@ const Invite = () => {
                     },
                 }}
                 >
-                    {mockDataInvites.length === 0 ? (
+                    {invites.length === 0 ? (
                         <Box
                             display="flex"
                             flexDirection= "column"
@@ -278,12 +344,12 @@ const Invite = () => {
                             mt="50px"
                         >
                             <Typography variant={isMobile ? "h6": "h5"} fontWeight="bold" color={colors.grey[100]}>
-                                Nenhum convite pendente.
+                                Nenhum convite encontrado.
                             </Typography>
                         </Box>
                 ) : (
                     <DataGrid
-                        rows={mockDataInvites}
+                        rows={invites}
                         columns ={columns}
                         localeText={{ noRowsLabel: <b>Nenhum convite encontrado.</b> }}
                         initialState={{
@@ -295,7 +361,7 @@ const Invite = () => {
                 )}
             </Box>
             <div>
-                {message !== 0  && (
+                {snackbarMessage !== ""  && (
                     <Snackbar 
                     open={openSnackbar} 
                     autoHideDuration={2500} 
@@ -304,7 +370,7 @@ const Invite = () => {
                 >
                     <Alert
                         onClose={handleCloseSnackbar}
-                        severity="success"
+                        severity={styleSnackBar}
                         variant="filled"
                         sx={{ 
                         width: '450px', 
@@ -319,6 +385,31 @@ const Invite = () => {
                     </Alert>
                 </Snackbar>
                 )}
+                {message && (
+                    <Snackbar 
+                    open={openSnackbar} 
+                    autoHideDuration={2500} 
+                    onClose={handleCloseSnackbar}
+                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }} 
+                >
+                    <Alert
+                        onClose={handleCloseSnackbar}
+                        severity={styleSnackBar}
+                        variant="filled"
+                        sx={{ 
+                        width: '450px', 
+                        height: '60px',
+                        display: 'flex', 
+                        alignItems: 'center',
+                        justifyContent: 'center', 
+                        fontSize: '20px',
+                    }}
+                    >
+                        {snackbarMessage}
+                    </Alert>
+                </Snackbar>
+                )}
+                
             </div>
         </Box>
     );

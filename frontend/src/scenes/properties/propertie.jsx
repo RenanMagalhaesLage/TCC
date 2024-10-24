@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import secureLocalStorage from 'react-secure-storage';
 import { useNavigate,useParams } from 'react-router-dom';
-import { Box, Typography, useTheme, Button, useMediaQuery,  Checkbox, FormControlLabel, Fade, Backdrop, Modal  } from "@mui/material";
+import { Box, Typography, useTheme, Button, useMediaQuery,  Checkbox, FormControlLabel, Fade, Backdrop, Modal,Tooltip,IconButton   } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
@@ -19,6 +19,7 @@ const Propertie = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const isMobile = useMediaQuery("(max-width: 800px)");
+    const isSmallDivice = useMediaQuery("(max-width: 1300px)");
     const [userData, setUserData] = useState(null);
     const [propriedade, setPropriedade] = useState("");
     const [usuarios, setUsuarios] = useState([]);
@@ -37,11 +38,7 @@ const Propertie = () => {
             flex: 1,
             headerAlign: "center",
             resizable: false,
-            renderCell: ({ row: { access } }) => {
-                if (access !== "owner") {
-                    return null; 
-                }
-        
+            renderCell: ({ row: { access } }) => {        
                 return (
                     <Box
                         width="60%"
@@ -50,17 +47,18 @@ const Propertie = () => {
                         display="flex"
                         justifyContent="center"
                         backgroundColor={
-                            access === "owner" ? colors.myorange[500] : colors.myorange[400]
+                            access === "owner" ? colors.orangeAccent[500] : colors.orangeAccent[300]
                         }
                         borderRadius="4px"
+                        sx={{color: theme.palette.mode === 'dark' ?colors.primary[400]: colors.grey[100]}}
                     >
                         {access === "owner" && <AdminPanelSettingsOutlinedIcon />}
-                        {access === "permission" && <LockOpenOutlinedIcon />}
-                        {!isMobile && (
+                        {access === "guest" && <LockOpenOutlinedIcon />}
+                        {!isSmallDivice && (
                             <Typography
-                                sx={{ ml: "5px", fontWeight: "bold", color: theme.palette.mode === 'dark' ? "#FFFFFF" : colors.grey[100] }}
+                                sx={{ ml: "5px", fontWeight: "bold", }}
                             >
-                                {access.charAt(0).toUpperCase() + access.slice(1)}
+                                {access === "owner" ? "Proprietário" : "Permissão"}
                             </Typography>
                         )}
                     </Box>
@@ -81,17 +79,32 @@ const Propertie = () => {
                         width="100%"
                         m="10px auto"
                     >
-                        {userData.email === owner.email && (
-                            <Button 
-                                variant="contained" 
-                                style={{ backgroundColor: access !== "owner" ? colors.redAccent[500] : colors.grey[800] }} 
-                                onClick={() => handleDelete(params.row.id)}
-                                sx={{ ml: 2 }} 
-                                disabled={access === "owner"} 
-                            >
-                                <PersonRemoveIcon />
-                            </Button>
+                        {isMobile ? (
+                            <>
+                                <Tooltip title="Remover">
+                                    <IconButton onClick={() => handleDelete(params.row.id)}  style={{ color: access !== "owner" ? colors.redAccent[500] : colors.grey[800] }}>
+                                        <PersonRemoveIcon />
+                                    </IconButton>
+                                </Tooltip>
+                            </>
+                        ):(
+                            <>
+                                <Tooltip title="Remover">
+                                    <Button 
+                                        variant="contained" 
+                                        style={{ backgroundColor: access !== "owner" ? colors.redAccent[500] : colors.grey[800] }} 
+                                        onClick={() => handleDelete(params.row.id)}
+                                        sx={{ ml: 2 }} 
+                                        disabled={access === "owner"} 
+                                    >
+                                        <PersonRemoveIcon />
+                                    </Button>
+                                </Tooltip>
+
+                                
+                            </>
                         )}
+                            
                         
 
                     </Box>
@@ -118,17 +131,32 @@ const Propertie = () => {
                         width="100%"
                         m="10px auto"
                     >
-                        <Button 
-                            variant="contained" 
-                            sx={{ backgroundColor: colors.greenAccent[500],
-                                "&:hover": {
-                                     backgroundColor: colors.grey[700], 
-                                },
-                             }} 
-                             onClick={() => handleView(id)}
-                        >
-                            <VisibilityIcon />
-                        </Button>
+                        {isMobile ? (
+                            <>
+                                <Tooltip title="Visualizar">
+                                    <IconButton onClick={() => handleView(id)} sx={{ color: colors.greenAccent[500]}}>
+                                        <VisibilityIcon />
+                                    </IconButton>
+                                </Tooltip>
+                            </>
+                        ):(
+                            <>
+                                <Tooltip title="Visualizar">
+                                    <Button
+                                        variant="contained"
+                                        sx={{
+                                            backgroundColor: colors.greenAccent[500],
+                                            "&:hover": {
+                                                backgroundColor: colors.grey[700], 
+                                            },
+                                        }}
+                                        onClick={() => handleView(id)}
+                                    >
+                                        <VisibilityIcon />
+                                    </Button>
+                                </Tooltip>
+                            </>
+                        )}
                        
 
                     </Box>
@@ -302,18 +330,20 @@ const Propertie = () => {
                                         flexGrow={1}
                                         width="100%" 
                                     >
-                                        <Button 
-                                            variant="contained" 
-                                            onClick={handleOpen} 
-                                            sx={{ backgroundColor:  colors.redAccent[500],
-                                                "&:hover": {
-                                                    backgroundColor: colors.grey[700], 
-                                                },
-                                            }} 
-
-                                        >
-                                            <DeleteIcon />
-                                        </Button>
+                                        <Tooltip title='Deletar'>
+                                            <Button 
+                                                variant="contained" 
+                                                onClick={handleOpen} 
+                                                sx={{ backgroundColor:  colors.redAccent[500],
+                                                    "&:hover": {
+                                                        backgroundColor: colors.grey[700], 
+                                                    },
+                                                }} 
+                                            >
+                                                <DeleteIcon />
+                                            </Button>
+                                        </Tooltip>
+                                        
                                         <Modal
                                             open={open}
                                             onClose={null} 
@@ -391,35 +421,39 @@ const Propertie = () => {
                                                 </Box>
                                             </Fade>
                                         </Modal>
-                                        <Button 
-                                            variant="contained" 
-                                            onClick={() => handleEdit()} 
-                                            sx={{ml:2,
-                                                backgroundColor:colors.myorange[500],
-                                                "&:hover": {
-                                                    backgroundColor: colors.grey[700], 
-                                                },
-                                            }}
+                                        <Tooltip title='Editar'>
+                                            <Button 
+                                                variant="contained" 
+                                                onClick={() => handleEdit()} 
+                                                sx={{ml:2,
+                                                    backgroundColor:colors.orangeAccent[500],
+                                                    "&:hover": {
+                                                        backgroundColor: colors.grey[700], 
+                                                    },
+                                                }}
 
-                                        >
-                                            <EditIcon />
-                                        </Button>
-                                        <Button 
-                                            variant="contained" 
-                                            onClick={() => handleEdit(params.row)} 
-                                            sx={{ml:2,
-                                                backgroundColor:colors.blueAccent[500],
-                                                "&:hover": {
-                                                    backgroundColor: colors.grey[700], 
-                                                },
-                                            }}
-                                        >
-                                            <PersonAddAlt1Icon />
-                                        </Button>
+                                            >
+                                                <EditIcon />
+                                            </Button>
+                                        </Tooltip>
+                                        <Tooltip title='Convidar Usuário'>
+                                            <Button 
+                                                variant="contained" 
+                                                onClick={() => handleEdit(params.row)} 
+                                                sx={{ml:2,
+                                                    backgroundColor:colors.blueAccent[500],
+                                                    "&:hover": {
+                                                        backgroundColor: colors.grey[700], 
+                                                    },
+                                                }}
+                                            >
+                                                <PersonAddAlt1Icon />
+                                            </Button>
+                                        </Tooltip>
+
+                                        
                                     </Box>
-                                    
                                 )}
-                                
                             </Box>   
                         </Box>
                         {/* Tabela de Glebas & Tabela de usuários na fazenda */}

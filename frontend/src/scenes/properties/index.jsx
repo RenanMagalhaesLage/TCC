@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, useTheme, Button, useMediaQuery,Snackbar, Alert  } from "@mui/material";
+import { Box, Typography, useTheme, Button, useMediaQuery,Snackbar, Alert,Tooltip,IconButton } from "@mui/material";
 import { useNavigate,useLocation,useParams } from 'react-router-dom';
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
@@ -50,7 +50,6 @@ const Properties = () => {
       }, [message]);
 
     const columns = [
-        { field: "id", headerName: "Id", flex: 1, cellClassName: "id-column--cell", resizable: false },
         { field: "name", headerName: "Nome", flex: 1, cellClassName: "name-column--cell", resizable: false },
         { field: "city", headerName: "Cidade", flex: 1, cellClassName: "city-column--cell", resizable: false },
         { field: "area", headerName: "Área", type: "number", headerAlign: "left", align: "left", resizable: false },
@@ -69,17 +68,18 @@ const Properties = () => {
                         display="flex"
                         justifyContent="center"
                         backgroundColor={
-                            access === "owner" ? colors.myorange[500] : colors.myorange[400]
+                            access === "owner" ? colors.orangeAccent[500] : colors.orangeAccent[300]
                         }
                         borderRadius="4px"
+                        sx={{color: theme.palette.mode === 'dark' ?colors.primary[400]: colors.grey[100]}}
                     >
                         {access === "owner" && <AdminPanelSettingsOutlinedIcon />}
-                        {access === "permission" && <LockOpenOutlinedIcon />}
+                        {access === "guest" && <LockOpenOutlinedIcon />}
                         {!isSmallDivice && (
                             <Typography
-                                sx={{ ml: "5px", fontWeight: "bold", color: theme.palette.mode === 'dark' ? "#FFFFFF" : colors.grey[100] }}
+                                sx={{ ml: "5px", fontWeight: "bold", }}
                             >
-                                {access.charAt(0).toUpperCase() + access.slice(1)}
+                                {access === "owner" ? "Proprietário" : "Permissão"}
                             </Typography>
                         )}
                     </Box>
@@ -100,19 +100,32 @@ const Properties = () => {
                         width="100%"
                         m="10px auto"
                     >
-                        <Button
-                            variant="contained"
-                            sx={{
-                                backgroundColor: colors.greenAccent[500],
-                                "&:hover": {
-                                    backgroundColor: colors.grey[700], 
-                                },
-                            }}
-                            onClick={() => handleView(id)}
-                        >
-                            <VisibilityIcon />
-                        </Button>
-
+                        {isMobile ? (
+                            <>
+                                <Tooltip title="Visualizar">
+                                    <IconButton onClick={() => handleView(id)} sx={{ color: colors.greenAccent[500]}}>
+                                        <VisibilityIcon />
+                                    </IconButton>
+                                </Tooltip>
+                            </>
+                        ):(
+                            <>
+                                <Tooltip title="Visualizar">
+                                    <Button
+                                        variant="contained"
+                                        sx={{
+                                            backgroundColor: colors.greenAccent[500],
+                                            "&:hover": {
+                                                backgroundColor: colors.grey[700], 
+                                            },
+                                        }}
+                                        onClick={() => handleView(id)}
+                                    >
+                                        <VisibilityIcon />
+                                    </Button>
+                                </Tooltip>
+                            </>
+                        )}
                     </Box>
                 );
             },
@@ -150,15 +163,12 @@ const Properties = () => {
     const handleView = (id) => {
         navigate(`/propriedades/${id}`);
     };
-    const handleAdd = () =>{
-        navigate(`/propriedades/add`);
-    }
 
     const handleCloseSnackbar = (event, reason) => {
         if (reason === 'clickaway') {
             return;
         }
-        setOpenSnackbar(false); // Fecha o Snackbar
+        setOpenSnackbar(false);
     };
 
     return (
@@ -174,7 +184,8 @@ const Properties = () => {
                         fontWeight: "bold",
                         padding: "10px 20px",
                         }}
-                        onClick={() => handleAdd()}
+                        onClick={() => navigate(`/propriedades/add`)}
+
                     >
                         <AddCircleOutlineIcon sx={{ mr: isMobile? "0px" :"10px" }} />
                         {!isMobile && ("Adicionar Propriedade")}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, useTheme, Button, useMediaQuery,Snackbar, Alert  } from "@mui/material";
+import { Box, Typography, useTheme, Button, useMediaQuery,Snackbar,Alert,Tooltip,IconButton  } from "@mui/material";
 import { useNavigate,useLocation } from 'react-router-dom';
 import axios from "axios";
 import secureLocalStorage from 'react-secure-storage';
@@ -49,15 +49,16 @@ const Safras = () => {
                         display="flex"
                         justifyContent="center"
                         backgroundColor={
-                            type === "Planejado" ? colors.myorange[500] : colors.myorange[400]
+                            type === "Planejado" ? colors.orangeAccent[500] : colors.orangeAccent[300]
                         }
                         borderRadius="4px"
+                        sx={{color: theme.palette.mode === 'dark' ?colors.primary[400]: colors.grey[100]}}
                     >
                         {type === "Planejado" && <EqualizerIcon/>}
                         {type === "Realizado" && <TimelineIcon />}
                         {!isSmallDivice && (
                             <Typography
-                                sx={{ ml: "5px", fontWeight: "bold", color: theme.palette.mode === 'dark' ? "#FFFFFF" : colors.grey[100] }}
+                                sx={{ ml: "5px", fontWeight: "bold"}}
                             >
                                 {type}
                             </Typography>
@@ -230,18 +231,32 @@ const Safras = () => {
                         width="100%"
                         m="10px auto"
                     >
-                        <Button 
-                            variant="contained" 
-                            sx={{ backgroundColor: colors.greenAccent[500],
-                                "&:hover": {
-                                    backgroundColor: colors.grey[700], 
-                                },
-                             }} 
-                             onClick={() => handleView(id)}
-                        >
-                            <VisibilityIcon />
-                        </Button>
-
+                        {isMobile ? (
+                            <>
+                                <Tooltip title="Visualizar">
+                                    <IconButton onClick={() => handleView(id)} sx={{ color: colors.greenAccent[500]}}>
+                                        <VisibilityIcon />
+                                    </IconButton>
+                                </Tooltip>
+                            </>
+                        ):(
+                            <>
+                                <Tooltip title="Visualizar">
+                                    <Button
+                                        variant="contained"
+                                        sx={{
+                                            backgroundColor: colors.greenAccent[500],
+                                            "&:hover": {
+                                                backgroundColor: colors.grey[700], 
+                                            },
+                                        }}
+                                        onClick={() => handleView(id)}
+                                    >
+                                        <VisibilityIcon />
+                                    </Button>
+                                </Tooltip>
+                            </>
+                        )}
                     </Box>
                 );
             },

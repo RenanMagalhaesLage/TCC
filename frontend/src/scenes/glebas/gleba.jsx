@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate,useParams } from 'react-router-dom';
 import secureLocalStorage from 'react-secure-storage';
 import axios from "axios";
-import { Box, Typography, useTheme, Button, useMediaQuery,Checkbox, FormControlLabel, Modal, Backdrop, Fade } from "@mui/material";
+import { Box, Typography, useTheme, Button, useMediaQuery,Checkbox,FormControlLabel,Modal,Backdrop,Fade,Tooltip,IconButton} from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import { mockDataUsers, mockDataGlebas } from "../../data/mockData";
@@ -46,17 +46,32 @@ const Gleba = () => {
                         width="100%"
                         m="10px auto"
                     >
-                        <Button 
-                            variant="contained" 
-                            sx={{ backgroundColor: colors.greenAccent[500],
-                                "&:hover": {
-                                    backgroundColor: colors.grey[700], 
-                                },
-                             }} 
-                            onClick={() => handleView(params.row)}
-                        >
-                            <VisibilityIcon />
-                        </Button>                      
+                        {isMobile ? (
+                            <>
+                                <Tooltip title="Visualizar">
+                                    <IconButton onClick={() => handleView(id)} sx={{ color: colors.greenAccent[500]}}>
+                                        <VisibilityIcon />
+                                    </IconButton>
+                                </Tooltip>
+                            </>
+                        ):(
+                            <>
+                                <Tooltip title="Visualizar">
+                                    <Button
+                                        variant="contained"
+                                        sx={{
+                                            backgroundColor: colors.greenAccent[500],
+                                            "&:hover": {
+                                                backgroundColor: colors.grey[700], 
+                                            },
+                                        }}
+                                        onClick={() => handleView(id)}
+                                    >
+                                        <VisibilityIcon />
+                                    </Button>
+                                </Tooltip>
+                            </>
+                        )}                     
 
                     </Box>
                 );
@@ -325,7 +340,7 @@ const Gleba = () => {
                                             variant="contained" 
                                             onClick={() => handleEdit()} 
                                             sx={{ml:2,
-                                                backgroundColor:colors.myorange[500],
+                                                backgroundColor:colors.orangeAccent[500],
                                                 "&:hover": {
                                                     backgroundColor: colors.grey[700], 
                                                 },

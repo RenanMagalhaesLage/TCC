@@ -42,7 +42,7 @@ const SafrasHistory = () => {
                         display="flex"
                         justifyContent="center"
                         backgroundColor={
-                            type === "Planejado" ? colors.myorange[500] : colors.myorange[400]
+                            type === "Planejado" ? colors.orangeAccent[500] : colors.orangeAccent[400]
                         }
                         borderRadius="4px"
                     >
