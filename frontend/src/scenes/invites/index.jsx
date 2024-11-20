@@ -176,7 +176,7 @@ const Invite = () => {
                                                             }}
                                                             disabled={!isChecked} 
                                                 >
-                                                 Deletar
+                                                 Recusar
                                                 </Button>
                                             </Box>
                                         </Box>

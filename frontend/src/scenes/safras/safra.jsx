@@ -14,6 +14,8 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DoneIcon from '@mui/icons-material/Done';
 import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 
 
 const Safra = () => {
@@ -29,6 +31,7 @@ const Safra = () => {
     const [custos,setCustos] = useState([]);
     const [open, setOpen] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
+    const [isHigher, setIsHigher] = useState(false)
 
     const headerNames = [
         "Cultivo",
@@ -47,11 +50,15 @@ const Safra = () => {
         "Grãos Esverdeados",
         "Grãos Quebrados",
         "Prod. Total",
+        
+    ];
+
+    const comparativoProd = [
         "Prod. Prevista",
         "Prod. Realizada",
         "Comparativo",
         "Porcentagem / HA",
-    ];
+    ]
 
     const fieldNames = [
         "cultivo",
@@ -74,7 +81,6 @@ const Safra = () => {
         "prodRealizada",
         "comparativo",
         "porcentHect",
-        "actions"
     ];
 
 
@@ -95,6 +101,7 @@ const Safra = () => {
                     setGleba(gleba);
                     setPropriedade(property);
                     setOwner(owner);
+                    setIsHigher(prodRealizada > prodPrevista);
                 } catch (error) {
                     console.log("ERROR - ao buscar a gleba.");
                 }
@@ -272,7 +279,7 @@ const Safra = () => {
                             gridColumn="span 12"
                             backgroundColor={colors.primary[400]}
                             display="grid"
-                            gridTemplateColumns={isMobile ? "1fr" : "repeat(2, 1fr)"} 
+                            gridTemplateColumns={"repeat(2, 1fr)"} 
                             padding="25px 35px 30px 35px"
                             height={isMobile ? "auto" : "initial"} 
                             minHeight={isMobile ? "900px" : "550px"} 
@@ -281,9 +288,9 @@ const Safra = () => {
                             sx={{boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.07)",}}
                         >
                             {/* Primeira Coluna */}
-                            <Box display="flex" flexDirection="column" alignItems="flex-start">
+                            <Box display="flex" flexDirection="column" alignItems="flex-start" >
                                 {headerNames.slice(0, Math.ceil(headerNames.length / 2)).map((headerName, index) => (
-                                        <Box display="flex" alignItems="center" marginBottom="15px" key={index}>
+                                        <Box display="flex" alignItems={isMobile ? "flex-start":"center" } marginBottom="15px" flexDirection={isMobile ? "column":"row" } key={index}>
                                             <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
                                                 {headerName}:
                                             </Typography>
@@ -296,9 +303,9 @@ const Safra = () => {
                             </Box>
 
                             {/* Segunda Coluna */}
-                            <Box display="flex" flexDirection="column" alignItems="flex-start">
+                            <Box display="flex" flexDirection="column" alignItems="flex-start" >
                                 {headerNames.slice(Math.ceil(headerNames.length / 2)).map((headerName, index) => (
-                                    <Box display="flex" alignItems="center" marginBottom="15px" key={index + Math.ceil(headerNames.length / 2)}>
+                                    <Box display="flex" alignItems={isMobile ? "flex-start":"center" } marginBottom="15px" flexDirection={isMobile ? "column":"row" } key={index + Math.ceil(headerNames.length / 2)}>
                                         <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
                                             {headerName}:
                                         </Typography>
@@ -307,7 +314,69 @@ const Safra = () => {
                                         </Typography>
                                     </Box>
                                 ))}
-                                {userData && owner && userData.email === owner.email &&  (
+                            </Box>  
+                            {/* Linha de baixo */} 
+                            <Box
+                                gridColumn="span 12"
+                                display="grid"
+                                gridTemplateColumns={isMobile ? "repeat(2, 1fr)" : "repeat(4, 1fr)"}
+                                gap="15px"
+                            >
+                                <Box display="flex" alignItems={isMobile ? "flex-start":"center" } marginBottom="15px" flexDirection={isMobile ? "column":"row" }>
+                                    <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginBottom="5px" marginRight="10px">
+                                        Prod. Prevista:
+                                    </Typography>
+                                    <Typography variant="body1" color={colors.grey[300]}>
+                                        {safra.prodPrevista}
+                                    </Typography>
+                                </Box>
+
+                                <Box display="flex" alignItems={isMobile ? "flex-start":"center" } marginBottom="15px" flexDirection={isMobile ? "column":"row" }>
+                                    <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginBottom="5px" marginRight="10px">
+                                    Prod. Realizada:
+                                    </Typography>
+                                    <Typography variant="body1" color={colors.grey[300]}>
+                                        {safra.prodRealizada}
+                                    </Typography>
+                                </Box>
+
+                                <Box display="flex" alignItems={"center" } marginBottom="15px">
+                                    <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginBottom="5px" marginRight="10px">
+                                    Comparativo:
+                                    </Typography>
+                                    <Typography variant="body1" color={colors.grey[300]}>
+                                    <Box
+                                        width="100%"
+                                        p="5px"
+                                        display="flex"
+                                        justifyContent="center"
+                                        alignItems="center"
+                                        backgroundColor={isHigher ? colors.mygreen[500] : colors.redAccent[500]} 
+                                        borderRadius="4px"
+                                        color={"#fff" }
+                                    >
+                                        {isHigher ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />} 
+                                    </Box>
+                                    </Typography>
+                                </Box>
+
+                                <Box display="flex" alignItems={isMobile ? "flex-start":"center" } marginBottom="15px" flexDirection={isMobile ? "column":"row" }>
+                                    <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginBottom="5px" marginRight="10px">
+                                    Porcentagem / HA:
+                                    </Typography>
+                                    <Typography variant="body1" color={colors.grey[300]}>
+                                        {safra.porcentHect}
+                                    </Typography>
+                                </Box>
+                                
+                            </Box>
+                            <Box
+                                gridColumn="span 12"
+                                display="grid"
+                                alignItems="flex-end"
+                                justifyContent="flex-end"
+                            >
+                            {userData && owner && userData.email === owner.email &&  (
                                     <Box 
                                         display="flex" 
                                         justifyContent= {isMobile ? "flex-start" : "flex-end"} 
@@ -422,7 +491,8 @@ const Safra = () => {
                                         </Tooltip>
                                     </Box>
                                 )}
-                            </Box>   
+                            </Box>
+
                         </Box>
                         {/*Tabelas*/}
                         <Box

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, useTheme, Button, useMediaQuery,Snackbar,Alert,Tooltip,IconButton  } from "@mui/material";
+import { Box, Typography,TextField, useTheme, Button, useMediaQuery,Snackbar,Alert,Tooltip,IconButton, Paper, Tabs, Tab} from "@mui/material";
+import { GridToolbarContainer, GridToolbarColumnsButton, GridToolbarFilterButton, GridToolbarDensitySelector } from '@mui/x-data-grid';
+import { styled } from '@mui/system';
+import { DataGrid,GridToolbar } from "@mui/x-data-grid";
 import { useNavigate,useLocation } from 'react-router-dom';
 import axios from "axios";
 import secureLocalStorage from 'react-secure-storage';
-import { DataGrid,GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import { mockDataFazenda, mockDataSafra } from "../../data/mockData";
 import Header from "../../components/Header";
@@ -28,6 +30,7 @@ const Safras = () => {
     const message = Number(query.get('message'));
     const [openSnackbar, setOpenSnackbar] = useState(!!message);
     const [snackbarMessage, setSnackbarMessage] = useState(""); 
+    const [safraType, setSafraType] = useState(0);
 
     const columns = [
         { field: "propertie", headerName: "Propriedade", flex: 1, minWidth: 150, cellClassName: "name-column--cell", resizable: false },
@@ -264,6 +267,202 @@ const Safras = () => {
         },  
     ];
 
+    const columnsPlanejadas = [
+        { field: "propertie", headerName: "Propriedade", flex: 1, minWidth: 150, cellClassName: "name-column--cell", resizable: false },
+        { field: "gleba", headerName: "Gleba", flex: 1, minWidth: 100, cellClassName: "name-column--cell", resizable: false },
+        { field: "area", headerName: "Área da Gleba", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },    
+        { field: "cultivo", headerName: "Cultivo", flex: 1, minWidth: 100, cellClassName: "city-column--cell", resizable: false },
+        { field: "semente", headerName: "Semente", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
+        { field: "metroLinear", headerName: "Metro Linear", type: "number", headerAlign: "left", align: "left", minWidth: 120, resizable: false },
+        { field: "dosagem", headerName: "Dosagem", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
+        { field: "toneladas", headerName: "Toneladas", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
+        { field: "adubo", headerName: "Adubo", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
+        { field: "dataFimPlantio", headerName: "Fim Plantio", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
+        { field: "dataFimColheita", headerName: "Fim Colheita", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
+        { field: "tempoLavoura", headerName: "Tempo Lavoura", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
+        { field: "precMilimetrica", headerName: "Precipitação Milimetrica", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
+        { field: "prodTotal", headerName: "Prod. Total", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
+        { field: "prodPrevista", headerName: "Prod. Prevista", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
+        {
+            field: "actions",
+            headerName: "Ações",
+            flex: 1,
+            minWidth: 100,
+            renderCell: (params) => {
+                const { id } = params.row;
+
+                return (
+                    <Box 
+                        display="flex" 
+                        justifyContent="center" 
+                        width="100%"
+                        m="10px auto"
+                    >
+                        {isMobile ? (
+                            <>
+                                <Tooltip title="Visualizar">
+                                    <IconButton onClick={() => handleView(id)} sx={{ color: colors.greenAccent[500]}}>
+                                        <VisibilityIcon />
+                                    </IconButton>
+                                </Tooltip>
+                            </>
+                        ):(
+                            <>
+                                <Tooltip title="Visualizar">
+                                    <Button
+                                        variant="contained"
+                                        sx={{
+                                            backgroundColor: colors.greenAccent[500],
+                                            "&:hover": {
+                                                backgroundColor: colors.grey[700], 
+                                            },
+                                        }}
+                                        onClick={() => handleView(id)}
+                                    >
+                                        <VisibilityIcon />
+                                    </Button>
+                                </Tooltip>
+                            </>
+                        )}
+                    </Box>
+                );
+            },
+            headerAlign: "center"
+        },  
+    ];
+
+    const columnsRealizadas = [
+        { field: "propertie", headerName: "Propriedade", flex: 1, minWidth: 150, cellClassName: "name-column--cell", resizable: false },
+        { field: "gleba", headerName: "Gleba", flex: 1, minWidth: 100, cellClassName: "nameGleba-column--cell", resizable: false },
+        { field: "area", headerName: "Área da Gleba", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },    
+        { field: "cultivo", headerName: "Cultivo", flex: 1, minWidth: 100, cellClassName: "city-column--cell", resizable: false },
+        { 
+            field: "umidade", 
+            headerName: "Umidade", 
+            type: "number", 
+            headerAlign: "left", 
+            align: "left", 
+            minWidth: 100, 
+            resizable: false, 
+            renderCell: ({ row: { umidade } }) =>{
+                return (
+                <Typography  sx={{mt: "16px"}}>
+                                {umidade + "%"}
+                </Typography>
+            )}
+        },    
+        { 
+            field: "impureza", 
+            headerName: "Impureza", 
+            type: "number", 
+            headerAlign: "left", 
+            align: "left", 
+            minWidth: 100, 
+            resizable: false,
+            renderCell: ({ row: { impureza } }) =>{
+                return (
+                <Typography  sx={{mt: "16px"}}>
+                                {impureza + "%"}
+                </Typography>
+            )}
+        },
+        { 
+            field: "graosAvariados", 
+            headerName: "Grãos Avariados", 
+            type: "number", 
+            headerAlign: "left", 
+            align: "left", 
+            minWidth: 100, 
+            resizable: false,
+            renderCell: ({ row: { graosAvariados } }) =>{
+                return (
+                <Typography  sx={{mt: "16px"}}>
+                                {graosAvariados + "%"}
+                </Typography>
+            )}
+         },
+        { 
+            field: "graosEsverdeados", 
+            headerName: "Grãos Esverdeados", 
+            type: "number", 
+            headerAlign: "left", 
+            align: "left", 
+            minWidth: 100, 
+            resizable: false,
+            renderCell: ({ row: { graosEsverdeados } }) =>{
+                return (
+                <Typography  sx={{mt: "16px"}}>
+                                {graosEsverdeados + "%"}
+                </Typography>
+            )}
+         },
+         { 
+            field: "graosQuebrados", 
+            headerName: "Grãos Quebrados", 
+            type: "number", 
+            headerAlign: "left", 
+            align: "left", 
+            minWidth: 100, 
+            resizable: false,
+            renderCell: ({ row: { graosQuebrados } }) =>{
+                return (
+                <Typography  sx={{mt: "16px"}}>
+                                {graosQuebrados + "%"}
+                </Typography>
+            )}
+         },
+         { field: "prodRealizada", headerName: "Prod. Realizada", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
+        {
+            field: "actions",
+            headerName: "Ações",
+            flex: 1,
+            minWidth: 100,
+            renderCell: (params) => {
+                const { id } = params.row;
+
+                return (
+                    <Box 
+                        display="flex" 
+                        justifyContent="center" 
+                        width="100%"
+                        m="10px auto"
+                    >
+                        {isMobile ? (
+                            <>
+                                <Tooltip title="Visualizar">
+                                    <IconButton onClick={() => handleView(id)} sx={{ color: colors.greenAccent[500]}}>
+                                        <VisibilityIcon />
+                                    </IconButton>
+                                </Tooltip>
+                            </>
+                        ):(
+                            <>
+                                <Tooltip title="Visualizar">
+                                    <Button
+                                        variant="contained"
+                                        sx={{
+                                            backgroundColor: colors.greenAccent[500],
+                                            "&:hover": {
+                                                backgroundColor: colors.grey[700], 
+                                            },
+                                        }}
+                                        onClick={() => handleView(id)}
+                                    >
+                                        <VisibilityIcon />
+                                    </Button>
+                                </Tooltip>
+                            </>
+                        )}
+                    </Box>
+                );
+            },
+            headerAlign: "center"
+        },  
+    ];
+
+
+    
+
     useEffect(() => {
         const storedUser = secureLocalStorage.getItem('userData'); 
         if (storedUser) {
@@ -332,6 +531,32 @@ const Safras = () => {
         navigate(`/safras/add`);
     }
 
+    const handleTabChange = (newValue) => {
+        setSafraType(newValue);
+        console.log(safraType)
+      };
+
+      const CustomTabs = styled(Tabs)({
+        color:colors.grey[100], 
+        backgroundColor: 'transparent', 
+        '& .MuiTabs-indicator': {
+          backgroundColor: colors.mygreen[400], 
+          height: '4px', 
+        },
+      });
+    
+      const CustomTab = styled(Tab)({
+        '&.Mui-selected': {
+        color:  colors.grey[100], 
+        },
+         '&.MuiTab-root': {
+        backgroundColor: colors.primary[400], // Cor de fundo para abas não selecionadas
+        },
+        '&:hover': {
+        color:  colors.mygreen[400], 
+        },
+      });
+
     return (
         <Box m="20px">
             <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -378,6 +603,18 @@ const Safras = () => {
                         color: `${colors.mygreen[200]} !important`,
                     },
                 }}>
+                <Paper square sx={{ width: '100%', maxWidth: '200px', margin: '0 auto' }}>
+                    <CustomTabs
+                        value={safraType}
+                        indicatorColor="primary"
+                        textColor="primary"
+                        onChange={(event, newValue) => handleTabChange(newValue)}
+                        aria-label="disabled tabs example"
+                    >
+                        <CustomTab  label="Planejada" icon={<EqualizerIcon/>} />
+                        <CustomTab  label="Realizada" icon={<TimelineIcon />}/>
+                    </CustomTabs>
+                </Paper>
                 {safras.length === 0 ? (
                         <Box
                             display="flex"
@@ -391,12 +628,12 @@ const Safras = () => {
                                 Nenhuma safra encontrada.
                             </Typography>
                         </Box>
-                ) : (
+                ) : ( 
                     <DataGrid
-                        rows={safras}
-                        columns={columns}
-                        slots={{ toolbar: GridToolbar, }}
-                    />
+                            rows={safraType === 0 ? safras : safras}
+                            columns={safraType === 0 ? columnsPlanejadas : columnsRealizadas}
+                            slots={{ toolbar: CustomToolbar }}
+                    />                    
                 )}
             </Box>
             <div>
@@ -430,3 +667,14 @@ const Safras = () => {
 };
 
 export default Safras;
+
+
+function CustomToolbar() {
+    return (
+      <GridToolbarContainer>
+        <GridToolbarColumnsButton /> {/* Botão de exibição de colunas */}
+        <GridToolbarFilterButton />  {/* Botão de filtro */}
+        <GridToolbarDensitySelector /> {/* Seletor de densidade */}
+      </GridToolbarContainer>
+    );
+  }

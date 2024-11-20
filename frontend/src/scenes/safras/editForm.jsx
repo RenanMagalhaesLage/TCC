@@ -229,7 +229,7 @@ const SafrasEditForm = () => {
                                 },
                     }} 
                     variant="contained">
-                Editar
+                Salvar
               </Button>
             </Box>
             {/*Object.keys(errors).length > 0 && (

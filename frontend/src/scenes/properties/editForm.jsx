@@ -151,7 +151,7 @@ const PropertiesEditForm = () => {
                                     },
                                 }} 
                                 variant="contained">
-                                Editar
+                                Salvar
                             </Button>
                         </Box>
                     </form>

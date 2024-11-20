@@ -154,7 +154,7 @@ const GlebasEditForm = () => {
                                 },
                     }} 
                     variant="contained">
-                Editar
+                Salvar
               </Button>
             </Box>
           </form>
