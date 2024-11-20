@@ -73,7 +73,7 @@ const GlebasForm = () => {
 
   const navigate = useNavigate(); 
   const handleFormSubmit = async (values) => {
-    console.log("Valores do formulário:", values);
+    //console.log("Valores do formulário:", values);
     if(id){
       values.propertie = propertie.name
     }
@@ -85,10 +85,8 @@ const GlebasForm = () => {
         return; 
       }
 
-      // Agora você pode usar o índice para acessar o vetor X
       const propriedadeId = optionsPropertieId[index].id;
 
-      // Realizar a requisição POST para o backend usando axios
       const response = await axios.post("http://localhost:3000/createGleba", {
         name: values.nameGleba,
         propertyId: propriedadeId,          

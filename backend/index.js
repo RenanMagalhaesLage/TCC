@@ -613,6 +613,69 @@ app.get('/safra/:id', async (req, res) => {
     }
 });
 
+/* Rota para --> CADASTRO DE SAFRA*/
+app.post('/safras', async (req, res) => {
+    try {
+        const { email, glebaId, 
+            cultivo, 
+            semente,
+            metroLinear,
+            dosagem,
+            toneladas,
+            adubo,
+            dataFimPlantio,
+            dataFimColheita,
+            tempoLavoura,
+            prodTotal,
+            prodPrevista, 
+        } = req.body;
+        const user = await User.findOne({ where: { email: email } });
+
+
+        if (
+            !email || !glebaId || !cultivo || !semente || !metroLinear || !dosagem || !toneladas || 
+            !adubo || !dataFimPlantio || !dataFimColheita || !tempoLavoura || !prodTotal || !prodPrevista
+        ) {
+            return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
+        }
+
+        const newSafra = await Safra.create({
+            type: "Planejado",
+            status: false,
+            cultivo: cultivo,
+            semente: semente,
+            metroLinear: metroLinear,
+            dosagem: dosagem,
+            toneladas: toneladas,
+            adubo: adubo,
+            dataFimPlantio: dataFimPlantio,
+            dataFimColheita: dataFimColheita,
+            tempoLavoura: tempoLavoura,
+            prodTotal: prodTotal,
+            prodPrevista: prodPrevista, 
+            precMilimetrica: 0,  
+            umidade: 0,          
+            impureza: 0,         
+            graosAvariados: 0,   
+            graosEsverdeados: 0, 
+            graosQuebrados: 0,   
+            prodTotal: 0,       
+            prodPrevista: 0,    
+            prodRealizada: 0,  
+            porcentHect: 0,
+            glebaId: glebaId       
+        });
+
+
+        return res.status(201).json({ 
+            safra: newSafra
+        });
+    } catch (error) {
+        console.error('Erro ao salvar safra:', error);
+        return res.status(500).json({ error: 'Erro ao salvar a safra.' });
+    }
+});
+
 /*------------------------
         ROTAS INVITE
 --------------------------*/

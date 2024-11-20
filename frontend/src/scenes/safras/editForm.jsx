@@ -13,9 +13,12 @@ const SafrasEditForm = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const isNonMobile = useMediaQuery("(min-width:600px)");
-  const [propertie,setPropertie] = useState(null);
-  const [gleba,setGleba] = useState(null);
-  const [safra, setSafra] = useState(null);
+  const [propertie,setPropertie] = useState(null)
+  const [optionsPropertie, setOptionsPropertie] = useState([]);
+  const [optionsPropertieId, setOptionsPropertieId] = useState([]);
+  const [gleba,setGleba] = useState(null)
+  const [optionsGleba, setOptionsGleba] = useState([]);
+  const [optionsGlebaId, setOptionsGlebaId] = useState([]);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const { id } = useParams(); 
@@ -53,45 +56,65 @@ const SafrasEditForm = () => {
 
   useEffect(() => {
     if (userData && userData.email) {
-        const fetchPropertyData = async () => {
-            try {
-                const response = await axios.get(`http://localhost:3000/safra/${id}`);
-                const { safra, gleba, propriedade, owner } = response.data;
-                setPropertie(propriedade);
-                setGleba(gleba);
-                setSafra(safra)
-                setLoading(false); 
-            } catch (error) {
-                console.error("Erro ao buscar dados da safra:", error);
-                setLoading(false); 
+      const fetchPropriedades = async () => {
+        try {
+            const response = await axios.get(`http://localhost:3000/searchPropriedades/${userData.email}`);
+            const propriedades = response.data.map(propriedade => propriedade.name);
+            const propriedadesId = response.data.map(propriedade => ({
+              id: propriedade.id,
+              name: propriedade.name,
+            }));
+            setOptionsPropertieId(propriedadesId);
+            setOptionsPropertie(propriedades);
+
+            if(id){
+              const fetchPropertyData = async () => {
+                try {
+                    const response = await axios.get(`http://localhost:3000/gleba/${id}`);
+                    const { gleba, propriedade, owner } = response.data;
+                    setPropertie(propriedade);
+                    //console.log("info --> " + propriedade.name + " " + gleba.name )
+                    setLoading(false); 
+                } catch (error) {
+                    console.error("Erro ao buscar dados da gleba:", error);
+                    setLoading(false); 
+                }
+            };
+            fetchPropertyData();
             }
-        };
-        fetchPropertyData();
+
+        } catch (err) {
+            console.error('Erro ao buscar propriedades:', err);  
+        }finally {
+          setLoading(false);
+        }
+      };
+      fetchPropriedades();
     }
   }, [userData]);
 
     const initialValues = {
-        type: safra ? safra.type :"",
-        cultivo: safra ? safra.cultivo : "",
-        semente: safra ? safra.semente :"",
-        metroLinear: safra ? safra.metroLinear :"",
-        dosagem: safra ? safra.dosagem :"",
-        toneladas: safra ? safra.toneladas :"",
-        adubo: safra ? safra.adubo :"",
-        dataFimPlantio: safra ? safra.dataFimPlantio :"",
-        dataFimColheita: safra ? safra.dataFimColheita :"",
-        tempoLavoura: safra ? safra.tempoLavoura :"",
-        precMilimetrica: safra ? safra.precMilimetrica :"",
-        umidade: safra ? safra.umidade :"",
-        impureza: safra ? safra.impureza :"",
-        graosAvariados: safra ? safra.graosAvariados :"",
-        graosEsverdeados: safra ? safra.graosEsverdeados :"",
-        graosQuebrados: safra ? safra.graosQuebrados :"",
-        prodTotal: safra ? safra.prodTotal :"",
-        prodPrevista: safra ? safra.prodPrevista :"",
-        prodRealizada: safra ? safra.prodRealizada :"",
-        porcentHect: safra ? safra.porcentHect :"",
-        nameGleba: gleba? gleba.name : "",
+        type: "",
+        cultivo: "",
+        semente: "",
+        metroLinear: "",
+        dosagem: "",
+        toneladas: "",
+        adubo: "",
+        dataFimPlantio: "",
+        dataFimColheita: "",
+        tempoLavoura: "",
+        precMilimetrica: "",
+        umidade: "",
+        impureza: "",
+        graosAvariados: "",
+        graosEsverdeados: "",
+        graosQuebrados: "",
+        prodTotal: "",
+        prodPrevista: "",
+        prodRealizada: "",
+        porcentHect: "",
+        nameGleba: "",
         propertie: propertie ? propertie.name : "",
     };
 
@@ -108,7 +131,7 @@ const SafrasEditForm = () => {
   
   return (
     <Box m="20px">
-      <Header title="Adicionar Safra" subtitle="Preencha os campos para que seja criado a safra" />
+      <Header title="Editar Safra" subtitle="Edite as informações da Safra" />
 
       <Formik
         onSubmit={handleFormSubmit}
@@ -133,25 +156,77 @@ const SafrasEditForm = () => {
                 "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
               }}
             >
-                <TextField
+                {propertie ? (
+                  <TextField
                     fullWidth
                     variant="filled"
                     label="Propriedade"
                     value={propertie.name}
                     disabled 
                     sx={{ gridColumn: "span 2" }}
-                />
-                <TextField
+                    
+                  />
+                ) : (
+                  <Autocomplete
+                    disablePortal
+                    id="properties"
+                    options={optionsPropertie}
+                    name="propertie"
+                    value={values.propertie || null} 
+                    onChange={(event, value) => setFieldValue('propertie', value)} 
+                    onBlur={handleBlur} 
+                    sx={{ gridColumn: "span 2" }}
+                    renderInput={(params) => (
+                      <TextField 
+                        {...params} 
+                        label="Propriedade"
+                        variant="filled"
+                        name="propertie"
+                        error={!!touched.propertie && !!errors.propertie }
+                        helperText={touched.propertie &&  errors.propertie }
+                        onBlur={handleBlur} 
+                      />
+                    )}
+                    noOptionsText="Não Encontrado"
+                  />
+                )}
+                {gleba ? (
+                  <TextField
                     fullWidth
                     variant="filled"
                     label="Gleba"
                     value={gleba.name}
                     disabled 
                     sx={{ gridColumn: "span 2" }}
-                />
+                    
+                  />
+                ) : (
+                  <Autocomplete
+                    disablePortal
+                    id="glebas"
+                    options={optionsGleba}
+                    name="nameGleba"
+                    value={values.nameGleba || null} 
+                    onChange={(event, value) => setFieldValue('nameGleba', value)} 
+                    onBlur={handleBlur} 
+                    sx={{ gridColumn: "span 2" }}
+                    renderInput={(params) => (
+                      <TextField 
+                        {...params} 
+                        label="Gleba"
+                        variant="filled"
+                        name="nameGleba"
+                        error={!!touched.nameGleba && !!errors.nameGleba}
+                        helperText={touched.nameGleba && errors.nameGleba}
+                        onBlur={handleBlur} 
+                      />
+                    )}
+                    noOptionsText="Não Encontrado"
+                  />
+                )}
 
                {fields.map(({ name, label, type }) => (
-                    <React.Fragment key={name}> 
+                    <React.Fragment key={name}> {/* Usando Fragment para agrupar os elementos */}
                         {
                           name === "type" ? (
                             <Autocomplete

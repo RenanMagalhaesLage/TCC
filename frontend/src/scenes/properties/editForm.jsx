@@ -74,7 +74,7 @@ const PropertiesEditForm = () => {
 
     return (
         <Box m="20px">
-            <Header title="Editar Propriedade" subtitle="Edite os campos da propriedade" />
+            <Header title="Editar Propriedade" subtitle="Edite as informações da Propriedade" />
 
             <Formik
                 onSubmit={handleFormSubmit}

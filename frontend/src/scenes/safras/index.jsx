@@ -32,6 +32,26 @@ const Safras = () => {
     const [snackbarMessage, setSnackbarMessage] = useState(""); 
     const [safraType, setSafraType] = useState(0);
 
+    useEffect(() => {
+        switch (message) {
+          case 1:
+            setSnackbarMessage("Safra criada!");
+            break;
+    
+          case 2:
+            setSnackbarMessage("Edição realizada!");
+            break;
+    
+          case 3:
+            setSnackbarMessage("Safra excluída!");
+            break;
+    
+          default:
+            //console.log("Mensagem não reconhecida.");
+            break;
+        }
+      }, [message]);
+
     const columns = [
         { field: "propertie", headerName: "Propriedade", flex: 1, minWidth: 150, cellClassName: "name-column--cell", resizable: false },
         { field: "gleba", headerName: "Gleba", flex: 2, minWidth: 150, cellClassName: "name-column--cell", resizable: false },
@@ -280,7 +300,6 @@ const Safras = () => {
         { field: "dataFimPlantio", headerName: "Fim Plantio", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
         { field: "dataFimColheita", headerName: "Fim Colheita", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
         { field: "tempoLavoura", headerName: "Tempo Lavoura", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
-        { field: "precMilimetrica", headerName: "Precipitação Milimetrica", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
         { field: "prodTotal", headerName: "Prod. Total", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
         { field: "prodPrevista", headerName: "Prod. Prevista", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
         {
@@ -336,6 +355,7 @@ const Safras = () => {
         { field: "gleba", headerName: "Gleba", flex: 1, minWidth: 100, cellClassName: "nameGleba-column--cell", resizable: false },
         { field: "area", headerName: "Área da Gleba", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },    
         { field: "cultivo", headerName: "Cultivo", flex: 1, minWidth: 100, cellClassName: "city-column--cell", resizable: false },
+        { field: "precMilimetrica", headerName: "Precipitação Milimetrica", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
         { 
             field: "umidade", 
             headerName: "Umidade", 
@@ -460,9 +480,6 @@ const Safras = () => {
         },  
     ];
 
-
-    
-
     useEffect(() => {
         const storedUser = secureLocalStorage.getItem('userData'); 
         if (storedUser) {
@@ -557,6 +574,13 @@ const Safras = () => {
         },
       });
 
+      const handleCloseSnackbar = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setOpenSnackbar(false); // Fecha o Snackbar
+    };
+
     return (
         <Box m="20px">
             <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -577,7 +601,7 @@ const Safras = () => {
                     </Button>
                 </Box>
             </Box>
-            <Box m="20px 0 0 0" height="75vh" maxWidth="1600px" mx="auto"
+            <Box m="20px 0 0 0" height="75vh" maxWidth="1600px" mx="auto" mb="90px"
                 sx={{
                     "& .MuiDataGrid-root": {
                         border: "none",

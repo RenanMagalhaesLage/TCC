@@ -80,7 +80,7 @@ const GlebasEditForm = () => {
   
   return (
     <Box m="20px">
-      <Header title="Editar Gleba" subtitle="Edite os campos da gleba" />
+      <Header title="Editar Gleba" subtitle="Edite as informações da Gleba" />
 
       <Formik
         onSubmit={handleFormSubmit}
