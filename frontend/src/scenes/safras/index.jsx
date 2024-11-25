@@ -550,7 +550,7 @@ const Safras = () => {
 
     const handleTabChange = (newValue) => {
         setSafraType(newValue);
-        console.log(safraType)
+        //console.log(safraType)
       };
 
       const CustomTabs = styled(Tabs)({
@@ -633,7 +633,6 @@ const Safras = () => {
                         indicatorColor="primary"
                         textColor="primary"
                         onChange={(event, newValue) => handleTabChange(newValue)}
-                        aria-label="disabled tabs example"
                     >
                         <CustomTab  label="Planejada" icon={<EqualizerIcon/>} />
                         <CustomTab  label="Realizada" icon={<TimelineIcon />}/>

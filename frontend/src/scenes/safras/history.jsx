@@ -1,16 +1,11 @@
 import { Box, Typography, useTheme, Button, useMediaQuery  } from "@mui/material";
-import { DataGrid,GridToolbar } from "@mui/x-data-grid";
+
+import { DataGrid,GridToolbarContainer, GridToolbarColumnsButton, GridToolbarFilterButton, GridToolbarDensitySelector } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import { useNavigate,useLocation } from 'react-router-dom';
 import { mockDataFazenda, mockDataSafra } from "../../data/mockData";
-import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
-import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
-import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import Header from "../../components/Header";
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import EqualizerIcon from '@mui/icons-material/Equalizer';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
@@ -26,57 +21,6 @@ const SafrasHistory = () => {
         { field: "propertie", headerName: "Propriedade", flex: 1, minWidth: 150, cellClassName: "name-column--cell", resizable: false },
         { field: "gleba", headerName: "Gleba", flex: 2, minWidth: 150, cellClassName: "name-column--cell", resizable: false },
         { field: "area", headerName: "Área", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
-        {
-            field: "type",
-            headerName: "Tipo",
-            flex: 1,
-            headerAlign: "center",
-            minWidth: 200,
-            resizable: false,
-            renderCell: ({ row: { type } }) => {
-                return (
-                    <Box
-                        width="60%"
-                        m="10px auto"
-                        p="5px"
-                        display="flex"
-                        justifyContent="center"
-                        backgroundColor={
-                            type === "Planejado" ? colors.orangeAccent[500] : colors.orangeAccent[400]
-                        }
-                        borderRadius="4px"
-                    >
-                        {type === "Planejado" && <EqualizerIcon/>}
-                        {type === "Realizado" && <TimelineIcon />}
-                        {!isSmallDivice && (
-                            <Typography
-                                sx={{ ml: "5px", fontWeight: "bold", color: theme.palette.mode === 'dark' ? "#FFFFFF" : colors.grey[100] }}
-                            >
-                                {type}
-                            </Typography>
-                        )}
-                    </Box>
-                );
-            }
-        },    
-        /*    
-        { field: "status", headerName: "Status", flex: 1, type: "boolean", resizable: false, minWidth: 170,
-            renderCell: ({ row: { status } }) => (
-              <Box
-                  width="60%"
-                  m="10px auto"
-                  p="5px"
-                  display="flex"
-                  justifyContent="center"
-                  backgroundColor={status ? "red" : "green"}
-                  borderRadius="4px"
-              >
-                  <Typography sx={{ fontWeight: "bold", color: "#FFFFFF" }}>
-                      {status ? "Finalizada" : "Andamento"}
-                  </Typography>
-              </Box>
-            )
-        },*/
         { field: "cultivo", headerName: "Cultivo", flex: 1, minWidth: 100, cellClassName: "city-column--cell", resizable: false },
         { field: "semente", headerName: "Semente", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
         { field: "metroLinear", headerName: "Metro Linear", type: "number", headerAlign: "left", align: "left", minWidth: 120, resizable: false },
@@ -253,7 +197,7 @@ const SafrasHistory = () => {
     return (
         <Box m="20px">
             <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Header title="Histórico Safras" subtitle="Gerencie as suas safras já finalizadas" />
+                <Header title="Histórico Safras" subtitle="Gerencie as suas safras que já foram finalizadas" />
             </Box>
             <Box m="20px 0 0 0" height="75vh" maxWidth="1600px" mx="auto"
                 sx={{
@@ -284,11 +228,21 @@ const SafrasHistory = () => {
                 <DataGrid
                     rows={mockDataSafra}
                     columns={columns}
-                    slots={{ toolbar: GridToolbar, }}
+                    slots={{ toolbar: CustomToolbar }}
                 />
             </Box>
         </Box>
     );
 };
+
+function CustomToolbar() {
+    return (
+      <GridToolbarContainer>
+        <GridToolbarColumnsButton /> {/* Botão de exibição de colunas */}
+        <GridToolbarFilterButton />  {/* Botão de filtro */}
+        <GridToolbarDensitySelector /> {/* Seletor de densidade */}
+      </GridToolbarContainer>
+    );
+}
 
 export default SafrasHistory;

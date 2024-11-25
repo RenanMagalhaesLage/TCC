@@ -436,7 +436,7 @@ app.get('/searchGlebas/:email', async (req, res) => {
 });
 
 /*  Rota para --> EDIÇÃO GLEBA */
-app.put('/editGleba/:id', async (req, res) => {
+app.put('/glebas/:id', async (req, res) => {
     try {
         const { name, area } = req.body;
         const [updated] = await Gleba.update(
@@ -571,7 +571,7 @@ app.get('/searchSafras/:email', async (req, res) => {
 });
 
 /*  Rota para --> BUSCA POR DETERMINADA SAFRA */
-app.get('/safra/:id', async (req, res) => {
+app.get('/safras/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -659,8 +659,6 @@ app.post('/safras', async (req, res) => {
             graosAvariados: 0,   
             graosEsverdeados: 0, 
             graosQuebrados: 0,   
-            prodTotal: 0,       
-            prodPrevista: 0,    
             prodRealizada: 0,  
             porcentHect: 0,
             glebaId: glebaId       
@@ -675,6 +673,72 @@ app.post('/safras', async (req, res) => {
         return res.status(500).json({ error: 'Erro ao salvar a safra.' });
     }
 });
+
+/*  Rota para --> EDIÇÃO SAFRA */
+app.put('/safras/:id', async (req, res) => {
+    try {
+        const { 
+            email, 
+            glebaId, 
+            cultivo, 
+            semente,
+            metroLinear,
+            dosagem,
+            toneladas,
+            adubo,
+            dataFimPlantio,
+            dataFimColheita,
+            tempoLavoura,
+            prodTotal,
+            prodPrevista, 
+            type,
+            precMilimetrica,  
+            umidade,          
+            impureza,         
+            graosAvariados,   
+            graosEsverdeados, 
+            graosQuebrados,   
+            prodRealizada,  
+            //porcentHect,
+        } = req.body;
+        const [updated] = await Safra.update(
+            { 
+                cultivo, 
+                semente,
+                metroLinear,
+                dosagem,
+                toneladas,
+                adubo,
+                dataFimPlantio,
+                dataFimColheita,
+                tempoLavoura,
+                prodTotal,
+                prodPrevista,
+                type,
+                precMilimetrica,  
+                umidade,          
+                impureza,         
+                graosAvariados,   
+                graosEsverdeados, 
+                graosQuebrados,   
+                prodRealizada, 
+            },
+            { where: { id: req.params.id } }
+        );
+
+
+        if (updated) {
+            const updatedSafra = await Safra.findByPk(req.params.id);
+            return res.json(updatedSafra);
+        }
+
+        res.status(404).json({ message: 'Safra não encontrada' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+
 
 /*------------------------
         ROTAS INVITE

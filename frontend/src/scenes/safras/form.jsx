@@ -46,7 +46,7 @@ const SafrasForm = () => {
 
   useEffect(() => {
     if (userData && userData.email) {
-      const fetchPropriedades = async () => {
+      const fetchSafras = async () => {
         try {
             const response = await axios.get(`http://localhost:3000/searchGlebas/${userData.email}`);
             const glebaNames = response.data
@@ -67,7 +67,7 @@ const SafrasForm = () => {
             console.log(optionsGlebaId)
 
             if(id){
-              const fetchPropertyData = async () => {
+              const fetchSafraData = async () => {
                 try {
                     const response = await axios.get(`http://localhost:3000/gleba/${id}`);
                     const { gleba, propriedade, owner } = response.data;
@@ -79,16 +79,16 @@ const SafrasForm = () => {
                     setLoading(false); 
                 }
             };
-            fetchPropertyData();
+            fetchSafraData();
             }
 
         } catch (err) {
-            console.error('Erro ao buscar propriedades:', err);  
+            console.error('Erro ao buscar safras:', err);  
         }finally {
           setLoading(false);
         }
       };
-      fetchPropriedades();
+      fetchSafras();
     }
   }, [userData]);
 

@@ -9,14 +9,12 @@ import { mockDataSafra, mockDataGlebas } from "../../data/mockData";
 import Header from "../../components/Header";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DoneIcon from '@mui/icons-material/Done';
 import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-
 
 const Safra = () => {
     const theme = useTheme();
@@ -50,7 +48,6 @@ const Safra = () => {
         "Grãos Esverdeados",
         "Grãos Quebrados",
         "Prod. Total",
-        
     ];
 
     const comparativoProd = [
@@ -95,7 +92,7 @@ const Safra = () => {
         if (userData && userData.email) { 
             const fetchGlebas = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:3000/safra/${id}`);
+                    const response = await axios.get(`http://localhost:3000/safras/${id}`);
                     const {safra, gleba, property, owner } = response.data;
                     setSafra(safra)
                     setGleba(gleba);
@@ -133,6 +130,10 @@ const Safra = () => {
     const handleChip = () => {
         //console.info('You clicked the Chip.');
     };  
+
+    const handleFinalize = () => {
+        
+    }
 
 
     return (
@@ -310,7 +311,7 @@ const Safra = () => {
                                             {headerName}:
                                         </Typography>
                                         <Typography variant="body1" color={colors.grey[300]}>
-                                        {safra[fieldNames[index+10]]} 
+                                            {safra[fieldNames[index+8]]} 
                                         </Typography>
                                     </Box>
                                 ))}
@@ -484,9 +485,22 @@ const Safra = () => {
                                                         backgroundColor: colors.grey[700], 
                                                     },
                                                 }}
-
                                             >
                                                 <EditIcon />
+                                            </Button>
+                                        </Tooltip>
+                                        <Tooltip title='Finalizar Safra'>
+                                            <Button 
+                                                variant="contained" 
+                                                onClick={() => handleFinalize()} 
+                                                sx={{ml:2,
+                                                    backgroundColor:colors.blueAccent[500],
+                                                    "&:hover": {
+                                                        backgroundColor: colors.grey[700], 
+                                                    },
+                                                }}
+                                            >
+                                                <DoneAllIcon />
                                             </Button>
                                         </Tooltip>
                                     </Box>

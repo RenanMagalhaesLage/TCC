@@ -53,15 +53,14 @@ const GlebasEditForm = () => {
     propertie: property? property.name :"" 
   }
 
-  console.log(initialValues)
+  //console.log(initialValues)
 
   const navigate = useNavigate(); 
   const handleFormSubmit = async (values) => {
     try {
-      const response = await axios.put(`http://localhost:3000/editGleba/${id}`, {
+      const response = await axios.put(`http://localhost:3000/glebas/${id}`, {
         name: values.nameGleba,
         area: values.area,          
-        email: userData.email
       });
   
       if (response.status === 200) {

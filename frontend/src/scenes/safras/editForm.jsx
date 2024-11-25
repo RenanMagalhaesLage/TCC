@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, TextField, Typography, useTheme, Autocomplete, useMediaQuery } from "@mui/material";
+import { Box, Button, TextField, Typography, useTheme, Autocomplete, useMediaQuery, MenuItem } from "@mui/material";
 import { useNavigate,useParams } from 'react-router-dom';
 import { Formik } from "formik";
 import { tokens } from "../../theme";
@@ -13,38 +13,37 @@ const SafrasEditForm = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const isNonMobile = useMediaQuery("(min-width:600px)");
-  const [propertie,setPropertie] = useState(null)
-  const [optionsPropertie, setOptionsPropertie] = useState([]);
-  const [optionsPropertieId, setOptionsPropertieId] = useState([]);
-  const [gleba,setGleba] = useState(null)
-  const [optionsGleba, setOptionsGleba] = useState([]);
-  const [optionsGlebaId, setOptionsGlebaId] = useState([]);
+  const [property, setProperty] = useState("");
+  const [gleba, setGleba] = useState("");
+  const [safra, setSafra] = useState([]);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const { id } = useParams(); 
+  const [isPlanejado, setIsPlanejado] = useState(true);
 
 
   const fields = [
-    { name: "type", label: "Tipo", type: "text" },
+    //{ name: "type", label: "Tipo", type: "text" },
     { name: "cultivo", label: "Cultivo", type: "text" },
     { name: "semente", label: "Semente", type: "text" },
-    { name: "metroLinear", label: "Metro Linear", type: "text" },
+    { name: "metroLinear", label: "Metro Linear", type: "number" },
     { name: "dosagem", label: "Dosagem (kg/ha)", type: "number" },
     { name: "toneladas", label: "Toneladas", type: "number" },
     { name: "adubo", label: "Adubo", type: "text" },
+    { name: "prodTotal", label: "Prod. Total", type: "number" },
+    { name: "prodPrevista", label: "Prod. Prevista", type: "number" },
     { name: "dataFimPlantio", label: "Data Fim Plantio", type: "date" },
     { name: "dataFimColheita", label: "Data Fim Colheita", type: "date" },
-    { name: "tempoLavoura", label: "Tempo Lavoura (dias)", type: "number" },
+    { name: "tempoLavoura", label: "Tempo Lavoura (dias)", type: "number", disabled: true },
+  ];
+  const fieldsRealizada = [
     { name: "precMilimetrica", label: "Precipitação Milimétrica", type: "number" },
     { name: "umidade", label: "Umidade", type: "number" },
     { name: "impureza", label: "Impureza", type: "number" },
     { name: "graosAvariados", label: "Grãos Avariados", type: "number" },
     { name: "graosEsverdeados", label: "Grãos Esverdeados", type: "number" },
     { name: "graosQuebrados", label: "Grãos Quebrados", type: "number" },
-    { name: "prodTotal", label: "Prod. Total", type: "number" },
-    { name: "prodPrevista", label: "Prod. Prevista", type: "number" },
     { name: "prodRealizada", label: "Prod. Realizada", type: "number" },
-    { name: "porcentHect", label: "Porcentagem / HA", type: "number" },
   ];
   
   useEffect(() => {
@@ -56,76 +55,88 @@ const SafrasEditForm = () => {
 
   useEffect(() => {
     if (userData && userData.email) {
-      const fetchPropriedades = async () => {
+      const fetchSafras = async () => {
         try {
-            const response = await axios.get(`http://localhost:3000/searchPropriedades/${userData.email}`);
-            const propriedades = response.data.map(propriedade => propriedade.name);
-            const propriedadesId = response.data.map(propriedade => ({
-              id: propriedade.id,
-              name: propriedade.name,
-            }));
-            setOptionsPropertieId(propriedadesId);
-            setOptionsPropertie(propriedades);
-
-            if(id){
-              const fetchPropertyData = async () => {
-                try {
-                    const response = await axios.get(`http://localhost:3000/gleba/${id}`);
-                    const { gleba, propriedade, owner } = response.data;
-                    setPropertie(propriedade);
-                    //console.log("info --> " + propriedade.name + " " + gleba.name )
-                    setLoading(false); 
-                } catch (error) {
-                    console.error("Erro ao buscar dados da gleba:", error);
-                    setLoading(false); 
-                }
-            };
-            fetchPropertyData();
-            }
+            const response = await axios.get(`http://localhost:3000/safra/${id}`);
+            const { safra, gleba, property, owner } = response.data;
+            setSafra(safra);
+            setGleba(gleba);
+            setProperty(property);
+            setIsPlanejado(safra.type === "Planejado" ? true : false);
+            console.log(isPlanejado);
+            setLoading(false); 
 
         } catch (err) {
-            console.error('Erro ao buscar propriedades:', err);  
+            console.error('Erro ao buscar SAFRAS:', err);  
         }finally {
           setLoading(false);
         }
       };
-      fetchPropriedades();
+      fetchSafras();
     }
   }, [userData]);
 
-    const initialValues = {
-        type: "",
-        cultivo: "",
-        semente: "",
-        metroLinear: "",
-        dosagem: "",
-        toneladas: "",
-        adubo: "",
-        dataFimPlantio: "",
-        dataFimColheita: "",
-        tempoLavoura: "",
-        precMilimetrica: "",
-        umidade: "",
-        impureza: "",
-        graosAvariados: "",
-        graosEsverdeados: "",
-        graosQuebrados: "",
-        prodTotal: "",
-        prodPrevista: "",
-        prodRealizada: "",
-        porcentHect: "",
-        nameGleba: "",
-        propertie: propertie ? propertie.name : "",
-    };
 
-  
+const initialValues = safra ? {
+    type: safra.type || "",
+    cultivo: safra.cultivo || "",
+    semente: safra.semente || "",
+    metroLinear: safra.metroLinear || "",
+    dosagem: safra.dosagem || "",
+    toneladas: safra.toneladas || "",
+    adubo: safra.adubo || "",
+    dataFimPlantio: safra.dataFimPlantio || "",
+    dataFimColheita: safra.dataFimColheita || "",
+    tempoLavoura: safra.tempoLavoura || "",
+    precMilimetrica: safra.precMilimetrica || "",
+    umidade: safra.umidade || "",
+    impureza: safra.impureza || "",
+    graosAvariados: safra.graosAvariados || "",
+    graosEsverdeados: safra.graosEsverdeados || "",
+    graosQuebrados: safra.graosQuebrados || "",
+    prodTotal: safra.prodTotal || "",
+    prodPrevista: safra.prodPrevista || "",
+    prodRealizada: safra.prodRealizada || "",
+    porcentHect: safra.porcentHect || "",
+    gleba: gleba.name || "",
+    property: property.name || "",
+} : {};
 
   const navigate = useNavigate(); 
   const handleFormSubmit = async (values) => {
-    console.log("mandou")
+    try {
+      const response = await axios.put(`http://localhost:3000/safras/${id}`, {
+        cultivo: values.cultivo,
+        semente: values.semente,
+        metroLinear: values.metroLinear,
+        dosagem: values.dosagem,
+        toneladas: values.toneladas,
+        adubo: values.adubo,
+        dataFimPlantio: values.dataFimPlantio,
+        dataFimColheita: values.dataFimColheita,
+        tempoLavoura: values.tempoLavoura,
+        prodTotal: values.prodTotal,
+        prodPrevista: values.prodPrevista,
+        type: values.type,
+        precMilimetrica: values.type === "Planejado" ? 0 : values.precMilimetrica,
+        umidade:values.type === "Planejado" ? 0 : values.umidade,
+        impureza:values.type === "Planejado" ? 0 : values.impureza,
+        graosAvariados:values.type === "Planejado" ? 0 : values.graosAvariados,
+        graosEsverdeados:values.type === "Planejado" ? 0 : values.graosEsverdeados,
+        graosQuebrados:values.type === "Planejado" ? 0 : values.graosQuebrados,
+        prodRealizada:values.type === "Planejado" ? 0 : values.prodRealizada,         
+        
+      });
+  
+      if (response.status === 200) {  
+        navigate(`/safras?message=${encodeURIComponent("2")}`);
+      }
+    } catch (error) {
+      console.error("Erro ao editar safra: " , error);
+    }
   };
 
-  if (loading) {
+  if (loading || !safra || !gleba || !property) {
     return <Typography variant="h4" fontWeight="bold" sx={{ml: "50px"}}>Carregando...</Typography>;
   }
   
@@ -136,7 +147,7 @@ const SafrasEditForm = () => {
       <Formik
         onSubmit={handleFormSubmit}
         initialValues={initialValues}
-        validationSchema={checkoutSchema}
+        validationSchema={!isPlanejado ? checkoutSchema : checkoutSchema2}
       >
         {({
           values,
@@ -156,140 +167,122 @@ const SafrasEditForm = () => {
                 "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
               }}
             >
-                {propertie ? (
-                  <TextField
+              <TextField
                     fullWidth
                     variant="filled"
                     label="Propriedade"
-                    value={propertie.name}
+                    value={property.name}
                     disabled 
                     sx={{ gridColumn: "span 2" }}
-                    
-                  />
-                ) : (
-                  <Autocomplete
-                    disablePortal
-                    id="properties"
-                    options={optionsPropertie}
-                    name="propertie"
-                    value={values.propertie || null} 
-                    onChange={(event, value) => setFieldValue('propertie', value)} 
-                    onBlur={handleBlur} 
-                    sx={{ gridColumn: "span 2" }}
-                    renderInput={(params) => (
-                      <TextField 
-                        {...params} 
-                        label="Propriedade"
-                        variant="filled"
-                        name="propertie"
-                        error={!!touched.propertie && !!errors.propertie }
-                        helperText={touched.propertie &&  errors.propertie }
-                        onBlur={handleBlur} 
-                      />
-                    )}
-                    noOptionsText="Não Encontrado"
-                  />
-                )}
-                {gleba ? (
-                  <TextField
+              />
+              <TextField
                     fullWidth
                     variant="filled"
                     label="Gleba"
                     value={gleba.name}
                     disabled 
                     sx={{ gridColumn: "span 2" }}
-                    
-                  />
-                ) : (
-                  <Autocomplete
-                    disablePortal
-                    id="glebas"
-                    options={optionsGleba}
-                    name="nameGleba"
-                    value={values.nameGleba || null} 
-                    onChange={(event, value) => setFieldValue('nameGleba', value)} 
-                    onBlur={handleBlur} 
-                    sx={{ gridColumn: "span 2" }}
-                    renderInput={(params) => (
-                      <TextField 
-                        {...params} 
-                        label="Gleba"
-                        variant="filled"
-                        name="nameGleba"
-                        error={!!touched.nameGleba && !!errors.nameGleba}
-                        helperText={touched.nameGleba && errors.nameGleba}
-                        onBlur={handleBlur} 
-                      />
-                    )}
-                    noOptionsText="Não Encontrado"
-                  />
-                )}
+              />
 
-               {fields.map(({ name, label, type }) => (
-                    <React.Fragment key={name}> {/* Usando Fragment para agrupar os elementos */}
-                        {
-                          name === "type" ? (
-                            <Autocomplete
-                              disablePortal
-                              id="types"
-                              options={["Planejado", "Realizado"]}
-                              name="type"
-                              value={values.type || null}
-                              onChange={(event, value) => {
-                                setFieldValue('type', value);
-                              }}
-                              onBlur={handleBlur}
-                              sx={{ gridColumn: "span 1" }}
-                              renderInput={(params) => (
-                                <TextField
-                                  {...params}
-                                  label="Tipo"
-                                  variant="filled"
-                                  error={!!touched.type && !!errors.type}
-                                  helperText={touched.type && errors.type}
-                                  onBlur={handleBlur}
-                                />
-                              )}
-                              noOptionsText="Não Encontrado"
-                            />
-                          ) : type === "date" ? (
-                            // Condicional para campos de tipo número
-                            <TextField
-                              fullWidth
-                              variant="filled"
-                              type={type}
-                              label={label}
-                              onBlur={handleBlur}
-                              onChange={handleChange}
-                              value={values[name] || ''} 
-                              name={name}
-                              error={touched[name] && Boolean(errors[name])}
-                              helperText={touched[name] && errors[name]}
-                              sx={{ gridColumn: "span 1" }}
-                              InputLabelProps={{
-                                shrink:  true ,
-                              }}
-                            />
-                          ) : (
-                            // Condicional para outros tipos de input
-                            <TextField
-                              fullWidth
-                              variant="filled"
-                              type={type}
-                              label={label}
-                              onBlur={handleBlur}
-                              onChange={handleChange}
-                              value={values[name] || ''} 
-                              name={name}
-                              error={touched[name] && Boolean(errors[name])} 
-                              helperText={touched[name] && errors[name]} 
-                              sx={{ gridColumn: "span 1" }}
-                              
-                            />
-                          )
-                        }
-                    </React.Fragment>
-                ))}           
+              {fields.map(({ name, label, type, disabled }) => (
+                  <TextField
+                    key={name}
+                    fullWidth
+                    variant="filled"
+                    type={type}
+                    label={label}
+                    onBlur={handleBlur}
+                    onChange={(e) => {
+                      handleChange(e);
+                      if (name === "dataFimPlantio" || name === "dataFimColheita") {
+                        const tempoLavoura = calculateTempoLavoura(
+                          name === "dataFimPlantio" ? e.target.value : values.dataFimPlantio,
+                          name === "dataFimColheita" ? e.target.value : values.dataFimColheita
+                        );
+                        setFieldValue("tempoLavoura", tempoLavoura);
+                      }
+                    }}
+                    value={values[name] || ""}
+                    name={name}
+                    disabled={disabled}
+                    error={!!touched[name] && !!errors[name]}
+                    helperText={touched[name] && errors[name]}
+                    sx={{ gridColumn: "span 1" }}
+                    InputLabelProps={type === "date" ? { shrink: true } : {}}
+                  />
+                ))}
+            </Box>
+            <Box
+              display="grid"
+              gap="30px"
+              gridTemplateColumns="repeat(2, minmax(0, 1fr))"
+              mt= "30px"
+              sx={{
+                "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
+              }}
+            >
+              <TextField
+                select
+                fullWidth
+                variant="filled"
+                label="Tipo de Safra"
+                value={values.type}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setFieldValue("type", value); 
+                  setIsPlanejado(value === "Planejado"); 
+              }}
+                helperText="Selecione o tipo de safra"
+                InputLabelProps={{ shrink: true }}
+                sx={{ gridColumn: "span 1",
+                  "& .MuiFilledInput-root": {
+                    backgroundColor: colors.mygreen[300], 
+                  },
+                  "& .Mui-focused": {
+                    color: colors.mygreen[800], 
+                  },
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    color: colors.mygreen[800], 
+                  },
+                 }}
+              >
+                {["Planejado", "Realizado"].map((option) => (
+                  <MenuItem key={option} value={option}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Box>
+              
+            <Box
+              display="grid"
+              gap="30px"
+              gridTemplateColumns="repeat(4, minmax(0, 1fr))"
+              mt= "30px"
+              sx={{
+                "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
+              }}
+            >
+              
+              {values.type !== "Planejado" && fieldsRealizada.map(({ name, label, type, disabled }) => (
+                  <TextField
+                    key={name}
+                    fullWidth
+                    variant="filled"
+                    type={type}
+                    label={label}
+                    onBlur={handleBlur}
+                    onChange={(e) => {
+                      handleChange(e);
+                    }}
+                    value={values[name] || ""}
+                    name={name}
+                    disabled={disabled}
+                    error={!!touched[name] && !!errors[name]}
+                    helperText={touched[name] && errors[name]}
+                    sx={{ gridColumn: "span 1" }}
+                  />
+                ))}
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
               <Button 
@@ -307,11 +300,6 @@ const SafrasEditForm = () => {
                 Salvar
               </Button>
             </Box>
-            {/*Object.keys(errors).length > 0 && (
-                <Typography color="error" sx={{ mt: 2 }}>
-                Por favor, corrija os erros acima.
-                </Typography>
-            )*/}
           </form>
         )}
       </Formik>
@@ -324,7 +312,7 @@ const checkoutSchema = yup.object().shape({
     type: yup.string().required("Campo de preenchimento obrigatório"),
     cultivo: yup.string().required("Campo de preenchimento obrigatório"),
     semente: yup.string().required("Campo de preenchimento obrigatório"),
-    metroLinear: yup.string().required("Campo de preenchimento obrigatório"),
+    metroLinear: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
     dosagem: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
     toneladas: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
     adubo: yup.string().required("Campo de preenchimento obrigatório"),
@@ -340,8 +328,29 @@ const checkoutSchema = yup.object().shape({
     prodTotal: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
     prodPrevista: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
     prodRealizada: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
-    porcentHect: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
-    nameGleba: yup.string().required("Campo de preenchimento obrigatório"),
-    propertie: yup.string().required("Campo de preenchimento obrigatório"),
+    //porcentHect: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
 });
+
+const checkoutSchema2 = yup.object().shape({
+  type: yup.string().required("Campo de preenchimento obrigatório"),
+  cultivo: yup.string().required("Campo de preenchimento obrigatório"),
+  semente: yup.string().required("Campo de preenchimento obrigatório"),
+  metroLinear: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+  dosagem: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+  toneladas: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+  adubo: yup.string().required("Campo de preenchimento obrigatório"),
+  dataFimPlantio: yup.date().required("Campo de preenchimento obrigatório").typeError("Deve ser uma data válida"),
+  dataFimColheita: yup.date().required("Campo de preenchimento obrigatório").typeError("Deve ser uma data válida"),
+  tempoLavoura: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+  prodTotal: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+  prodPrevista: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+});
+
+const calculateTempoLavoura = (dataFimPlantio, dataFimColheita) => {
+  if (dataFimPlantio && dataFimColheita) {
+    const diff = new Date(dataFimColheita) - new Date(dataFimPlantio);
+    return Math.ceil(diff / (1000 * 60 * 60 * 24));
+  }
+  return "";
+};
 export default SafrasEditForm;
