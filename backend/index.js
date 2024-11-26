@@ -25,6 +25,7 @@ const UserProperty = require("./database/UserProperty");
 const Gleba = require("./database/Gleba");
 const Safra = require("./database/Safra");
 const Invite = require("./database/Invite");
+const Custo = require("./database/Custo");
 
 /*--------------------------------
     Relacionamentos dos Models
@@ -56,6 +57,20 @@ Gleba.hasMany(Safra, {
 Safra.belongsTo(Gleba,  {
     foreignKey: 'glebaId',
     as: 'safra',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE' 
+});
+
+Safra.hasMany(Custo,{
+    foreignKey: 'safraId',
+    as: 'custos',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE' 
+});
+
+Custo.belongsTo(Safra,{
+    foreignKey: 'safraId',
+    as: 'custo',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE' 
 });
@@ -435,7 +450,7 @@ app.get('/searchGlebas/:email', async (req, res) => {
     }
 });
 
-/*  Rota para --> EDIÇÃO GLEBA */
+/*  Rota para --> EDIÇÃO DE GLEBAS */
 app.put('/glebas/:id', async (req, res) => {
     try {
         const { name, area } = req.body;
@@ -570,7 +585,7 @@ app.get('/searchSafras/:email', async (req, res) => {
     }
 });
 
-/*  Rota para --> BUSCA POR DETERMINADA SAFRA */
+/*  Rota para --> BUSCA DE SAFRA POR ID*/
 app.get('/safras/:id', async (req, res) => {
     const { id } = req.params;
 
@@ -596,7 +611,7 @@ app.get('/safras/:id', async (req, res) => {
 
         const owner = await User.findByPk(userId);
         if (!owner) {
-            return res.status(404).json({ error: 'Dono da gleba não encontrado' });
+            return res.status(404).json({ error: 'Dono da safra não encontrado' });
         }
         
         const result = {
@@ -608,12 +623,12 @@ app.get('/safras/:id', async (req, res) => {
 
         return res.status(200).json(result);
     } catch (error) {
-        console.error('Erro ao buscar gleba:', error);
-        return res.status(500).json({ error: 'Erro ao buscar gleba' });
+        console.error('Erro ao buscar safra:', error);
+        return res.status(500).json({ error: 'Erro ao buscar safra' });
     }
 });
 
-/* Rota para --> CADASTRO DE SAFRA*/
+/* Rota para --> CADASTRO DE SAFRAS*/
 app.post('/safras', async (req, res) => {
     try {
         const { email, glebaId, 
@@ -674,7 +689,7 @@ app.post('/safras', async (req, res) => {
     }
 });
 
-/*  Rota para --> EDIÇÃO SAFRA */
+/*  Rota para --> EDIÇÃO DE SAFRAS */
 app.put('/safras/:id', async (req, res) => {
     try {
         const { 
@@ -738,6 +753,126 @@ app.put('/safras/:id', async (req, res) => {
     }
 });
 
+/*------------------------
+        ROTAS CUSTOS
+--------------------------*/
+/* Rota para --> BUSCA DE CUSTOS */
+app.get('/custos/:email', async (req, res) => {
+    const { email } = req.params;
+
+    try {
+        const user = await User.findOne({ where: { email: email } });
+        if (!user) {
+            return res.status(404).json({ error: 'Usuário não encontrado' });
+        }
+
+        /* Busca todas as propriedades associadas ao usuário e seus níveis de acesso*/
+        const userProperties = await UserProperty.findAll({
+            where: { userId: user.id },
+            attributes: ['propertyId', 'access']
+        });
+        
+        const propertyIds = userProperties.map(up => up.propertyId);
+        const access = userProperties.map(up => up.access);
+        
+        const properties = await Property.findAll({
+            where: {
+                id: propertyIds
+            },
+            include: {
+                model: Gleba, as: 'glebas', 
+                include: {
+                    model: Safra, as: 'safras',
+                    include:{
+                        model: Custo, as: 'custos'
+                    }  
+                }
+            }
+        });
+        
+        const propertiesWithAccess = properties.map((property, index) => ({
+            ...property.toJSON(),
+            access: access[index]
+        }));
+        
+        if (properties.length === 0) {
+            return res.status(404).json({ message: 'Nenhuma propriedade cadastrada para este usuário.' });
+        }
+        const result = propertiesWithAccess.map(property => {
+            const glebas = (property.glebas || []).map(gleba => {
+                const safras = (gleba.safras || []).map(safra => {
+                    const custos = safra.custos || [];
+                    return {
+                        ...safra,
+                        custos
+                    };
+                });
+        
+                return {
+                    ...gleba,
+                    safras
+                };
+            });
+        
+            return {
+                ...property,
+                glebas
+            };
+        });
+
+        return res.status(200).json(result);
+    } catch (error) {
+        console.error('Erro ao buscar custos do usuário:', error);
+        return res.status(500).json({ error: 'Erro ao buscar custos do usuário' });
+    }
+});
+
+/* Rota para --> BUSCA DE CUSTO POR ID*/
+app.get('/custo/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const custo = await Custo.findByPk(id);
+        if (!custo) {
+            return res.status(404).json({ error: 'Custo não encontrado' });
+        }
+
+        const safra = await Safra.findByPk(custo.safraId);
+
+        const gleba = await Gleba.findByPk(safra.glebaId);
+
+        const property = await Property.findByPk(gleba.propertyId);
+
+        const ownerProperty = await UserProperty.findOne({
+            where: { propertyId: gleba.propertyId },
+            attributes: ['userId', 'access']
+        }); 
+        
+        const userId = ownerProperty?.userId
+
+        const owner = await User.findByPk(userId);
+        if (!owner) {
+            return res.status(404).json({ error: 'Dono do custo não encontrado' });
+        }
+        
+        const result = {
+            custo: custo,
+            safra: safra,
+            gleba: gleba,
+            property: property,
+            owner: owner
+        };
+
+        return res.status(200).json(result);
+    } catch (error) {
+        console.error('Erro ao buscar custo:', error);
+        return res.status(500).json({ error: 'Erro ao buscar custo' });
+    }
+});
+
+/* Rota para --> CADASTRO DE CUSTOS */
+
+/* Rota para --> EDIÇÃO DE CUSTOS */
 
 
 /*------------------------

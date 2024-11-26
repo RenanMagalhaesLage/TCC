@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, useTheme, Button, useMediaQuery,Snackbar, Alert} from "@mui/material";
+import { Box, Typography, useTheme, Button, useMediaQuery,Snackbar, Alert,Tooltip,IconButton,} from "@mui/material";
 import { useNavigate,useLocation } from 'react-router-dom';
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridToolbarContainer, GridToolbarColumnsButton, GridToolbarFilterButton, GridToolbarDensitySelector } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
-import { mockDataFazenda } from "../../data/mockData";
-import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
-import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import Header from "../../components/Header";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import EqualizerIcon from '@mui/icons-material/Equalizer';
+import TimelineIcon from '@mui/icons-material/Timeline';
 import secureLocalStorage from 'react-secure-storage';
 import axios from "axios";
 
@@ -18,7 +17,6 @@ const Custos = () => {
     const colors = tokens(theme.palette.mode);
     const isMobile = useMediaQuery("(max-width: 800px)");
     const isSmallDivice = useMediaQuery("(max-width: 1300px)");
-    const [glebas, setGlebas] = useState([]);
     const [userData, setUserData] = useState(null);
 
     const location = useLocation();
@@ -26,11 +24,12 @@ const Custos = () => {
     const message = Number(query.get('message'));
     const [openSnackbar, setOpenSnackbar] = useState(!!message);
     const [snackbarMessage, setSnackbarMessage] = useState(""); 
+    const [custosData, setCustosData] = useState([]);
 
     useEffect(() => {
         switch (message) {
           case 1:
-            setSnackbarMessage("Gleba criada!");
+            setSnackbarMessage("Custo adicioando!");
             break;
     
           case 2:
@@ -38,7 +37,7 @@ const Custos = () => {
             break;
     
           case 3:
-            setSnackbarMessage("Gleba excluída!");
+            setSnackbarMessage("Custo excluído!");
             break;
     
           default:
@@ -48,10 +47,94 @@ const Custos = () => {
       }, [message]);
 
       const columns = [
-        { field: "name", headerName: "Nome", flex: 1, cellClassName: "name-column--cell", resizable: false },
-        { field: "propertie", headerName: "Propriedade", flex: 1, cellClassName: "propertie-column--cell", resizable: false },
-        { field: "gleba", headerName: "Gleba", flex: 1, cellClassName: "gleba-column--cell", resizable: false },
-        { field: "type", headerName: "Tipo", flex: 1, resizable: false },
+        {
+            field: "type",
+            headerName: "Tipo",
+            flex: 1,
+            headerAlign: "center",
+            minWidth: 200,
+            resizable: false,
+            renderCell: ({ row: { type } }) => {
+                return (
+                    <Box
+                        width="60%"
+                        m="10px auto"
+                        p="5px"
+                        display="flex"
+                        justifyContent="center"
+                        backgroundColor={
+                            type === "Planejado" ? colors.orangeAccent[500] : colors.orangeAccent[300]
+                        }
+                        borderRadius="4px"
+                        sx={{color: theme.palette.mode === 'dark' ?colors.primary[400]: colors.grey[100]}}
+                    >
+                        {type === "Planejado" && <EqualizerIcon/>}
+                        {type === "Realizado" && <TimelineIcon />}
+                        {!isSmallDivice && (
+                            <Typography
+                                sx={{ ml: "5px", fontWeight: "bold"}}
+                            >
+                                {type}
+                            </Typography>
+                        )}
+                    </Box>
+                );
+            }
+        },
+        { field: "category", headerName: "Categoria", flex: 1,  resizable: false },
+        { field: "name", headerName: "Nome", flex: 1,  resizable: false },
+        { field: "unit", headerName: "Unidade", flex: 1, resizable: false },
+        { field: "quantity", headerName: "Quantidade", flex: 1, resizable: false },
+        { field: "price", headerName: "Preço", flex: 1,  resizable: false },
+        { field: "totalValue", headerName: "Valor Total", flex: 1,  resizable: false },
+        { field: "date", headerName: "Data", flex: 1, resizable: false },
+        { field: "note", headerName: "Observação", flex: 1, resizable: false },
+        {
+            field: "actions",
+            headerName: "Ações",
+            flex: 1,
+            minWidth: 100,
+            renderCell: (params) => {
+                const { id } = params.row;
+
+                return (
+                    <Box 
+                        display="flex" 
+                        justifyContent="center" 
+                        width="100%"
+                        m="10px auto"
+                    >
+                        {isMobile ? (
+                            <>
+                                <Tooltip title="Visualizar">
+                                    <IconButton onClick={() => handleView(id)} sx={{ color: colors.greenAccent[500]}}>
+                                        <VisibilityIcon />
+                                    </IconButton>
+                                </Tooltip>
+                            </>
+                        ):(
+                            <>
+                                <Tooltip title="Visualizar">
+                                    <Button
+                                        variant="contained"
+                                        sx={{
+                                            backgroundColor: colors.greenAccent[500],
+                                            "&:hover": {
+                                                backgroundColor: colors.grey[700], 
+                                            },
+                                        }}
+                                        onClick={() => handleView(id)}
+                                    >
+                                        <VisibilityIcon />
+                                    </Button>
+                                </Tooltip>
+                            </>
+                        )}
+                    </Box>
+                );
+            },
+            headerAlign: "center"
+        },
 
     ];
     
@@ -65,33 +148,43 @@ const Custos = () => {
 
     useEffect(() => {
         if (userData && userData.email) { 
-            const fetchGlebas = async () => {
+            const fetchCustosData = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:3000/searchGlebas/${userData.email}`);
+                    const response = await axios.get(`http://localhost:3000/custos/${userData.email}`);
                     const linhasDaTabela = response.data.flatMap(fazenda => {
-                        return fazenda.glebas.map(gleba => ({
-                            id: gleba.id, 
-                            name: gleba.name, 
-                            propertie: fazenda.name, 
-                            area: gleba.area, 
-                            access: fazenda.access 
-                        }));
+                        return fazenda.glebas.flatMap(gleba => { 
+                            return gleba.safras.flatMap(safra => {  
+                                return safra.custos.map(custo => ({
+                                    id: custo.id,
+                                    type: custo.type,
+                                    status: custo.status,
+                                    category: custo.category,
+                                    name: custo.name,
+                                    unit: custo.unit,
+                                    quantity: custo.quantity,
+                                    price: custo.price,
+                                    totalValue: custo.totalValue,
+                                    date: custo.date,
+                                    note: custo.note,
+                                }))
+                            });
+                        });
                     });
 
-                    setGlebas(linhasDaTabela);
+                    setCustosData(linhasDaTabela);                      
 
                     
                 } catch (error) {
-                    console.log("ERRO - ao buscar as glebas.");
+                    console.log("ERRO - ao buscar os Custos.");
                 }
             };
-            fetchGlebas();
+            fetchCustosData();
         }
     }, [userData]);  
 
     useEffect(() => {
         //console.log(glebas); 
-    }, [glebas]);
+    }, [custosData]);
 
     const navigate = useNavigate(); 
     const handleView = (id) => {
@@ -158,9 +251,10 @@ const Custos = () => {
                     },
                 }}>
                 <DataGrid
-                    rows={glebas}
+                    rows={custosData}
                     columns={columns}
-                    localeText={{ noRowsLabel: <b>Nenhum custo encontrado.</b> }}
+                    slots={{ toolbar: CustomToolbar }}
+                    getRowId={(row) => row.id}
                 />
             </Box>
             <div>
@@ -194,3 +288,14 @@ const Custos = () => {
 };
 
 export default Custos;
+
+
+function CustomToolbar() {
+    return (
+      <GridToolbarContainer>
+        <GridToolbarColumnsButton /> {/* Botão de exibição de colunas */}
+        <GridToolbarFilterButton />  {/* Botão de filtro */}
+        <GridToolbarDensitySelector /> {/* Seletor de densidade */}
+      </GridToolbarContainer>
+    );
+}

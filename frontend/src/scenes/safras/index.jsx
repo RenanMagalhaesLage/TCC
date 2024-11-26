@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Box, Typography,TextField, useTheme, Button, useMediaQuery,Snackbar,Alert,Tooltip,IconButton, Paper, Tabs, Tab} from "@mui/material";
-import { GridToolbarContainer, GridToolbarColumnsButton, GridToolbarFilterButton, GridToolbarDensitySelector } from '@mui/x-data-grid';
+import { DataGrid,GridToolbarContainer, GridToolbarColumnsButton, GridToolbarFilterButton, GridToolbarDensitySelector } from '@mui/x-data-grid';
 import { styled } from '@mui/system';
-import { DataGrid,GridToolbar } from "@mui/x-data-grid";
 import { useNavigate,useLocation } from 'react-router-dom';
 import axios from "axios";
 import secureLocalStorage from 'react-secure-storage';
@@ -700,4 +699,4 @@ function CustomToolbar() {
         <GridToolbarDensitySelector /> {/* Seletor de densidade */}
       </GridToolbarContainer>
     );
-  }
+}

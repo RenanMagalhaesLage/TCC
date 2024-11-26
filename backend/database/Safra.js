@@ -1,7 +1,7 @@
 const Sequelize = require("sequelize");
 const connection = require("./database");
 
-const Safra = connection.define('safras',{
+const Safra = connection.define('safra',{
     type:{
         type: Sequelize.STRING,
         allowNull: false,

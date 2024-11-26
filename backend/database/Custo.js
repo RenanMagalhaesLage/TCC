@@ -6,29 +6,43 @@ const Custo = connection.define('custos',{
         type: Sequelize.BOOLEAN, //Safra finalizada ? Sim --> true
         allowNull: false,
     },
-    name:{
+    type:{
+        type: Sequelize.STRING,
+        allowNull: false,
+        validate: {
+            isIn: [['Planejado', 'Realizado']] 
+        }
+    },
+    name: {
         type: Sequelize.STRING,
         allowNull: false
-    },unidade:{
+    },
+    unit: { 
         type: Sequelize.STRING,
         allowNull: false
-    },quantidade:{
+    },
+    quantity: { 
         type: Sequelize.DOUBLE,
         allowNull: false
-    },preco:{
+    },
+    price: {
         type: Sequelize.DOUBLE,
         allowNull: false
-    },categoria:{
+    },
+    category: { 
         type: Sequelize.STRING,
         allowNull: false
-    },valorTotal:{
+    },
+    totalValue: { 
         type: Sequelize.STRING,
         allowNull: false
-    },data:{
+    },
+    date: { //Realizar a viabilidade desse campo
         type: Sequelize.DATEONLY,
-        allowNull:false,
+        allowNull: false,
         defaultValue: Sequelize.NOW
-    },observacao:{
+    },
+    note: {
         type: Sequelize.STRING,
         allowNull: false
     }
