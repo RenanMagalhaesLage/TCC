@@ -110,7 +110,7 @@ const GlebasForm = () => {
   
   return (
     <Box m="20px">
-      <Header title="Adicionar Gleba" subtitle="Preencha os campos para que seja criado a gleba" />
+      <Header title="Adicionar Gleba" subtitle="Preencha os campos para que seja cadastrado uma gleba" />
 
       <Formik
         onSubmit={handleFormSubmit}

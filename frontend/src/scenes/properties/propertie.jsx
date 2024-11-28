@@ -525,7 +525,6 @@ const Propertie = () => {
                         </Box> 
                         <Box
                         gridColumn="span 12"
-                        backgroundColor={colors.primary[400]}
                         display="flex"
                         alignItems="center"
                         justifyContent="center"

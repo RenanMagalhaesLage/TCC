@@ -158,7 +158,7 @@ const SafrasForm = () => {
   
   return (
     <Box m="20px">
-      <Header title="Adicionar Safra" subtitle="Preencha os campos para que seja criado a safra" />
+      <Header title="Adicionar Safra" subtitle="Preencha os campos para que seja cadastrado uma safra" />
       <Typography variant="body1" sx={{ mb: "20px", color: colors.grey[600] }}>
         Toda safra criada inicialmente possui o status de <i>Planejada</i>.
       </Typography>

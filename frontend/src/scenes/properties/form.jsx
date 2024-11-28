@@ -48,7 +48,7 @@ const PropertiesForm = () => {
 
   return (
     <Box m="20px">
-      <Header title="Adicionar Propriedade" subtitle="Preencha os campos para que seja criado a propriedade" />
+      <Header title="Adicionar Propriedade" subtitle="Preencha os campos para que seja cadastrado uma propriedade" />
 
       <Formik
         onSubmit={handleFormSubmit}

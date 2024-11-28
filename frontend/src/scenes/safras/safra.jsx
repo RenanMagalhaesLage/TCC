@@ -98,7 +98,7 @@ const Safra = () => {
                     setGleba(gleba);
                     setPropriedade(property);
                     setOwner(owner);
-                    setIsHigher(prodRealizada > prodPrevista);
+                    setIsHigher(safra.prodRealizada > safra.prodPrevista);
                 } catch (error) {
                     console.log("ERROR - ao buscar a gleba.");
                 }

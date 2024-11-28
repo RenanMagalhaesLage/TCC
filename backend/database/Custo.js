@@ -34,7 +34,7 @@ const Custo = connection.define('custos',{
         allowNull: false
     },
     totalValue: { 
-        type: Sequelize.STRING,
+        type: Sequelize.DOUBLE,
         allowNull: false
     },
     date: { //Realizar a viabilidade desse campo
