@@ -43,8 +43,8 @@ const GlebasForm = () => {
             if(id){
               const fetchPropertyData = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:3000/propriedade/${id}`);
-                    setProperty(response.data);
+                    const response = await axios.get(`http://localhost:3000/propriedades/${id}`);
+                    setProperty(response.data.property);
                     setLoading(false); 
                 } catch (error) {
                     console.error("Erro ao buscar dados da gleba:", error);
@@ -77,7 +77,7 @@ const GlebasForm = () => {
       values.property = property.id
     }
     try {
-      const response = await axios.post("http://localhost:3000/createGleba", {
+      const response = await axios.post("http://localhost:3000/glebas", {
         name: values.nameGleba,
         propertyId: values.property,          
         area: values.area,          

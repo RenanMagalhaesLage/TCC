@@ -227,3 +227,15 @@
     }
 });*/
 
+/* Rota para --> OBTER UMA PROPRIEDADE PELO ID */
+app.get('/propriedade/:id', async (req, res) => {
+    try {
+        const property = await Property.findByPk(req.params.id);
+        if (!property) {
+            return res.status(404).json({ message: 'Propriedade não encontrada' });
+        }
+        res.json(property);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});

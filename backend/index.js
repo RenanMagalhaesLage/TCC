@@ -265,63 +265,8 @@ app.get('/user', async (req, res) => {
     ROTAS PROPRIEDADE
 --------------------------*/
 
-/* Rota para --> CADASTRO DE PROPRIEDADE */
-app.post('/createPropriedade', async (req, res) => {
-    try {
-        const { name, city, area, email } = req.body;
-        const user = await User.findOne({ where: { email: email } });
-
-
-        if (!name || !city || !area || !email) {
-            return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
-        }
-
-        const newProperty = await Property.create({
-            name: name,
-            city: city,
-            area: area
-        });
-
-        const userProperty = await UserProperty.create({
-            userId: user.id, 
-            propertyId: newProperty.id, 
-            access: "owner" 
-        });
-
-        return res.status(201).json({ 
-            property: newProperty, 
-            relationship: userProperty 
-        });
-    } catch (error) {
-        console.error('Erro ao salvar propriedade:', error);
-        return res.status(500).json({ error: 'Erro ao salvar a propriedade.' });
-    }
-});
-
-/* Rota para --> EDIÇÃO DE PROPRIEDADE */
-app.put('/editPropriedade/:id', async (req, res) => {
-    try {
-        const { name, area, city } = req.body;
-        const [updated] = await Property.update(
-            { name, area, city},
-            { where: { id: req.params.id } }
-        );
-
-
-        if (updated) {
-            const updatedProperty = await Property.findByPk(req.params.id);
-            return res.json(updatedProperty);
-        }
-
-        res.status(404).json({ message: 'Propriedade não encontrada' });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-});
-
-/* Rota para --> REMOVER PROPRIEDADE */
-
-/* Rota para --> BUSCA POR DETERMINADA PROPRIEDADE E SEUS USUÁRIOS E SUAS GLEBAS */
+/* Rota para --> BUSCAR PROPRIEDADE 
+   Retorno: Propriedade, Glebas e Users associados à Propriedade */
 app.get('/propriedades/:id', async (req, res) => {
     const { id } = req.params;
 
@@ -384,16 +329,96 @@ app.get('/propriedades/:id', async (req, res) => {
     }
 });
 
-/* Rota para --> OBTER UMA PROPRIEDADE PELO ID */
-app.get('/propriedade/:id', async (req, res) => {
+/* Rota para --> CADASTRAR DE PROPRIEDADE */
+app.post('/propriedades', async (req, res) => {
     try {
-        const property = await Property.findByPk(req.params.id);
-        if (!property) {
-            return res.status(404).json({ message: 'Propriedade não encontrada' });
+        const { name, city, area, email } = req.body;
+        const user = await User.findOne({ where: { email: email } });
+
+
+        if (!name || !city || !area || !email) {
+            return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
         }
-        res.json(property);
+
+        const newProperty = await Property.create({
+            name: name,
+            city: city,
+            area: area
+        });
+
+        const userProperty = await UserProperty.create({
+            userId: user.id, 
+            propertyId: newProperty.id, 
+            access: "owner" 
+        });
+
+        return res.status(201).json({ 
+            property: newProperty, 
+            relationship: userProperty 
+        });
+    } catch (error) {
+        console.error('Erro ao salvar propriedade:', error);
+        return res.status(500).json({ error: 'Erro ao salvar a propriedade.' });
+    }
+});
+
+/* Rota para --> EDITAR PROPRIEDADE */
+app.put('/propriedades/:id', async (req, res) => {
+    try {
+        const { name, area, city } = req.body;
+        const [updated] = await Property.update(
+            { name, area, city},
+            { where: { id: req.params.id } }
+        );
+
+
+        if (updated) {
+            const updatedProperty = await Property.findByPk(req.params.id);
+            return res.json(updatedProperty);
+        }
+
+        res.status(404).json({ message: 'Propriedade não encontrada' });
     } catch (error) {
         res.status(500).json({ message: error.message });
+    }
+});
+
+/* Rota para --> REMOVER PROPRIEDADE */
+app.delete('/propriedades/:id', async(req,res) =>{
+    try {
+        const { id } = req.params;
+        const propriedade = await Property.findByPk(id);
+        if (!propriedade) {
+            return res.status(404).json({ error: 'Propriedade não encontrada.' });
+        }
+        const glebas = await Gleba.findAll({
+            where: { propertyId: id }
+        });
+        const glebasIds = glebas.map(gleba => gleba.id);
+
+        const safras = await Safra.findAll({
+            where: { glebaId: glebasIds }
+        });
+        const safraIds = safras.map(safra => safra.id);
+
+        await Custo.destroy({
+            where: { safraId: safraIds }
+        });
+
+        await Safra.destroy({
+            where: { glebaId: glebasIds }
+        });
+
+        await Gleba.destroy({
+            where: { propertyId: id }
+        });
+
+        await propriedade.destroy();
+
+        res.status(200).json({ message: 'Propriedade deletada com sucesso.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erro no servidor.' });
     }
 });
 
@@ -401,57 +426,8 @@ app.get('/propriedade/:id', async (req, res) => {
         ROTAS GLEBAS
 --------------------------*/
 
-/* Rota para --> CADASTRO DE GLEBA*/
-app.post('/createGleba', async (req, res) => {
-    try {
-        const { name, propertyId, area, email } = req.body;
-        const user = await User.findOne({ where: { email: email } });
-
-
-        if (!name || !propertyId || !area || !email) {
-            return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
-        }
-
-        const newGleba = await Gleba.create({
-            name: name,
-            area: area,
-            propertyId: propertyId
-        });
-
-
-        return res.status(201).json({ 
-            gleba: newGleba
-        });
-    } catch (error) {
-        console.error('Erro ao salvar gleba:', error);
-        return res.status(500).json({ error: 'Erro ao salvar a gleba.' });
-    }
-});
-
-/*  Rota para --> EDIÇÃO DE GLEBAS */
-app.put('/glebas/:id', async (req, res) => {
-    try {
-        const { name, area } = req.body;
-        const [updated] = await Gleba.update(
-            { name, area},
-            { where: { id: req.params.id } }
-        );
-
-
-        if (updated) {
-            const updatedGleba = await Gleba.findByPk(req.params.id);
-            return res.json(updatedGleba);
-        }
-
-        res.status(404).json({ message: 'Gleba não encontrada' });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-});
-
-/* Rota para --> REMOVER DE GLEBA */
-
-/*  Rota para --> BUSCA POR DETERMINADA GLEBA E SUAS SAFRAS */
+/*  Rota para --> BUSCAR GLEBA 
+    Retorno: Gleba e Safras associados à Gleba */
 app.get('/gleba/:id', async (req, res) => {
     const { id } = req.params;
 
@@ -497,6 +473,84 @@ app.get('/gleba/:id', async (req, res) => {
         return res.status(500).json({ error: 'Erro ao buscar gleba' });
     }
 });
+
+/* Rota para --> CADASTRAR DE GLEBA*/
+app.post('/glebas', async (req, res) => {
+    try {
+        const { name, propertyId, area, email } = req.body;
+        const user = await User.findOne({ where: { email: email } });
+
+
+        if (!name || !propertyId || !area || !email) {
+            return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
+        }
+
+        const newGleba = await Gleba.create({
+            name: name,
+            area: area,
+            propertyId: propertyId
+        });
+
+
+        return res.status(201).json({ 
+            gleba: newGleba
+        });
+    } catch (error) {
+        console.error('Erro ao salvar gleba:', error);
+        return res.status(500).json({ error: 'Erro ao salvar a gleba.' });
+    }
+});
+
+/*  Rota para --> EDITAR DE GLEBAS */
+app.put('/glebas/:id', async (req, res) => {
+    try {
+        const { name, area } = req.body;
+        const [updated] = await Gleba.update(
+            { name, area},
+            { where: { id: req.params.id } }
+        );
+
+
+        if (updated) {
+            const updatedGleba = await Gleba.findByPk(req.params.id);
+            return res.json(updatedGleba);
+        }
+
+        res.status(404).json({ message: 'Gleba não encontrada' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+/* Rota para --> REMOVER DE GLEBA */
+app.delete('/glebas/:id', async(req,res) =>{
+    try {
+        const { id } = req.params;
+        const gleba = await Gleba.findByPk(id);
+        if (!gleba) {
+            return res.status(404).json({ error: 'Gleba não encontrada.' });
+        }
+        const safras = await Safra.findAll({
+            where: { glebaId: id }
+        });
+
+        const safraIds = safras.map(safra => safra.id);
+        await Custo.destroy({
+            where: { safraId: safraIds }
+        });
+
+        await Safra.destroy({
+            where: { glebaId: id }
+        });
+
+        await gleba.destroy();
+        res.status(200).json({ message: 'Gleba deletada com sucesso.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erro no servidor.' });
+    }
+});
+
 
 /*------------------------
         ROTAS SAFRAS

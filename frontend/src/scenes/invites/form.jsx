@@ -42,8 +42,8 @@ const InvitesForm = () => {
             if (id) {
               const fetchPropertyData = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:3000/propriedade/${id}`);
-                    setPropertie(response.data);
+                    const response = await axios.get(`http://localhost:3000/propriedades/${id}`);
+                    setPropertie(response.data.property);
                     setLoading(false); 
                 } catch (error) {
                     console.error("Erro ao buscar dados da gleba:", error);

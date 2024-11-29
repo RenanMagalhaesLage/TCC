@@ -29,8 +29,8 @@ const PropertiesEditForm = () => {
         if (userData && userData.email) {
             const fetchPropertyData = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:3000/propriedade/${id}`);
-                    setPropertyData(response.data);
+                    const response = await axios.get(`http://localhost:3000/propriedades/${id}`);
+                    setPropertyData(response.data.property);
                     setLoading(false); 
                 } catch (error) {
                     console.error("Erro ao buscar dados da propriedade:", error);
@@ -51,7 +51,7 @@ const PropertiesEditForm = () => {
 
     const handleFormSubmit = async (values) => {
         try {
-            const response = await axios.put(`http://localhost:3000/editPropriedade/${id}`, {
+            const response = await axios.put(`http://localhost:3000/propriedades/${id}`, {
                 name: values.namePropertie,
                 area: values.area,
                 city: values.city,
