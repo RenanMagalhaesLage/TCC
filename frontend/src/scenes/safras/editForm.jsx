@@ -57,7 +57,7 @@ const SafrasEditForm = () => {
     if (userData && userData.email) {
       const fetchSafras = async () => {
         try {
-            const response = await axios.get(`http://localhost:3000/safra/${id}`);
+            const response = await axios.get(`http://localhost:3000/safras/${id}`);
             const { safra, gleba, property, owner } = response.data;
             setSafra(safra);
             setGleba(gleba);

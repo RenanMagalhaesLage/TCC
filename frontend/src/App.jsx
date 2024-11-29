@@ -32,6 +32,7 @@ import Invite from './scenes/invites';
 import InvitesForm from './scenes/invites/form';
 import CustosPage from './scenes/custos/custosPage';
 import CustosForm from './scenes/custos/form';
+import CustosEditPage from './scenes/custos/editPage';
 
 
 function App() {
@@ -84,6 +85,7 @@ function App() {
                   <Route path="/custos" element={<Custos />} />
                   <Route path="/custos/:id" element={<CustosPage />} />
                   <Route path="/custos/add" element={<CustosForm />} />
+                  <Route path="/custos/edit/:id" element={<CustosEditPage />} />
                   <Route path="/history" element={<SafrasHistory />} />
                   <Route path="/invites" element={<Invite />} />
                   <Route path="/invites/add" element={<InvitesForm />} />

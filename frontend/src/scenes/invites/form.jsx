@@ -12,12 +12,11 @@ const InvitesForm = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const isNonMobile = useMediaQuery("(min-width:600px)");
-  const [optionsPropertie, setOptionsPropertie] = useState([]);
-  const [optionsPropertieId, setOptionsPropertieId] = useState([]);
+  const [propertyOptions, setPropertyOptions] = useState([]);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const { id } = useParams(); 
-  const [propertie, setPropertie] = useState(null);
+  const [property, setProperty] = useState(null);
   const [errorMessage, setErrorMessage] = useState(""); // Novo estado para a mensagem de erro
 
   useEffect(() => {
@@ -31,14 +30,14 @@ const InvitesForm = () => {
     if (userData && userData.email) {
       const fetchPropriedades = async () => {
         try {
-            const response = await axios.get(`http://localhost:3000/searchPropriedades/${userData.email}`);
-            const propriedades = response.data.map(propriedade => propriedade.name);
-            const propriedadesId = response.data.map(propriedade => ({
-              id: propriedade.id,
-              name: propriedade.name,
+            const response = await axios.get(`http://localhost:3000/user`, {
+              params: { email: userData.email }
+            });
+            const propertyData = response.data.map(property =>({
+                id: property.id,
+                name: property.name
             }));
-            setOptionsPropertieId(propriedadesId);
-            setOptionsPropertie(propriedades);
+            setPropertyOptions(propertyData);
 
             if (id) {
               const fetchPropertyData = async () => {
@@ -66,31 +65,21 @@ const InvitesForm = () => {
 
   const initialValues = {
     email: "",
-    propertie: propertie ? propertie.name : ""   
+    property: property ? property.id : ""   
   };
 
   const navigate = useNavigate(); 
   const handleFormSubmit = async (values) => {
-    console.log("Valores do formulário:", values);
-    setErrorMessage(""); // Limpa a mensagem de erro ao enviar o formulário
+    setErrorMessage(""); 
 
     if (id) {
-      values.propertie = propertie.name;
+      values.property = property.id;
     }
 
     try {
-      const index = optionsPropertieId.findIndex(item => item.name === values.propertie);
-
-      if (index === -1) {
-        console.error("Propriedade não encontrada ao procurar na Gleba");
-        return; 
-      }
-
-      const propriedadeId = optionsPropertieId[index].id;
-
       const response = await axios.post("http://localhost:3000/createInvite", {
         reciverEmail: values.email,
-        propertyId: propriedadeId,
+        propertyId: values.property,
         senderEmail: userData.email
       });
   
@@ -102,7 +91,7 @@ const InvitesForm = () => {
     } catch (error) {
       console.error("Erro ao criar invite:", error);
       if (error.response && error.response.status === 400) {
-        setErrorMessage(error.response.data.error || "Erro ao criar o convite."); // Define a mensagem de erro
+        setErrorMessage(error.response.data.error || "Erro ao criar o convite.");
       }
     }
   };
@@ -151,40 +140,46 @@ const InvitesForm = () => {
                 helperText={touched.email && errors.email}
                 sx={{ gridColumn: "span 2" }}
               />
-              {propertie ? (
+              {property ? (
                 <TextField
                   id="properties"
                   fullWidth
                   variant="filled"
                   label="Propriedade"
-                  name="propertie"
-                  value={propertie.name}
+                  name="property"
+                  value={property.name}
                   disabled 
                   sx={{ gridColumn: "span 2" }}
                 />
               ) : (
                 <Autocomplete
-                  disablePortal
-                  id="properties"
-                  options={optionsPropertie}
-                  name="propertie"
-                  value={values.propertie || null} 
-                  onChange={(event, value) => setFieldValue('propertie', value)} 
-                  onBlur={handleBlur} 
-                  sx={{ gridColumn: "span 2" }}
-                  renderInput={(params) => (
-                    <TextField 
-                      {...params} 
-                      label="Propriedade"
-                      variant="filled"
-                      name="propertie"
-                      error={!!touched.propertie && !!errors.propertie }
-                      helperText={touched.propertie && errors.propertie }
-                      onBlur={handleBlur} 
-                    />
-                  )}
-                  noOptionsText="Não Encontrado"
-                />
+                    disablePortal
+                    id="properties"
+                    options={propertyOptions}
+                    getOptionLabel={(option) => option.name || ""}
+                    name="property"
+
+                    value={
+                      values.property
+                        ? propertyOptions.find((option) => option.id === values.property) 
+                        : null
+                    } 
+                    onChange={(event, value) => setFieldValue('property', value?.id || null)} 
+                    onBlur={handleBlur} 
+                    sx={{ gridColumn: "span 2" }}
+                    renderInput={(params) => (
+                      <TextField 
+                        {...params} 
+                        label="Propriedade"
+                        variant="filled"
+                        name="property"
+                        error={!!touched.property && !!errors.property }
+                        helperText={touched.property &&  errors.property }
+                        onBlur={handleBlur} 
+                      />
+                    )}
+                    noOptionsText="Não Encontrado"
+                  />
               )}
             </Box>
 

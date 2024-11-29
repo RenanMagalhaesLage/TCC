@@ -91,7 +91,7 @@ const CustosPage = () => {
         if (userData && userData.email) { 
             const fetchCustosData = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:3000/custo/${id}`);
+                    const response = await axios.get(`http://localhost:3000/custos/${id}`);
                     const {custo, safra, gleba, property, owner } = response.data;
                     setCusto(custo);
                     setSafra(safra);
