@@ -118,8 +118,16 @@ const CustosPage = () => {
         setIsChecked(false);
     };
 
-    const handleDelete = () =>{
+    const handleDelete = async () =>{
         handleClose();
+        try {
+            const response = await axios.delete(`http://localhost:3000/custos/${id}`, {
+                answer: false, 
+            });
+            navigate(`/custos?message=${encodeURIComponent("3")}`);
+        } catch (error) {
+            console.error("Erro ao deletar custo:", error);
+        }
     }
 
     const handleCheckboxChange = (event) => {
@@ -413,13 +421,12 @@ const CustosPage = () => {
                                                         }}
                                                     >
                                                         <Typography id="modal-modal-title" variant="h4" component="h2">
-                                                            Deseja realmente deletar esta safra?
+                                                            Deseja realmente deletar este custo?
                                                         </Typography>
                                                         <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                                                             Ao fazer isso, esteja ciente que:
                                                             <ul>
                                                                 <li>Essa ação não pode ser revertida;</li>
-                                                                <li>Ao deletar a safra, os custos correspondentes também serão apagados.</li>
                                                             </ul>
                                                         </Typography>
                                                         

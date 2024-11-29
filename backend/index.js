@@ -502,7 +502,7 @@ app.get('/gleba/:id', async (req, res) => {
         ROTAS SAFRAS
 --------------------------*/
 
-/*  Rota para --> BUSCA DE SAFRA POR ID*/
+/*  Rota para --> BUSCAR SAFRA POR ID*/
 app.get('/safras/:id', async (req, res) => {
     const { id } = req.params;
 
@@ -545,7 +545,7 @@ app.get('/safras/:id', async (req, res) => {
     }
 });
 
-/* Rota para --> CADASTRO DE SAFRAS*/
+/* Rota para --> CADASTRAR SAFRAS*/
 app.post('/safras', async (req, res) => {
     try {
         const { email, glebaId, 
@@ -606,7 +606,7 @@ app.post('/safras', async (req, res) => {
     }
 });
 
-/*  Rota para --> EDIÇÃO DE SAFRAS */
+/*  Rota para --> EDITAR SAFRAS */
 app.put('/safras/:id', async (req, res) => {
     try {
         const { 
@@ -670,11 +670,32 @@ app.put('/safras/:id', async (req, res) => {
     }
 });
 
+/* Rota para --> REMOVER SAFRAS */
+app.delete('/safras/:id', async(req,res) =>{
+    try {
+        const { id } = req.params; 
+        const safra = await Safra.findByPk(id);
+        if (!safra) {
+            return res.status(404).json({ error: 'Safra não encontrada.' });
+        }
+
+        await Custo.destroy({
+            where: { safraId: id },
+        });        
+
+        await safra.destroy();
+        res.status(200).json({ message: 'Safra deletada com sucesso.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erro no servidor.' });
+    }
+});
+
 /*------------------------
         ROTAS CUSTOS
 --------------------------*/
 
-/* Rota para --> BUSCA DE CUSTO POR ID*/
+/* Rota para --> BUSCAR CUSTO POR ID*/
 app.get('/custos/:id', async (req, res) => {
     const { id } = req.params;
 
@@ -717,7 +738,7 @@ app.get('/custos/:id', async (req, res) => {
     }
 });
 
-/* Rota para --> CADASTRO DE CUSTOS */
+/* Rota para --> CADASTRAR CUSTOS */
 app.post('/custos', async (req, res) => {
     try {
         const { email, safraId, 
@@ -764,7 +785,7 @@ app.post('/custos', async (req, res) => {
     }
 });
 
-/* Rota para --> EDIÇÃO DE CUSTOS */
+/* Rota para --> EDITAR CUSTOS */
 app.put('/custos/:id', async (req, res) => {
     try {
         const { 
@@ -803,6 +824,24 @@ app.put('/custos/:id', async (req, res) => {
         res.status(404).json({ message: 'Custo não encontrado' });
     } catch (error) {
         res.status(500).json({ message: error.message });
+    }
+});
+
+/* Rota para --> REMOVER CUSTOS */
+app.delete('/custos/:id', async(req,res) =>{
+    try {
+        const { id } = req.params; 
+
+        const custo = await Custo.findByPk(id);
+        if (!custo) {
+            return res.status(404).json({ error: 'Custo não encontrado.' });
+        }
+
+        await custo.destroy();
+        res.status(200).json({ message: 'Custo deletado com sucesso.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erro no servidor.' });
     }
 });
 

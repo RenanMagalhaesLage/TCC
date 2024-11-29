@@ -119,8 +119,16 @@ const Safra = () => {
         setIsChecked(false);
     };
 
-    const handleDelete = () =>{
+    const handleDelete = async () =>{
         handleClose();
+        try {
+            const response = await axios.delete(`http://localhost:3000/safras/${id}`, {
+                answer: false, 
+            });
+            navigate(`/safras?message=${encodeURIComponent("3")}`);
+        } catch (error) {
+            console.error("Erro ao deletar safra:", error);
+        }
     }
 
     const handleCheckboxChange = (event) => {
