@@ -150,7 +150,9 @@ const Custos = () => {
         if (userData && userData.email) { 
             const fetchCustosData = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:3000/custos/${userData.email}`);
+                    const response = await axios.get(`http://localhost:3000/user`, {
+                        params: { email: userData.email }
+                    });
                     const linhasDaTabela = response.data.flatMap(fazenda => {
                         return fazenda.glebas.flatMap(gleba => { 
                             return gleba.safras.flatMap(safra => {  

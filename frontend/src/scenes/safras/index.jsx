@@ -488,15 +488,17 @@ const Safras = () => {
 
     useEffect(() => {
         if (userData && userData.email) { 
-            const fetchSafras = async () => {
+            const fetchSafrasData = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:3000/searchSafras/${userData.email}`);
-                    const linhasDaTabela = response.data.flatMap(fazenda => {
-                        return fazenda.glebas.flatMap(gleba => { 
+                    const response = await axios.get(`http://localhost:3000/user`, {
+                        params: { email: userData.email }
+                    });
+                    const linhasDaTabela = response.data.flatMap(property => {
+                        return property.glebas.flatMap(gleba => { 
                             return gleba.safras.map(safra => ({  
                                 id: safra.id,   
                                 gleba: gleba.name,
-                                propertie: fazenda.name,
+                                propertie: property.name,
                                 area: gleba.area,
                                 type: safra.type,  
                                 status: safra.status,
@@ -519,7 +521,7 @@ const Safras = () => {
                                 prodPrevista: safra.prodPrevista, 
                                 prodRealizada: safra.prodRealizada, 
                                 porcentHect: safra.porcentHect,
-                                access: fazenda.access
+                                access: property.access
                             }));
                         });
                     });
@@ -531,7 +533,7 @@ const Safras = () => {
                     console.log("ERRO - ao buscar as glebas.");
                 }
             };
-            fetchSafras();
+            fetchSafrasData();
         }
     }, [userData]);  
 

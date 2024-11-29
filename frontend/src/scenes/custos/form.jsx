@@ -14,11 +14,7 @@ const CustosForm = () => {
   const colors = tokens(theme.palette.mode);
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const [gleba,setGleba] = useState(null);
-  const [optionsGleba, setOptionsGleba] = useState([]);
-  const [optionsGlebaId, setOptionsGlebaId] = useState([]);
   const [safraOptions, setSafraOptions] = useState([]);
-  const [safraOptionsId, setSafraOptionsId] = useState([]);
-
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const { id } = useParams(); 
@@ -50,17 +46,11 @@ const CustosForm = () => {
 
   useEffect(() => {
     if (userData && userData.email) {
-      const fetchSafras = async () => {
+      const fetchCustosData = async () => {
         try {
-            const response = await axios.get(`http://localhost:3000/searchSafras/${userData.email}`);
-            const safrasOptions = response.data.flatMap(property => 
-              property.glebas.flatMap(gleba =>
-                gleba.safras.map(safra => `${safra.cultivo} - ${safra.dataFimPlantio} - ${gleba.name} - ${property.name}` )
-              )
-            );
-            setSafraOptions(safrasOptions);    
-            //console.log("safras -> " + safrasOptions);
-
+            const response = await axios.get(`http://localhost:3000/user`, {
+              params: { email: userData.email }
+            });
             const safraData = response.data.flatMap(property =>
               property.glebas.flatMap(gleba =>
                   gleba.safras.map(safra => ({
@@ -69,9 +59,7 @@ const CustosForm = () => {
                   }))
               ) 
             );
-          
-            setSafraOptionsId(safraData);
-            //console.log("safra -> " +safraOptionsId)
+            setSafraOptions(safraData);
 
             if(id){
               const fetchSafraData = async () => {
@@ -95,7 +83,7 @@ const CustosForm = () => {
           setLoading(false);
         }
       };
-      fetchSafras();
+      fetchCustosData();
     }
   }, [userData]);
 
@@ -141,23 +129,17 @@ const CustosForm = () => {
   const navigate = useNavigate(); 
   const handleFormSubmit = async (values) => {
     try {
-      
-      console.log("id safra -> " + values.safra);
-
-      const response = await axios.post("http://localhost:3000/safras", {
+      const response = await axios.post("http://localhost:3000/custos", {
         email: userData.email,
-        glebaId: glebaId,
-        cultivo: values.cultivo, 
-        semente: values.semente,
-        metroLinear: values.metroLinear,
-        dosagem: values.dosagem,
-        toneladas: values.toneladas,
-        adubo: values.adubo,
-        dataFimPlantio: values.dataFimPlantio,
-        dataFimColheita: values.dataFimColheita,
-        tempoLavoura: values.tempoLavoura,
-        prodTotal: values.prodTotal,
-        prodPrevista: values.prodPrevista,
+        safraId: values.safra,
+        name: values.name,
+        category: values.category,
+        unit: values.unit,
+        quantity: values.quantity,
+        price: values.price,
+        totalValue: values.totalValue,
+        date: values.date,
+        note: values.note
       });
       if (response.status === 201) {  
         navigate(`/custos?message=${encodeURIComponent("1")}`);
@@ -212,12 +194,12 @@ const CustosForm = () => {
                   <Autocomplete
                       disablePortal
                       id="safras"
-                      options={safraOptionsId} 
+                      options={safraOptions} 
                       getOptionLabel={(option) => option.name || ""} 
                       name="safra"
                       value={
                           values.safra 
-                            ? safraOptionsId.find((option) => option.id === values.safra) 
+                            ? safraOptions.find((option) => option.id === values.safra) 
                             : null
                       } 
                       onChange={(event, value) => setFieldValue('safra', value?.id || null)} 

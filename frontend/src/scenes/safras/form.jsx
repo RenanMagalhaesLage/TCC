@@ -14,8 +14,7 @@ const SafrasForm = () => {
   const colors = tokens(theme.palette.mode);
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const [gleba,setGleba] = useState(null);
-  const [optionsGleba, setOptionsGleba] = useState([]);
-  const [optionsGlebaId, setOptionsGlebaId] = useState([]);
+  const [glebaOptions,setGlebaOptions] = useState([]);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const { id } = useParams(); 
@@ -48,23 +47,16 @@ const SafrasForm = () => {
     if (userData && userData.email) {
       const fetchSafras = async () => {
         try {
-            const response = await axios.get(`http://localhost:3000/searchGlebas/${userData.email}`);
-            const glebaNames = response.data
-                .flatMap(property =>
-                    property.glebas.map(gleba => `${gleba.name} - ${property.name}`) // Concatena o nome da gleba com o nome da fazenda
-                );
-            setOptionsGleba(glebaNames);    
-            console.log(optionsGleba);
-
-            //console.log(optionsGleba); 
-            const glebaIds = response.data.flatMap(property =>
-              property.glebas.map(gleba => ({
-                id: gleba.id,
-                name: gleba.name
-              }))
-            );
-            setOptionsGlebaId(glebaIds);
-            console.log(optionsGlebaId)
+            const response = await axios.get(`http://localhost:3000/user`, {
+              params: { email: userData.email }
+            });
+            const glebaData = response.data.flatMap(property =>
+              property.glebas.map(gleba =>({
+                      id: gleba.id,
+                      name: `${gleba.name} - ${property.name}`
+                  }))
+              );
+            setGlebaOptions(glebaData);
 
             if(id){
               const fetchSafraData = async () => {
@@ -112,25 +104,15 @@ const SafrasForm = () => {
     tempoLavoura: "",
     prodTotal: "",
     prodPrevista: "",
-    nameGleba: "",
+    gleba: "",
   };  
 
   const navigate = useNavigate(); 
   const handleFormSubmit = async (values) => {
     try {
-      const extractedValue = values.nameGleba.split(" - ")[0];
-      console.log(extractedValue)
-      const index = optionsGlebaId.findIndex(item => item.name === extractedValue);
-
-      if (index === -1) {
-        console.error("Gleba não encontrada ao procurar na Safra");
-        return; 
-      }
-      const glebaId = optionsGlebaId[index].id;
-
       const response = await axios.post("http://localhost:3000/safras", {
         email: userData.email,
-        glebaId: glebaId,
+        glebaId: values.gleba,
         cultivo: values.cultivo, 
         semente: values.semente,
         metroLinear: values.metroLinear,
@@ -199,10 +181,15 @@ const SafrasForm = () => {
                   <Autocomplete
                     disablePortal
                     id="glebas"
-                    options={optionsGleba}
-                    name="nameGleba"
-                    value={values.nameGleba || null} 
-                    onChange={(event, value) => setFieldValue('nameGleba', value)} 
+                    options={glebaOptions}
+                    getOptionLabel={(option) => option.name || ""}
+                    name="gleba"
+                    value={
+                      values.gleba 
+                        ? glebaOptions.find((option) => option.id === values.gleba) 
+                        : null
+                    } 
+                    onChange={(event, value) => setFieldValue('gleba', value?.id || null)} 
                     onBlur={handleBlur} 
                     sx={{ gridColumn: "span 2" }}
                     renderInput={(params) => (
@@ -210,9 +197,9 @@ const SafrasForm = () => {
                         {...params} 
                         label="Gleba"
                         variant="filled"
-                        name="nameGleba"
-                        error={!!touched.nameGleba && !!errors.nameGleba}
-                        helperText={touched.nameGleba && errors.nameGleba}
+                        name="gleba"
+                        error={!!touched.gleba && !!errors.gleba}
+                        helperText={touched.gleba && errors.gleba}
                         onBlur={handleBlur} 
                       />
                     )}
@@ -289,6 +276,6 @@ const checkoutSchema = yup.object().shape({
     //tempoLavoura: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
     prodTotal: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
     prodPrevista: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
-    nameGleba: yup.string().required("Campo de preenchimento obrigatório"),
+    gleba: yup.string().required("Campo de preenchimento obrigatório"),
 });
 export default SafrasForm;

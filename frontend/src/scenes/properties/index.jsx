@@ -143,15 +143,17 @@ const Properties = () => {
 
     useEffect(() => {
         if (userData && userData.email) { 
-            const fetchPropriedades = async () => {
+            const fetchPropriedadesData = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:3000/searchPropriedades/${userData.email}`);
+                    const response = await axios.get(`http://localhost:3000/user`, {
+                        params: { email: userData.email }
+                    });
                     setPropriedades(response.data); 
                 } catch (error) {
                     console.log("ERRO - ao buscar as propriedades.");
                 }
             };
-            fetchPropriedades();
+            fetchPropriedadesData();
         }
     }, [userData]);  
 

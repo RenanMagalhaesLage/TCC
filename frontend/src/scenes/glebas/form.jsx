@@ -13,12 +13,11 @@ const GlebasForm = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const isNonMobile = useMediaQuery("(min-width:600px)");
-  const [optionsPropertie, setOptionsPropertie] = useState([]);
-  const [optionsPropertieId, setOptionsPropertieId] = useState([]);
+  const [propertyOptions, setPropertyOptions] = useState([]);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const { id } = useParams(); 
-  const [propertie,setPropertie] = useState(null)
+  const [property,setProperty] = useState(null);
 
 
   useEffect(() => {
@@ -32,20 +31,20 @@ const GlebasForm = () => {
     if (userData && userData.email) {
       const fetchPropriedades = async () => {
         try {
-            const response = await axios.get(`http://localhost:3000/searchPropriedades/${userData.email}`);
-            const propriedades = response.data.map(propriedade => propriedade.name);
-            const propriedadesId = response.data.map(propriedade => ({
-              id: propriedade.id,
-              name: propriedade.name,
+            const response = await axios.get(`http://localhost:3000/user`, {
+              params: { email: userData.email }
+            });
+            const propertyData = response.data.map(property =>({
+                id: property.id,
+                name: property.name
             }));
-            setOptionsPropertieId(propriedadesId);
-            setOptionsPropertie(propriedades);
+            setPropertyOptions(propertyData);
 
             if(id){
               const fetchPropertyData = async () => {
                 try {
                     const response = await axios.get(`http://localhost:3000/propriedade/${id}`);
-                    setPropertie(response.data);
+                    setProperty(response.data);
                     setLoading(false); 
                 } catch (error) {
                     console.error("Erro ao buscar dados da gleba:", error);
@@ -68,28 +67,19 @@ const GlebasForm = () => {
   const initialValues = {
     nameGleba: "",
     area: "",
-    propertie: propertie? propertie.name :""   
+    property: property? property.name :""   
   }
 
   const navigate = useNavigate(); 
   const handleFormSubmit = async (values) => {
     //console.log("Valores do formulário:", values);
     if(id){
-      values.propertie = propertie.name
+      values.property = property.id
     }
     try {
-      const index = optionsPropertieId.findIndex(item => item.name === values.propertie);
-
-      if (index === -1) {
-        console.error("Propriedade não encontrada ao procurar na Gleba");
-        return; 
-      }
-
-      const propriedadeId = optionsPropertieId[index].id;
-
       const response = await axios.post("http://localhost:3000/createGleba", {
         name: values.nameGleba,
-        propertyId: propriedadeId,          
+        propertyId: values.property,          
         area: values.area,          
         email: userData.email
       });
@@ -161,14 +151,14 @@ const GlebasForm = () => {
                   helperText={touched.area && errors.area}
                   sx={{ gridColumn: "span 2" }}
                 />
-                {propertie ?(
+                {property ?(
                   <TextField
                     id="properties"
                     fullWidth
                     variant="filled"
                     label="Propriedade"
-                    name="propertie"
-                    value={propertie.name}
+                    name="property"
+                    value={property.name}
                     disabled 
                     sx={{ gridColumn: "span 2" }}
                     
@@ -177,10 +167,16 @@ const GlebasForm = () => {
                   <Autocomplete
                     disablePortal
                     id="properties"
-                    options={optionsPropertie}
-                    name="propertie"
-                    value={values.propertie || null} 
-                    onChange={(event, value) => setFieldValue('propertie', value)} 
+                    options={propertyOptions}
+                    getOptionLabel={(option) => option.name || ""}
+                    name="property"
+
+                    value={
+                      values.property
+                        ? propertyOptions.find((option) => option.id === values.property) 
+                        : null
+                    } 
+                    onChange={(event, value) => setFieldValue('property', value?.id || null)} 
                     onBlur={handleBlur} 
                     sx={{ gridColumn: "span 2" }}
                     renderInput={(params) => (
@@ -188,9 +184,9 @@ const GlebasForm = () => {
                         {...params} 
                         label="Propriedade"
                         variant="filled"
-                        name="propertie"
-                        error={!!touched.propertie && !!errors.propertie }
-                        helperText={touched.propertie &&  errors.propertie }
+                        name="property"
+                        error={!!touched.property && !!errors.property }
+                        helperText={touched.property &&  errors.property }
                         onBlur={handleBlur} 
                       />
                     )}
@@ -226,14 +222,11 @@ const GlebasForm = () => {
 const checkoutSchema = yup.object().shape({
     nameGleba: yup.string().required("Campo de preenchimento obrigatório"),
     area: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
-    propertie: yup.string().required("Campo de preenchimento obrigatório"),
-
+    property: yup.string().required("Campo de preenchimento obrigatório"),
 });
 
 const checkoutSchema2 = yup.object().shape({
   nameGleba: yup.string().required("Campo de preenchimento obrigatório"),
   area: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
-  //propertie: yup.string().required("Campo de preenchimento obrigatório"),
-
 });
 export default GlebasForm;

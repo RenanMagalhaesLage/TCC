@@ -188,6 +188,79 @@ app.post("/protegida", verificaTokens,async(req,res) =>{
     //node --watch index.js
 });
 
+
+/* Rota para --> BUSCA TODOS OS DADOS DO USER - DADO DETERMINADO EMAIL 
+   Retorno: Propriedades, Glebas, Safras e Custos associados ao user */
+app.get('/user', async (req, res) => {
+    const { email }  = req.query;
+
+    try {
+        const user = await User.findOne({ where: { email: email } });
+        if (!user) {
+            return res.status(404).json({ error: 'Usuário não encontrado' });
+        }
+
+        /* Busca todas as propriedades associadas ao usuário e seus níveis de acesso*/
+        const userProperties = await UserProperty.findAll({
+            where: { userId: user.id },
+            attributes: ['propertyId', 'access']
+        });
+        
+        const propertyIds = userProperties.map(up => up.propertyId);
+        const access = userProperties.map(up => up.access);
+        
+        const properties = await Property.findAll({
+            where: {
+                id: propertyIds
+            },
+            include: {
+                model: Gleba, as: 'glebas', 
+                include: {
+                    model: Safra, as: 'safras',
+                    include:{
+                        model: Custo, as: 'custos'
+                    }  
+                }
+            }
+        });
+        
+        const propertiesWithAccess = properties.map((property, index) => ({
+            ...property.toJSON(),
+            access: access[index]
+        }));
+        
+        if (properties.length === 0) {
+            return res.status(404).json({ message: 'Nenhuma propriedade cadastrada para este usuário.' });
+        }
+        const result = propertiesWithAccess.map(property => {
+            const glebas = (property.glebas || []).map(gleba => {
+                const safras = (gleba.safras || []).map(safra => {
+                    const custos = safra.custos || [];
+                    return {
+                        ...safra,
+                        custos
+                    };
+                });
+        
+                return {
+                    ...gleba,
+                    safras
+                };
+            });
+        
+            return {
+                ...property,
+                glebas
+            };
+        });
+
+        return res.status(200).json(result);
+    } catch (error) {
+        console.error('Erro ao buscar custos do usuário:', error);
+        return res.status(500).json({ error: 'Erro ao buscar custos do usuário' });
+    }
+});
+
 /*------------------------
     ROTAS PROPRIEDADE
 --------------------------*/
@@ -871,8 +944,53 @@ app.get('/custo/:id', async (req, res) => {
 });
 
 /* Rota para --> CADASTRO DE CUSTOS */
+app.post('/custos', async (req, res) => {
+    try {
+        const { email, safraId, 
+            name,
+            category,
+            unit,
+            quantity,
+            price,
+            totalValue,
+            date,
+            note
+        } = req.body;
+        const user = await User.findOne({ where: { email: email } });
 
+
+        if (
+            !email || !safraId || !name || !category || !unit || !quantity || !price || !totalValue || !date || !note
+        ) {
+            return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
+        }
+        const safra = await Safra.findByPk(safraId)
+
+        const newCusto = await Custo.create({
+            type: safra.type,
+            status: safra.status,
+            name: name,
+            category: category,
+            unit: unit,
+            quantity: quantity,
+            price: price,
+            totalValue: totalValue,
+            date: date,
+            note: note,
+            safraId: safraId       
+        });
+
+
+        return res.status(201).json({ 
+            custo: newCusto
+        });
+    } catch (error) {
+        console.error('Erro ao salvar custo:', error);
+        return res.status(500).json({ error: 'Erro ao salvar o custo.' });
+    }
+});
 /* Rota para --> EDIÇÃO DE CUSTOS */
+
 
 
 /*------------------------

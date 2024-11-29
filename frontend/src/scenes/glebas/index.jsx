@@ -142,9 +142,11 @@ const Glebas = () => {
 
     useEffect(() => {
         if (userData && userData.email) { 
-            const fetchGlebas = async () => {
+            const fetchGlebasData = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:3000/searchGlebas/${userData.email}`);
+                    const response = await axios.get(`http://localhost:3000/user`, {
+                        params: { email: userData.email }
+                    });
                     const linhasDaTabela = response.data.flatMap(fazenda => {
                         return fazenda.glebas.map(gleba => ({
                             id: gleba.id, 
@@ -162,7 +164,7 @@ const Glebas = () => {
                     console.log("ERRO - ao buscar as glebas.");
                 }
             };
-            fetchGlebas();
+            fetchGlebasData();
         }
     }, [userData]);  
 
