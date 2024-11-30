@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Box, Typography, useTheme, Button, useMediaQuery,Snackbar, Alert,Tooltip,IconButton } from "@mui/material";
 import { useNavigate,useLocation,useParams } from 'react-router-dom';
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid,GridToolbarContainer, GridToolbarColumnsButton, GridToolbarFilterButton, GridToolbarDensitySelector } from '@mui/x-data-grid';
 import { tokens } from "../../theme";
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
@@ -25,6 +25,7 @@ const Properties = () => {
     const message = Number(query.get('message'));
     const [openSnackbar, setOpenSnackbar] = useState(!!message);
     const [snackbarMessage, setSnackbarMessage] = useState(""); 
+
     useEffect(() => {
         switch (message) {
           case 1:
@@ -239,6 +240,7 @@ const Properties = () => {
                             rows={propriedades}
                             columns={columns}
                             localeText={{ noRowsLabel: <b>Nenhuma propriedade encontrada.</b> }}
+                            slots={{ toolbar: CustomToolbar }}
 
                         />
                     )}
@@ -274,5 +276,15 @@ const Properties = () => {
         </Box>
     );
 };
+
+function CustomToolbar() {
+    return (
+      <GridToolbarContainer>
+        <GridToolbarColumnsButton /> {/* Botão de exibição de colunas */}
+        <GridToolbarFilterButton />  {/* Botão de filtro */}
+        <GridToolbarDensitySelector /> {/* Seletor de densidade */}
+      </GridToolbarContainer>
+    );
+}
 
 export default Properties;

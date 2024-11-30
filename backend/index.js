@@ -566,13 +566,10 @@ app.get('/safras/:id', async (req, res) => {
             return res.status(404).json({ error: 'Safra não encontrada' });
         }
 
-        //Recebendo dados da gleba
         const gleba = await Gleba.findByPk(safra.glebaId);
 
-        //Recebendo dados da propriedade
         const property = await Property.findByPk(gleba.propertyId);
 
-        //Procurar dono da propriedade
         const ownerProperty = await UserProperty.findOne({
             where: { propertyId: gleba.propertyId },
             attributes: ['userId', 'access']
@@ -584,8 +581,15 @@ app.get('/safras/:id', async (req, res) => {
         if (!owner) {
             return res.status(404).json({ error: 'Dono da safra não encontrado' });
         }
+
+        const custos = await Custo.findAll({
+            where: {
+                safraId: safra.id,
+            }
+        })
         
         const result = {
+            custos: custos,
             safra: safra,
             gleba: gleba,
             property: property,
@@ -982,7 +986,7 @@ app.post('/createInvite', async (req, res) => {
     }
 });
 
-/* Rota para --> ACEITAR OU INVITE */
+/* Rota para --> ACEITAR OU RECUSAR INVITE */
 app.post('/acceptInvite/:id', async (req, res) => {
     const { id } = req.params;
 

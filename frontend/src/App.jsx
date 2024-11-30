@@ -13,7 +13,6 @@ import Bar from "./scenes/bar";
 import Pie from "./scenes/pie";
 import Line from "./scenes/line";
 import Login from './scenes/login';
-import Register from './scenes/register';
 import Properties from './scenes/properties';
 import Propertie from './scenes/properties/propertie';
 import PropertiesForm from './scenes/properties/form';
@@ -23,16 +22,16 @@ import Gleba from './scenes/glebas/gleba';
 import GlebasForm from './scenes/glebas/form';
 import GlebasEditForm from './scenes/glebas/editForm';
 import Safras from './scenes/safras'
-import Safra from './scenes/safras/safra';
+import SafrasPage from './scenes/safras/safrasPage';
 import SafrasForm from './scenes/safras/form';
-import Custos from './scenes/custos';
 import SafrasHistory from './scenes/safras/history';
-import SafrasEditForm from './scenes/safras/editForm';
+import Custos from './scenes/custos';
 import Invite from './scenes/invites';
 import InvitesForm from './scenes/invites/form';
 import CustosPage from './scenes/custos/custosPage';
 import CustosForm from './scenes/custos/form';
 import CustosEditPage from './scenes/custos/editPage';
+import SafrasEditPage from './scenes/safras/editPage';
 
 
 function App() {
@@ -78,10 +77,10 @@ function App() {
                   <Route path="/glebas/add/:id?" element={<GlebasForm />} />
                   <Route path="/glebas/edit/:id" element={<GlebasEditForm />} />
                   <Route path="/safras" element={<Safras />} />
-                  <Route path="/safras/:id" element={<Safra />} />
+                  <Route path="/safras/:id" element={<SafrasPage />} />
                   <Route path="/safras/add" element={<SafrasForm />} />
                   <Route path="/safras/add/:id?" element={<SafrasForm />} />
-                  <Route path="/safras/edit/:id" element={<SafrasEditForm />} />
+                  <Route path="/safras/edit/:id" element={<SafrasEditPage />} />
                   <Route path="/custos" element={<Custos />} />
                   <Route path="/custos/:id" element={<CustosPage />} />
                   <Route path="/custos/add" element={<CustosForm />} />

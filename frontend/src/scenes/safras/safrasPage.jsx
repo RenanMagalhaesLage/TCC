@@ -3,9 +3,8 @@ import { useNavigate,useParams } from 'react-router-dom';
 import secureLocalStorage from 'react-secure-storage';
 import axios from "axios";
 import { Box, Typography, useTheme, Button, useMediaQuery,Checkbox, FormControlLabel, Modal, Backdrop, Fade, Chip,Tooltip,IconButton } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid,GridToolbarContainer, GridToolbarColumnsButton, GridToolbarFilterButton, GridToolbarDensitySelector } from '@mui/x-data-grid';
 import { tokens } from "../../theme";
-import { mockDataSafra, mockDataGlebas } from "../../data/mockData";
 import Header from "../../components/Header";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -15,18 +14,22 @@ import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
-const Safra = () => {
+
+const SafrasPage = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const isMobile = useMediaQuery("(max-width: 1000px)");
+    const isSmallDivice = useMediaQuery("(max-width: 1300px)");
     const [owner, setOwner] = useState("");
     const { id } = useParams();
     const [userData, setUserData] = useState(null);
     const [propriedade, setPropriedade] = useState("");
     const [safra, setSafra] = useState("");
     const [gleba, setGleba] = useState("");
-    const [custos,setCustos] = useState([]);
+    const [custosRealizados,setCustosRealizados] = useState([]);
+    const [custosPlanejados,setCustosPlanejados] = useState([]);
     const [open, setOpen] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
     const [isHigher, setIsHigher] = useState(false)
@@ -80,6 +83,63 @@ const Safra = () => {
         "porcentHect",
     ];
 
+    const columns = [
+        { field: "category", headerName: "Categoria", flex: 1, minWidth: 80, resizable: false },
+        { field: "name", headerName: "Nome", flex: 1, minWidth: 80, resizable: false },
+        { field: "unit", headerName: "Unidade", flex: 1, resizable: false },
+        { field: "quantity", headerName: "Quantidade", flex: 1, resizable: false },
+        { field: "price", headerName: "Preço", flex: 1,  resizable: false },
+        { field: "totalValue", headerName: "Valor Total", flex: 1,  resizable: false },
+        { field: "date", headerName: "Data", flex: 1, resizable: false },
+        { field: "note", headerName: "Observação", flex: 1, minWidth: 80, resizable: false },
+        {
+            field: "actions",
+            headerName: "Ações",
+            flex: 1,
+            minWidth: 100,
+            renderCell: (params) => {
+                const { id } = params.row;
+
+                return (
+                    <Box 
+                        display="flex" 
+                        justifyContent="center" 
+                        width="100%"
+                        m="10px auto"
+                    >
+                        {isMobile ? (
+                            <>
+                                <Tooltip title="Visualizar">
+                                    <IconButton onClick={() => handleView(id)} sx={{ color: colors.greenAccent[500]}}>
+                                        <VisibilityIcon />
+                                    </IconButton>
+                                </Tooltip>
+                            </>
+                        ):(
+                            <>
+                                <Tooltip title="Visualizar">
+                                    <Button
+                                        variant="contained"
+                                        sx={{
+                                            backgroundColor: colors.greenAccent[500],
+                                            "&:hover": {
+                                                backgroundColor: colors.grey[700], 
+                                            },
+                                        }}
+                                        onClick={() => handleView(id)}
+                                    >
+                                        <VisibilityIcon />
+                                    </Button>
+                                </Tooltip>
+                            </>
+                        )}
+                    </Box>
+                );
+            },
+            headerAlign: "center"
+        },
+
+    ];
 
     useEffect(() => {
         const storedUser = secureLocalStorage.getItem('userData'); 
@@ -93,19 +153,28 @@ const Safra = () => {
             const fetchGlebas = async () => {
                 try {
                     const response = await axios.get(`http://localhost:3000/safras/${id}`);
-                    const {safra, gleba, property, owner } = response.data;
+                    const {custos, safra, gleba, property, owner } = response.data;
+                    
+                    const custosPlanejados = custos.filter(custo => custo.type === 'Planejado');
+                    const custosRealizados = custos.filter(custo => custo.type === 'Realizado');
+                    setCustosPlanejados(custosPlanejados);
+                    setCustosRealizados(custosRealizados);
                     setSafra(safra)
                     setGleba(gleba);
                     setPropriedade(property);
                     setOwner(owner);
-                    setIsHigher(safra.prodRealizada > safra.prodPrevista);
+                    setIsHigher(safra.prodRealizada >= safra.prodPrevista);
                 } catch (error) {
-                    console.log("ERROR - ao buscar a gleba.");
+                    console.log("ERROR - ao buscar a safra.");
                 }
             };
             fetchGlebas();
         }
     }, [userData]);  
+
+    useEffect(() => {
+        //console.log(custos); 
+    }, [custosPlanejados, custosRealizados]);
 
     const navigate = useNavigate(); 
 
@@ -526,20 +595,18 @@ const Safra = () => {
                             mt={isMobile ? "770px": "300px"}
                         >
                             <Typography variant="h4" fontWeight="bold" color={colors.grey[100]}>
-                                Custos da Safra
+                                Custos Planejados da Safra
                             </Typography>
                         </Box>
                         <Box
                             gridColumn="span 12"
-                            backgroundColor={colors.primary[400]}
                             display="flex"
                             alignItems="center"
                             justifyContent="center"
                             minHeight="475px"
                             mt={isMobile ? "670px": "205px"}
-                            sx={{boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.07)",}}
                         >
-                            {custos.length === 0 ? (
+                            {custosPlanejados.length === 0 ? (
                                 <Box
                                     display="flex"
                                     flexDirection= "column"
@@ -548,7 +615,7 @@ const Safra = () => {
                                     gap="20px"
                                 >
                                     <Typography variant={isMobile ? "h6": "h5"} fontWeight="bold" color={colors.grey[100]}>
-                                        Nenhum custo da safra foi encontrado.
+                                        Nenhum custo planejado da safra foi encontrado.
                                     </Typography>
                                     <Button
                                         sx={{
@@ -567,8 +634,66 @@ const Safra = () => {
                             ):(
                                 
                                 <DataGrid
-                                    rows={mockDataGlebas}
-                                    columns={columnsSafras}
+                                    rows={custosPlanejados}
+                                    columns={columns}
+                                    sx={{mb:"20px"}}
+                                    slots={{ toolbar: CustomToolbar }}
+                                />
+                            )}
+                        </Box>
+
+                        <Box
+                            gridColumn="span 12"
+                            display="flex"
+                            alignItems="center"  
+                            justifyContent="left"  
+                            height="50px"
+                            mt={isMobile ? "990px": "530px"}
+                        >
+                            <Typography variant="h4" fontWeight="bold" color={colors.grey[100]}>
+                                Custos Realizados da Safra
+                            </Typography>
+                        </Box>
+                        <Box
+                            gridColumn="span 12"
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center"
+                            minHeight="475px"
+                            mt={isMobile ? "895px": "440px"}
+                        >
+                            {custosRealizados.length === 0 ? (
+                                <Box
+                                    display="flex"
+                                    flexDirection= "column"
+                                    alignItems="center"  
+                                    justifyContent="center"
+                                    gap="20px"
+                                >
+                                    <Typography variant={isMobile ? "h6": "h5"} fontWeight="bold" color={colors.grey[100]}>
+                                        Nenhum custo realizado da safra foi encontrado.
+                                    </Typography>
+                                    <Button
+                                        sx={{
+                                        backgroundColor: colors.mygreen[400],
+                                        color: colors.grey[100],
+                                        fontSize: "14px",
+                                        fontWeight: "bold",
+                                        padding: "10px 20px",
+                                        }}
+                                        onClick={() => handleAdd()}
+                                    >
+                                        <AddCircleOutlineIcon sx={{ mr: "10px" }} />
+                                        {("Adicionar Custo")}
+                                    </Button>
+                                </Box>
+                            ):(
+                                
+                                <DataGrid
+                                    rows={custosRealizados}
+                                    columns={columns}
+                                    sx={{mb:"20px"}}
+                                    slots={{ toolbar: CustomToolbar }}
                                 />
                             )}
                         </Box>
@@ -578,4 +703,15 @@ const Safra = () => {
     );
 };
 
-export default Safra;
+
+function CustomToolbar() {
+    return (
+      <GridToolbarContainer>
+        <GridToolbarColumnsButton /> {/* Botão de exibição de colunas */}
+        <GridToolbarFilterButton />  {/* Botão de filtro */}
+        <GridToolbarDensitySelector /> {/* Seletor de densidade */}
+      </GridToolbarContainer>
+    );
+}
+
+export default SafrasPage;

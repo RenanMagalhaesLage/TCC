@@ -46,7 +46,7 @@ const Custos = () => {
         }
       }, [message]);
 
-      const columns = [
+    const columns = [
         {
             field: "type",
             headerName: "Tipo",
@@ -252,12 +252,27 @@ const Custos = () => {
                         color: `${colors.mygreen[200]} !important`,
                     },
                 }}>
-                <DataGrid
-                    rows={custosData}
-                    columns={columns}
-                    slots={{ toolbar: CustomToolbar }}
-                    getRowId={(row) => row.id}
-                />
+                {custosData.length === 0 ? (
+                        <Box
+                            display="flex"
+                            flexDirection= "column"
+                            alignItems="center"  
+                            justifyContent="center"
+                            gap="20px"
+                            mt="50px"
+                        >
+                            <Typography variant={isMobile ? "h6": "h5"} fontWeight="bold" color={colors.grey[100]}>
+                                Nenhuma custo encontrado.
+                            </Typography>
+                        </Box>
+                ) : ( 
+                    <DataGrid
+                        rows={custosData}
+                        columns={columns}
+                        slots={{ toolbar: CustomToolbar }}
+                        getRowId={(row) => row.id}
+                    />
+                )}
             </Box>
             <div>
                 {message && (

@@ -3,7 +3,7 @@ import { Box, Typography, useTheme, Button, useMediaQuery,Snackbar, Alert,Toolti
 import { useNavigate,useLocation } from 'react-router-dom';
 import secureLocalStorage from 'react-secure-storage';
 import axios from "axios";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid,GridToolbarContainer, GridToolbarColumnsButton, GridToolbarFilterButton, GridToolbarDensitySelector } from '@mui/x-data-grid';
 import { tokens } from "../../theme";
 import { mockDataFazenda } from "../../data/mockData";
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
@@ -259,6 +259,7 @@ const Glebas = () => {
                             pagination: { paginationModel: { pageSize: 15 } },
                           }}
                         pageSizeOptions={[15, 20, 30]}
+                        slots={{ toolbar: CustomToolbar }}
                     />
                 )}
                 
@@ -292,5 +293,15 @@ const Glebas = () => {
         </Box>
     );
 };
+
+function CustomToolbar() {
+    return (
+      <GridToolbarContainer>
+        <GridToolbarColumnsButton /> {/* Botão de exibição de colunas */}
+        <GridToolbarFilterButton />  {/* Botão de filtro */}
+        <GridToolbarDensitySelector /> {/* Seletor de densidade */}
+      </GridToolbarContainer>
+    );
+}
 
 export default Glebas;

@@ -30,14 +30,6 @@ INSERT INTO safras (type, status, cultivo, semente, metroLinear, dosagem, tonela
 ('Planejado', false, 'Café', 'Semente G', 520, 58, 28.0, 'Adubo U', '2024-09-01', '2024-03-01', 180, 0, 0, 0, 0, 0, 0, 180, 230.0, 0, 0, 7, NOW(), NOW()),
 ('Planejado', false, 'Milho', 'Semente H', 680, 68, 33.0, 'Adubo V', '2024-10-01', '2024-04-01', 160, 0, 0, 0, 0, 0, 0, 240, 290.0, 0, 0, 8, NOW(), NOW());
 
-INSERT INTO custos (name, unit, quantity, price, category, totalValue, date, note, safraId, status, createdAt, updatedAt) VALUES
-('Fertilizante', 'kg', 100, 15.00, 'Insumos', 1500.00, NOW(), 'Fertilizante nitrogenado para solo', 1, false, NOW(), NOW()),
-('Pesticida', 'litro', 50, 16.00, 'Insumos', 800.00, NOW(), 'Controle de pragas', 1, false, NOW(), NOW()),
-('Transporte', 'viagem', 2, 600.00, 'Logística', 1200.00, NOW(), 'Transporte de grãos', 1, false, NOW(), NOW()),
-('Mão de Obra', 'hora', 200, 12.50, 'Serviços', 2500.00, NOW(), 'Trabalhadores rurais', 1, false, NOW(), NOW()),
-('Equipamento', 'unidade', 1, 3000.00, 'Capital', 3000.00, NOW(), 'Compra de trator', 1, false, NOW(), NOW()),
-('Seguro', 'contrato', 1, 1100.00, 'Seguros', 1100.00, NOW(), 'Seguro da safra', 1, false, NOW(), NOW());
-
 INSERT INTO custos (name, unit, quantity, price, category, totalValue, date, note, safraId, status, type, createdAt, updatedAt) VALUES
 ('Fertilizante', 'kg', 100, 15.00, 'Insumos', 1500.00, NOW(), 'Fertilizante nitrogenado para solo', 1, false, 'Planejado', NOW(), NOW()),
 ('Pesticida', 'litro', 50, 16.00, 'Insumos', 800.00, NOW(), 'Controle de pragas', 1, false, 'Planejado', NOW(), NOW()),

@@ -6,7 +6,6 @@ import { useNavigate,useLocation } from 'react-router-dom';
 import axios from "axios";
 import secureLocalStorage from 'react-secure-storage';
 import { tokens } from "../../theme";
-import { mockDataFazenda, mockDataSafra } from "../../data/mockData";
 import Header from "../../components/Header";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
@@ -21,7 +20,8 @@ const Safras = () => {
     const isMobile = useMediaQuery("(max-width: 800px)");
     const isSmallDivice = useMediaQuery("(max-width: 1300px)");
 
-    const [safras, setSafras] = useState([]);
+    const [safrasPlanejadas, setSafrasPlanejadas] = useState("");
+    const [safrasRealizadas, setSafrasRealizadas] = useState("");
     const [userData, setUserData] = useState(null);
 
     const location = useLocation();
@@ -353,7 +353,7 @@ const Safras = () => {
         { field: "propertie", headerName: "Propriedade", flex: 1, minWidth: 150, cellClassName: "name-column--cell", resizable: false },
         { field: "gleba", headerName: "Gleba", flex: 1, minWidth: 100, cellClassName: "nameGleba-column--cell", resizable: false },
         { field: "area", headerName: "Área da Gleba", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },    
-        { field: "cultivo", headerName: "Cultivo", flex: 1, minWidth: 100, cellClassName: "city-column--cell", resizable: false },
+        { field: "cultivo", headerName: "Cultivo", flex: 1, minWidth: 70, cellClassName: "city-column--cell", resizable: false },
         { field: "precMilimetrica", headerName: "Precipitação Milimetrica", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
         { 
             field: "umidade", 
@@ -525,10 +525,11 @@ const Safras = () => {
                             }));
                         });
                     });
-
-                    setSafras(linhasDaTabela);
-
+                    const safrasPlanejadas = linhasDaTabela.filter(safra => safra.type === 'Planejado');
+                    const safrasRealizadas = linhasDaTabela.filter(safra => safra.type === 'Realizado');
                     
+                    setSafrasPlanejadas(safrasPlanejadas);
+                    setSafrasRealizadas(safrasRealizadas);
                 } catch (error) {
                     console.log("ERRO - ao buscar as glebas.");
                 }
@@ -539,7 +540,7 @@ const Safras = () => {
 
     useEffect(() => {
         //console.log(glebas); 
-    }, [safras]);
+    }, [safrasPlanejadas, safrasRealizadas]);
 
     const navigate = useNavigate(); 
     const handleView = (id) => {
@@ -639,7 +640,7 @@ const Safras = () => {
                         <CustomTab  label="Realizada" icon={<TimelineIcon />}/>
                     </CustomTabs>
                 </Paper>
-                {safras.length === 0 ? (
+                {safrasPlanejadas.length === 0 && safrasRealizadas.length === 0 ? (
                         <Box
                             display="flex"
                             flexDirection= "column"
@@ -654,9 +655,10 @@ const Safras = () => {
                         </Box>
                 ) : ( 
                     <DataGrid
-                            rows={safraType === 0 ? safras : safras}
-                            columns={safraType === 0 ? columnsPlanejadas : columnsRealizadas}
-                            slots={{ toolbar: CustomToolbar }}
+                        rows={safraType === 0 ? safrasPlanejadas : safrasRealizadas}
+                        columns={safraType === 0 ? columnsPlanejadas : columnsRealizadas}
+                        slots={{ toolbar: CustomToolbar }}
+                        localeText={{ noRowsLabel: safraType === 0 ? <h2>Nenhuma safra planejada encontrada.</h2> :  <h2>Nenhuma safra realizada encontrada.</h2>}}
                     />                    
                 )}
             </Box>

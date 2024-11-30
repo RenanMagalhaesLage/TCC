@@ -9,7 +9,7 @@ import axios from 'axios';
 import secureLocalStorage from 'react-secure-storage'; 
 
 
-const SafrasEditForm = () => {
+const SafrasEditPage = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const isNonMobile = useMediaQuery("(min-width:600px)");
@@ -353,4 +353,4 @@ const calculateTempoLavoura = (dataFimPlantio, dataFimColheita) => {
   }
   return "";
 };
-export default SafrasEditForm;
+export default SafrasEditPage;

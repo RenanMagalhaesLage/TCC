@@ -1,9 +1,10 @@
+import React, { useState, useEffect } from "react";
 import { Box, Typography, useTheme, Button, useMediaQuery  } from "@mui/material";
-
 import { DataGrid,GridToolbarContainer, GridToolbarColumnsButton, GridToolbarFilterButton, GridToolbarDensitySelector } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import { useNavigate,useLocation } from 'react-router-dom';
-import { mockDataFazenda, mockDataSafra } from "../../data/mockData";
+import axios from "axios";
+import secureLocalStorage from 'react-secure-storage';
 import Header from "../../components/Header";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import EqualizerIcon from '@mui/icons-material/Equalizer';
@@ -16,6 +17,8 @@ const SafrasHistory = () => {
     const colors = tokens(theme.palette.mode);
     const isMobile = useMediaQuery("(max-width: 800px)");
     const isSmallDivice = useMediaQuery("(max-width: 1300px)");
+    const [userData, setUserData] = useState(null);
+    const [safras, setSafras] = useState("");
 
     const columns = [
         { field: "propertie", headerName: "Propriedade", flex: 1, minWidth: 150, cellClassName: "name-column--cell", resizable: false },
@@ -130,6 +133,7 @@ const SafrasHistory = () => {
                         alignItems="center"
                         backgroundColor={isHigher ? colors.mygreen[500] : colors.redAccent[500]} 
                         borderRadius="4px"
+                        color={"#fff" }
                     >
                         {isHigher ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />} 
                     </Box>
@@ -186,6 +190,62 @@ const SafrasHistory = () => {
         },  
     ];
 
+    useEffect(() => {
+        const storedUser = secureLocalStorage.getItem('userData'); 
+        if (storedUser) {
+            setUserData(JSON.parse(storedUser));
+        }
+    }, []);
+
+    useEffect(() => {
+        if (userData && userData.email) { 
+            const fetchSafrasData = async () => {
+                try {
+                    const response = await axios.get(`http://localhost:3000/user`, {
+                        params: { email: userData.email }
+                    });
+                    const linhasDaTabela = response.data.flatMap(property => {
+                        return property.glebas.flatMap(gleba => { 
+                            return gleba.safras.map(safra => ({  
+                                id: safra.id,   
+                                gleba: gleba.name,
+                                propertie: property.name,
+                                area: gleba.area,
+                                type: safra.type,  
+                                status: safra.status,
+                                cultivo: safra.cultivo,
+                                semente: safra.semente, 
+                                metroLinear: safra.metroLinear, 
+                                dosagem: safra.dosagem, 
+                                toneladas: safra.toneladas, 
+                                adubo: safra.adubo, 
+                                dataFimPlantio: safra.dataFimPlantio, 
+                                dataFimColheita: safra.dataFimColheita, 
+                                tempoLavoura: safra.tempoLavoura, 
+                                precMilimetrica: safra.precMilimetrica, 
+                                umidade: safra.umidade, 
+                                impureza: safra.impureza, 
+                                graosAvariados: safra.graosAvariados, 
+                                graosEsverdeados: safra.graosEsverdeados, 
+                                graosQuebrados: safra.graosQuebrados, 
+                                prodTotal: safra.prodTotal, 
+                                prodPrevista: safra.prodPrevista, 
+                                prodRealizada: safra.prodRealizada, 
+                                porcentHect: safra.porcentHect,
+                                access: property.access
+                            }));
+                        });
+                    });
+                    const safrasFinalizadas = linhasDaTabela.filter(safra => safra.status === true);
+                    setSafras(safrasFinalizadas);
+                } catch (error) {
+                    console.log("ERRO - ao buscar as glebas.");
+                }
+            };
+            fetchSafrasData();
+        }
+    }, [userData]);
+
     const navigate = useNavigate(); 
     const handleView = (id) => {
         navigate(`/safras/${id}`);
@@ -197,7 +257,7 @@ const SafrasHistory = () => {
     return (
         <Box m="20px">
             <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Header title="Histórico Safras" subtitle="Gerencie as suas safras que já foram finalizadas" />
+                <Header title="Histórico Safras" subtitle="Gerencie as suas safras finalizadas" />
             </Box>
             <Box m="20px 0 0 0" height="75vh" maxWidth="1600px" mx="auto"
                 sx={{
@@ -225,11 +285,26 @@ const SafrasHistory = () => {
                         color: `${colors.mygreen[200]} !important`,
                     },
                 }}>
-                <DataGrid
-                    rows={mockDataSafra}
-                    columns={columns}
-                    slots={{ toolbar: CustomToolbar }}
-                />
+                {safras.length === 0 ? (
+                        <Box
+                            display="flex"
+                            flexDirection= "column"
+                            alignItems="center"  
+                            justifyContent="center"
+                            gap="20px"
+                            mt="50px"
+                        >
+                            <Typography variant={isMobile ? "h6": "h5"} fontWeight="bold" color={colors.grey[100]}>
+                                Nenhuma safra finalizada encontrada.
+                            </Typography>
+                        </Box>
+                ) : ( 
+                    <DataGrid
+                        rows={safras}
+                        columns={columns}
+                        slots={{ toolbar: CustomToolbar }}
+                    />
+                )}
             </Box>
         </Box>
     );
