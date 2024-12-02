@@ -1,4 +1,4 @@
-import { useTheme } from "@mui/material";
+import { useTheme,useMediaQuery } from "@mui/material";
 import { ResponsiveBar } from "@nivo/bar";
 import { tokens } from "../theme";
 import { mockBarData as data } from "../data/mockData";
@@ -7,6 +7,9 @@ import {red} from "@mui/material/colors"
 const BarChart = ({ isDashboard = false }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const isMobile = useMediaQuery("(max-width: 800px)");
+  const isSmallDivice = useMediaQuery("(max-width: 1400px)");
+  const isMediumDivice = useMediaQuery("(max-width: 1800px)");
 
   return (
     <ResponsiveBar
@@ -45,13 +48,13 @@ const BarChart = ({ isDashboard = false }) => {
             },
         }
       }}
-      keys={["hot dog", "burger", "sandwich", "kebab", "fries", "donut"]}
-      indexBy="country"
+      keys={["custoMedioPorHectare"]}
+      indexBy="gleba"
       margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
       padding={0.3}
       valueScale={{ type: "linear" }}
       indexScale={{ type: "band", round: true }}
-      colors={{ scheme: "nivo" }}
+      colors={() => "#ff6347"}
       defs={[
         {
           id: "dots",
@@ -79,12 +82,13 @@ const BarChart = ({ isDashboard = false }) => {
       axisTop={null}
       axisRight={null}
       axisBottom={{
-        tickSize: 5,
-        tickPadding: 5,
-        tickRotation: 0,
-        legend: isDashboard ? undefined : "country", // changed
+        tickSize: isSmallDivice ? 0 : 5, 
+        tickPadding: isSmallDivice ? 0 : 5,
+        tickRotation: isSmallDivice ? 0 : 0, 
+        legend: isDashboard ? undefined : "gleba", // changed
         legendPosition: "middle",
         legendOffset: 32,
+        format: isSmallDivice ? () => "" : undefined,
       }}
       axisLeft={{
         tickSize: 5,
@@ -101,7 +105,9 @@ const BarChart = ({ isDashboard = false }) => {
         from: "color",
         modifiers: [["darker", 1.6]],
       }}
-      legends={[
+      legends={
+        true ? []:
+        [
         {
           dataFrom: "keys",
           anchor: "bottom-right",

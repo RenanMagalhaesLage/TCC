@@ -1,5 +1,6 @@
 import { createContext, useState, useMemo } from "react";
 import { createTheme } from "@mui/material/styles";
+//Comando --> ctrl + k + ctrl + g
 
 // color design tokens export
 export const tokens = (mode) => ({
@@ -80,8 +81,30 @@ export const tokens = (mode) => ({
           600: "#fbb800",
           700: "#966316",
           800: "#64420e",
-          900: "#322107"
+          900: "#322107",
       },
+      purpleAccent: {
+          100: "#e2d9f3",
+          200: "#c5b3e6",
+          300: "#a98eda",
+          400: "#8c68cd",
+          500: "#6f42c1",
+          600: "#59359a",
+          700: "#432874",
+          800: "#2c1a4d",
+          900: "#160d27"
+      },
+      yellowAccent: {
+          100: "#fcf9cc",
+          200: "#f8f399",
+          300: "#f5ed67",
+          400: "#f1e734",
+          500: "#eee101",
+          600: "#beb401",
+          700: "#8f8701",
+          800: "#5f5a00",
+          900: "#302d00"
+},
       }
     : {
         grey: {

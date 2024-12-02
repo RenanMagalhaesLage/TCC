@@ -214,7 +214,7 @@ const Sidebar = ({ onLogout }) => {
             </Typography>
             <Item
               title="Projetado"
-              to="/"
+              to="/projetado"
               icon={<BarChartOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}

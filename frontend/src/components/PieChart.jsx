@@ -1,11 +1,15 @@
 import { ResponsivePie } from "@nivo/pie";
 import { tokens } from "../theme";
-import { useTheme } from "@mui/material";
+import { useTheme, useMediaQuery } from "@mui/material";
 import { mockPieData as data } from "../data/mockData";
 
 const PieChart = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const isMobile = useMediaQuery("(max-width: 800px)");
+  const isSmallDivice = useMediaQuery("(max-width: 1000px)");
+  const isMediumDivice = useMediaQuery("(max-width: 1800px)");
+
   return (
     <ResponsivePie
       data={data}
@@ -47,11 +51,13 @@ const PieChart = () => {
       innerRadius={0.5}
       padAngle={0.7}
       cornerRadius={3}
+      sortByValue={true}
       activeOuterRadiusOffset={8}
       borderColor={{
         from: "color",
         modifiers: [["darker", 0.2]],
       }}
+      enableArcLinkLabels={isMobile? false : true}
       arcLinkLabelsSkipAngle={10}
       arcLinkLabelsTextColor={colors.grey[100]}
       arcLinkLabelsThickness={2}
@@ -83,31 +89,35 @@ const PieChart = () => {
           spacing: 10,
         },
       ]}
-      legends={[
-        {
-          anchor: "bottom",
-          direction: "row",
-          justify: false,
-          translateX: 0,
-          translateY: 56,
-          itemsSpacing: 0,
-          itemWidth: 100,
-          itemHeight: 18,
-          itemTextColor: "#999",
-          itemDirection: "left-to-right",
-          itemOpacity: 1,
-          symbolSize: 18,
-          symbolShape: "circle",
-          effects: [
+      legends={
+        isSmallDivice
+          ? [] // Remove as legendas em telas pequenas
+          : [
             {
-              on: "hover",
-              style: {
-                itemTextColor: "#000",
-              },
+              anchor: "bottom",
+              direction: "row",
+              justify: false,
+              translateX: 0,
+              translateY: 70,
+              itemsSpacing: 10,
+              itemWidth: 110,
+              itemHeight: 18,
+              itemTextColor: "#999",
+              itemDirection: "left-to-right",
+              itemOpacity: 1,
+              symbolSize: 15,
+              symbolShape: "circle",
+              effects: [
+                {
+                  on: "hover",
+                  style: {
+                    itemTextColor: "#000",
+                  },
+                },
+              ],
             },
-          ],
-        },
-      ]}
+          ]
+        }
     />
   );
 };

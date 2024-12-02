@@ -32,6 +32,7 @@ import CustosPage from './scenes/custos/custosPage';
 import CustosForm from './scenes/custos/form';
 import CustosEditPage from './scenes/custos/editPage';
 import SafrasEditPage from './scenes/safras/editPage';
+import DashboardProjetado from './scenes/dashboard/dashboardProjetado';
 
 
 function App() {
@@ -88,6 +89,8 @@ function App() {
                   <Route path="/history" element={<SafrasHistory />} />
                   <Route path="/invites" element={<Invite />} />
                   <Route path="/invites/add" element={<InvitesForm />} />
+                  <Route path="/projetado" element={<DashboardProjetado />} />
+
 
                 </Routes>
               </main>
