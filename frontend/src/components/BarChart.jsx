@@ -2,7 +2,7 @@ import { useTheme,useMediaQuery } from "@mui/material";
 import { ResponsiveBar } from "@nivo/bar";
 import { tokens } from "../theme";
 import { mockBarData as data } from "../data/mockData";
-import {red} from "@mui/material/colors"
+import { colorSchemes } from "@nivo/colors";
 
 const BarChart = ({ isDashboard = false }) => {
   const theme = useTheme();
@@ -10,6 +10,7 @@ const BarChart = ({ isDashboard = false }) => {
   const isMobile = useMediaQuery("(max-width: 800px)");
   const isSmallDivice = useMediaQuery("(max-width: 1400px)");
   const isMediumDivice = useMediaQuery("(max-width: 1800px)");
+  const nivoColors = colorSchemes.nivo;
 
   return (
     <ResponsiveBar
@@ -54,7 +55,7 @@ const BarChart = ({ isDashboard = false }) => {
       padding={0.3}
       valueScale={{ type: "linear" }}
       indexScale={{ type: "band", round: true }}
-      colors={() => "#ff6347"}
+      colors={(bar) => nivoColors[bar.index % nivoColors.length]}
       defs={[
         {
           id: "dots",

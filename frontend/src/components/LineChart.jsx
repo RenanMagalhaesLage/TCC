@@ -59,7 +59,8 @@ const LineChart = ({ isCustomLineColors = false, isDashboard = false }) => {
           },
         },
       }}
-      colors={isDashboard ? { datum: "color" } : { scheme: "nivo" }}
+      colors={{ scheme: "nivo" }}
+      //colors={isDashboard ? { datum: "color" } : { scheme: "nivo" }}
       margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
       xScale={{ type: "point" }}
       yScale={{
@@ -124,7 +125,6 @@ const LineChart = ({ isCustomLineColors = false, isDashboard = false }) => {
                   {
                     on: "hover",
                     style: {
-                      itemBackground: "rgba(0, 0, 0, .03)",
                       itemOpacity: 1,
                     },
                   },

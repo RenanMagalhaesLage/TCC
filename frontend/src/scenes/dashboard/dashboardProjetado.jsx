@@ -12,6 +12,9 @@ import BarChart from "../../components/BarChart";
 import StatBox from "../../components/StatBox";
 import ProgressCircle from "../../components/ProgressCircle";
 import PieChart from "../../components/PieChart";
+import FenceIcon from '@mui/icons-material/Fence';
+import InfoBox from "../../components/InfoBox";
+import LocalAtmIcon from '@mui/icons-material/LocalAtm';
 
 const DashboardProjetado = () => {
   const isMobile = useMediaQuery("(max-width: 800px)");
@@ -52,9 +55,180 @@ const DashboardProjetado = () => {
       >
         {/* ROW 1 */}
         <Box
+          gridColumn={isSmallDivice ? "span 6": "span 2"}
+          backgroundColor={colors.primary[400]}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          sx={{
+            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.09)", 
+          }}
+        >
+          <InfoBox
+            title="1.242"
+            subtitle="Hectares"
+          />
+        </Box>
+        <Box
+          gridColumn={isSmallDivice ? "span 6": "span 2"}
+          backgroundColor={colors.primary[400]}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          sx={{
+            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.09)", 
+          }}
+        >
+          <InfoBox
+            title="R$ 165,00"
+            subtitle="Preço venda R$ / HÁ "
+
+          />
+        </Box>
+        <Box
+          gridColumn={isSmallDivice ? "span 12": "span 2"}
+          backgroundColor={colors.primary[400]}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          sx={{
+            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.09)", 
+          }}
+        >
+          <InfoBox
+            title="R$ 7.547"
+            subtitle="Custo médio / HÁ "
+          />
+        </Box>
+        <Box
+          gridColumn={isSmallDivice ? "span 6": "span 3"}
+          backgroundColor={colors.primary[400]}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          sx={{
+            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.09)", 
+          }}
+        >
+          <InfoBox
+            title="45,80"
+            subtitle="Ponto Equilibrio (SCS)"
+          />
+        </Box>
+        <Box
+          gridColumn={isSmallDivice ? "span 6": "span 3"}
+          backgroundColor={colors.primary[400]}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          sx={{
+            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.09)", 
+          }}
+        >
+          <InfoBox
+            title="74,48"
+            subtitle="Prod. Estimada (SCS)"
+          />
+        </Box>
+        {/* ROW 2 */}
+        <Box
+          gridColumn={isSmallDivice ? "span 6": "span 2"}
+          backgroundColor={colors.primary[400]}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          sx={{
+            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.09)", 
+          }}
+        >
+          <InfoBox
+            title="R$ 9.181.446"
+            subtitle="Custo Total"
+          />
+        </Box>
+        <Box
+          gridColumn={isSmallDivice ? "span 6": "span 2"}
+          backgroundColor={colors.primary[400]}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          sx={{
+            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.09)", 
+          }}
+        >
+          <InfoBox
+            title="R$ 15.250.069"
+            subtitle="Receita Bruta"
+          />
+        </Box>
+        <Box
+          gridColumn={isSmallDivice ? "span 6": "span 2"}
+          backgroundColor={colors.primary[400]}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          sx={{
+            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.09)", 
+          }}
+        >
+          <InfoBox
+            title="R$ 4.742"
+            subtitle="Lucro / HÁ"
+          />
+        </Box>
+        <Box
+          gridColumn={isSmallDivice ? "span 6": "span 2"}
+          backgroundColor={colors.primary[400]}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          sx={{
+            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.09)", 
+          }}
+        >
+          <InfoBox
+            title="R$ 6.068.624"
+            subtitle="Lucro Total"
+          />
+        </Box>
+        <Box
+          gridColumn={isSmallDivice ? "span 6": "span 2"}
+          backgroundColor={colors.primary[400]}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          sx={{
+            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.09)", 
+          }}
+        >
+          <InfoBox
+            title="38,4%"
+            subtitle="Rentabilidade (LAIR %)"
+          />
+        </Box>
+        <Box
+          gridColumn={isSmallDivice ? "span 6": "span 2"}
+          backgroundColor={colors.primary[400]}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          sx={{
+            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.09)", 
+          }}
+        >
+          <InfoBox
+            title="34,5%"
+            subtitle="Rentabilidade Final"
+          />
+        </Box>
+        {/* ROW 3 */}
+        <Box
           gridColumn={isMediumDivice ? "span 12": "span 6"}
           gridRow= "span 3"
           backgroundColor={colors.primary[400]}
+          sx={{
+            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.09)", 
+          }}
         >
           <Box
             mt="25px"
@@ -89,6 +263,9 @@ const DashboardProjetado = () => {
           gridColumn={isMediumDivice ? "span 12": "span 6"}
           gridRow="span 3"
           backgroundColor={colors.primary[400]}
+          sx={{
+            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.09)", 
+          }}
         >
           <Box
             mt="25px"
@@ -119,11 +296,14 @@ const DashboardProjetado = () => {
             <LineChart isDashboard={true} />
           </Box>
         </Box>
-        {/* ROW 2 */}
+        {/* ROW 4 */}
         <Box
           gridColumn="span 12"
           gridRow="span 3"
           backgroundColor={colors.primary[400]}
+          sx={{
+            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.09)", 
+          }}
         >
           <Box
             mt="25px"
@@ -160,230 +340,8 @@ const DashboardProjetado = () => {
             <BarChart isDashboard={true} />
           </Box>
         </Box>
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          
-          <StatBox
-            title="12,361"
-            subtitle="Emails Sent"
-            progress="0.75"
-            increase="+14%"
-            icon={
-              <EmailIcon
-                sx={{ color: colors.mygreen[600], fontSize: "26px" }}
-              />
-            }
-          />
-        </Box>
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <StatBox
-            title="431,225"
-            subtitle="Sales Obtained"
-            progress="0.50"
-            increase="+21%"
-            icon={
-              <PointOfSaleIcon
-                sx={{ color: colors.mygreen[600], fontSize: "26px" }}
-              />
-            }
-          />
-        </Box>
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <StatBox
-            title="32,441"
-            subtitle="New Clients"
-            progress="0.30"
-            increase="+5%"
-            icon={
-              <PersonAddIcon
-                sx={{ color: colors.mygreen[600], fontSize: "26px" }}
-              />
-            }
-          />
-        </Box>
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <StatBox
-            title="1,325,134"
-            subtitle="Traffic Received"
-            progress="0.80"
-            increase="+43%"
-            icon={
-              <TrafficIcon
-                sx={{ color: colors.mygreen[600], fontSize: "26px" }}
-              />
-            }
-          />
-        </Box>
-
-        {/* ROW 3 */}
-        <Box
-          gridColumn="span 8"
-          gridRow="span 2"
-          backgroundColor={colors.primary[400]}
-        >
-          <Box
-            mt="25px"
-            p="0 30px"
-            display="flex "
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Box>
-              <Typography
-                variant="h5"
-                fontWeight="600"
-                color={colors.grey[100]}
-              >
-                Revenue Generated
-              </Typography>
-              <Typography
-                variant="h3"
-                fontWeight="bold"
-                color={colors.mygreen[500]}
-              >
-                $59,342.32
-              </Typography>
-            </Box>
-            <Box>
-              <IconButton>
-                <DownloadOutlinedIcon
-                  sx={{ fontSize: "26px", color: colors.mygreen[500] }}
-                />
-              </IconButton>
-            </Box>
-          </Box>
-          <Box height="250px" m="-20px 0 0 0">
-            <BarChart isDashboard={true} />
-          </Box>
-        </Box>
-        <Box
-          gridColumn="span 4"
-          gridRow="span 2"
-          backgroundColor={colors.primary[400]}
-          overflow="auto"
-        >
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-            borderBottom={`4px solid ${colors.primary[500]}`}
-            colors={colors.grey[100]}
-            p="15px"
-          >
-            <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
-              Recent Transactions
-            </Typography>
-          </Box>
-          {mockTransactions.map((transaction, i) => (
-            <Box
-              key={`${transaction.txId}-${i}`}
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-              borderBottom={`4px solid ${colors.primary[500]}`}
-              p="15px"
-            >
-              <Box>
-                <Typography
-                  color={colors.mygreen[500]}
-                  variant="h5"
-                  fontWeight="600"
-                >
-                  {transaction.txId}
-                </Typography>
-                <Typography color={colors.grey[100]}>
-                  {transaction.user}
-                </Typography>
-              </Box>
-              <Box color={colors.grey[100]}>{transaction.date}</Box>
-              <Box
-                backgroundColor={colors.mygreen[500]}
-                p="5px 10px"
-                borderRadius="4px"
-              >
-                ${transaction.cost}
-              </Box>
-            </Box>
-          ))}
-        </Box>
-
-        {/* ROW 3 */}
-        <Box
-          gridColumn="span 4"
-          gridRow="span 2"
-          backgroundColor={colors.primary[400]}
-          p="30px"
-        >
-          <Typography variant="h5" fontWeight="600">
-            Campaign
-          </Typography>
-          <Box
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            mt="25px"
-          >
-            <ProgressCircle size="125" />
-            <Typography
-              variant="h5"
-              color={colors.mygreen[500]}
-              sx={{ mt: "15px" }}
-            >
-              $48,352 revenue generated
-            </Typography>
-            <Typography>Includes extra misc expenditures and costs</Typography>
-          </Box>
-        </Box>
-        <Box
-          gridColumn="span 4"
-          gridRow="span 2"
-          backgroundColor={colors.primary[400]}
-        >
-          <Typography
-            variant="h5"
-            fontWeight="600"
-            sx={{ padding: "30px 30px 0 30px" }}
-          >
-            Sales Quantity
-          </Typography>
-          <Box height="250px" mt="-20px">
-            <BarChart isDashboard={true} />
-          </Box>
-        </Box>
-        <Box
-          gridColumn="span 4"
-          gridRow="span 2"
-          backgroundColor={colors.primary[400]}
-        ></Box>
-
-        <Box
-          gridColumn="span 4"
-          gridRow="span 2"
-          backgroundColor={colors.primary[400]}
-        ></Box>
+        {/* ROW 5 */}
+        
         
         
       </Box>
