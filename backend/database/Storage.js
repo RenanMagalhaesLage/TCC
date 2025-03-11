@@ -1,17 +1,10 @@
 const Sequelize = require("sequelize");
 const connection = require("./database");
 
-const Custo = connection.define('custos',{
-    status:{
-        type: Sequelize.BOOLEAN, //Safra finalizada ? Sim --> true
-        allowNull: false,
-    },
-    type:{
+const Storage = connection.define('storages',{
+    stored_location: {
         type: Sequelize.STRING,
-        allowNull: false,
-        validate: {
-            isIn: [['Planejado', 'Realizado']] 
-        }
+        allowNull: false
     },
     name: {
         type: Sequelize.STRING,
@@ -48,7 +41,5 @@ const Custo = connection.define('custos',{
     }
 });
 
-//Custo.sync({force:true});
 
-
-module.exports = Custo;
+module.exports = Storage;

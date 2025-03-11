@@ -12,7 +12,7 @@ import secureLocalStorage from 'react-secure-storage';
 import axios from "axios";
 
 
-const Custos = () => {
+const Storage = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const isMobile = useMediaQuery("(max-width: 800px)");
@@ -47,40 +47,7 @@ const Custos = () => {
       }, [message]);
 
     const columns = [
-        {
-            field: "type",
-            headerName: "Tipo",
-            flex: 1,
-            headerAlign: "center",
-            minWidth: 200,
-            resizable: false,
-            renderCell: ({ row: { type } }) => {
-                return (
-                    <Box
-                        width="60%"
-                        m="10px auto"
-                        p="5px"
-                        display="flex"
-                        justifyContent="center"
-                        backgroundColor={
-                            type === "Planejado" ? colors.orangeAccent[500] : colors.orangeAccent[300]
-                        }
-                        borderRadius="4px"
-                        sx={{color: theme.palette.mode === 'dark' ?colors.primary[400]: colors.grey[100]}}
-                    >
-                        {type === "Planejado" && <EqualizerIcon/>}
-                        {type === "Realizado" && <TimelineIcon />}
-                        {!isSmallDivice && (
-                            <Typography
-                                sx={{ ml: "5px", fontWeight: "bold"}}
-                            >
-                                {type}
-                            </Typography>
-                        )}
-                    </Box>
-                );
-            }
-        },
+        { field: "stored_location", headerName: "Localização", flex: 1,  resizable: false },
         { field: "category", headerName: "Categoria", flex: 1,  resizable: false },
         { field: "name", headerName: "Nome", flex: 1,  resizable: false },
         { field: "unit", headerName: "Unidade", flex: 1, resizable: false },
@@ -208,7 +175,7 @@ const Custos = () => {
         <Box m="20px">
             <Box display="flex" justifyContent="space-between" alignItems="center">
 
-                <Header title="Custos" subtitle="Gerencie os seus custos" />
+                <Header title="Estoque" subtitle="Gerencie o seu estoque" />
                 <Box>
                     <Button
                         sx={{
@@ -221,7 +188,7 @@ const Custos = () => {
                         onClick={() => handleAdd()}
                     >
                         <AddCircleOutlineIcon sx={{ mr: isMobile? "0px" :"10px" }} />
-                        {!isMobile && ("Adicionar Custo")}
+                        {!isMobile && ("Adicionar ao Estoque")}
                     </Button>
                 </Box>
             </Box>
@@ -304,7 +271,7 @@ const Custos = () => {
     );
 };
 
-export default Custos;
+export default Storage;
 
 
 function CustomToolbar() {

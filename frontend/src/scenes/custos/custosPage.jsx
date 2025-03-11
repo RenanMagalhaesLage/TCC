@@ -92,14 +92,15 @@ const CustosPage = () => {
             const fetchCustosData = async () => {
                 try {
                     const response = await axios.get(`http://localhost:3000/custos/${id}`);
-                    const {custo, safra, gleba, property, owner } = response.data;
+                    const custo = response.data;
+                    const safra = response.data.safra;
+                    const glebas = response.data.safra.glebas;
                     setCusto(custo);
                     setSafra(safra);
-                    setGleba(gleba);
-                    setPropriedade(property);
-                    setOwner(owner);
+                    setGleba(glebas);
                 } catch (error) {
-                    console.log("ERROR - ao buscar dados do custo.");
+                    console.log(`ERROR - ao buscar dados do custo de id = ${id}.`);
+                    console.log(error);
                 }
             };
             fetchCustosData();
@@ -206,77 +207,6 @@ const CustosPage = () => {
                                 />
                             </Box>
                         </Box>
-                        
-                        <Box
-                            gridColumn="span 12"
-                            backgroundColor={colors.primary[400]}
-                            display="grid"
-                            gridTemplateColumns={isMobile ? "1fr" : "repeat(2, 1fr)"} 
-                            padding="25px 35px 30px 35px"
-                            height={isMobile ? "auto" : "initial"} 
-                            minHeight={isMobile ? "220px" : "auto"} 
-                            marginBottom={isMobile ? "0px" :"118px"}
-                            marginTop={"-130px"}
-                            sx={{boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.07)",}}
-                        >
-                            {/* Primeira Coluna */}
-                            <Box display="flex" flexDirection="column" alignItems="flex-start" >
-                                <Box display="flex" alignItems="center" marginBottom="15px">
-                                    <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
-                                    Nome da Fazenda:
-                                    </Typography>
-                                    <Typography variant="body1" color={colors.grey[300]}>
-                                    {propriedade.name}
-                                    </Typography>
-                                </Box>
-                                <Box display="flex" alignItems="center" marginBottom="15px">
-                                    <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
-                                    Cidade:
-                                    </Typography>
-                                    <Typography variant="body1" color={colors.grey[300]}>
-                                    {propriedade.city}
-                                    </Typography>
-                                </Box>  
-                                <Box display="flex" alignItems="center" marginBottom="15px">
-                                    <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
-                                    Nome do Dono:
-                                    </Typography>
-                                    <Typography variant="body1" color={colors.grey[300]}>
-                                    {owner.name}
-                                    </Typography>
-                                </Box>
-                                
-                            </Box>
-
-                            {/* Segunda Coluna */}
-                            <Box display="flex" flexDirection="column" alignItems="flex-start">
-                                <Box display="flex" alignItems="center" marginBottom="15px" >
-                                    <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
-                                    Nome da Gleba:
-                                    </Typography>
-                                    <Typography variant="body1" color={colors.grey[300]}>
-                                    {gleba.name}
-                                    </Typography>
-                                </Box>
-                                <Box display="flex" alignItems="center"  marginBottom="15px">
-                                    <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
-                                    Área da Gleba:
-                                    </Typography>
-                                    <Typography variant="body1" color={colors.grey[300]}>
-                                    {gleba.area}
-                                    </Typography>
-                                </Box>
-                                <Box display="flex" alignItems="center" >
-                                    <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
-                                    Safra:
-                                    </Typography>
-                                    <Typography variant="body1" color={colors.grey[300]}>
-                                    {safra.cultivo + " - " + safra.dataFimPlantio}
-                                    </Typography>
-                                </Box>
-                            </Box>   
-                        </Box>
-
                         <Box
                             gridColumn="span 12"
                             backgroundColor={colors.primary[400]}
@@ -291,6 +221,14 @@ const CustosPage = () => {
                         >
                             {/* Primeira Coluna */}
                             <Box  gridColumn={isMobile ? "span 12" : "span 1"} display="flex" flexDirection="column" alignItems="flex-start" >
+                                <Box display="flex" alignItems="center" marginBottom="15px" >
+                                    <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
+                                    Safra:
+                                    </Typography>
+                                    <Typography variant="body1" color={colors.grey[300]}>
+                                    {safra.cultivo + " - " + safra.dataFimPlantio}
+                                    </Typography>
+                                </Box>
                                 <Box display="flex" alignItems="center" marginBottom="15px">
                                     <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
                                     Categoria do Custo:
@@ -314,7 +252,11 @@ const CustosPage = () => {
                                     <Typography variant="body1" color={colors.grey[300]}>
                                     {custo.unit}
                                     </Typography>
-                                </Box>
+                                </Box>                                
+                            </Box>
+
+                            {/* Segunda Coluna */}
+                            <Box  gridColumn={isMobile ? "span 12" : "span 1"} display="flex" flexDirection="column" alignItems="flex-start">
                                 <Box display="flex" alignItems="center" marginBottom="15px">
                                     <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
                                     Data:
@@ -323,11 +265,6 @@ const CustosPage = () => {
                                     {custo.date}
                                     </Typography>
                                 </Box>
-                                
-                            </Box>
-
-                            {/* Segunda Coluna */}
-                            <Box  gridColumn={isMobile ? "span 12" : "span 1"} display="flex" flexDirection="column" alignItems="flex-start">
                                 <Box display="flex" alignItems="center" marginBottom="15px" >
                                     <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
                                     Quantidade:
@@ -349,7 +286,7 @@ const CustosPage = () => {
                                     Valor Total:
                                     </Typography>
                                     <Typography variant="body1" color={colors.grey[300]}>
-                                    {custo.totalValue}
+                                    {custo.total_value}
                                     </Typography>
                                 </Box>
                             </Box>

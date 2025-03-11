@@ -27,7 +27,7 @@ const SafrasPage = () => {
     const [userData, setUserData] = useState(null);
     const [propriedade, setPropriedade] = useState("");
     const [safra, setSafra] = useState("");
-    const [gleba, setGleba] = useState("");
+    const [glebas, setGlebas] = useState([]);
     const [custosRealizados,setCustosRealizados] = useState([]);
     const [custosPlanejados,setCustosPlanejados] = useState([]);
     const [open, setOpen] = useState(false);
@@ -89,7 +89,7 @@ const SafrasPage = () => {
         { field: "unit", headerName: "Unidade", flex: 1, resizable: false },
         { field: "quantity", headerName: "Quantidade", flex: 1, resizable: false },
         { field: "price", headerName: "Preço", flex: 1,  resizable: false },
-        { field: "totalValue", headerName: "Valor Total", flex: 1,  resizable: false },
+        { field: "total_value", headerName: "Valor Total", flex: 1,  resizable: false },
         { field: "date", headerName: "Data", flex: 1, resizable: false },
         { field: "note", headerName: "Observação", flex: 1, minWidth: 80, resizable: false },
         {
@@ -150,25 +150,29 @@ const SafrasPage = () => {
 
     useEffect(() => {
         if (userData && userData.email) { 
-            const fetchGlebas = async () => {
+            const fetchSafras = async () => {
                 try {
                     const response = await axios.get(`http://localhost:3000/safras/${id}`);
-                    const {custos, safra, gleba, property, owner } = response.data;
+                    const safra = response.data;
+                    const glebas = response.data.glebas;
+                    const custos = response.data.custos;
                     
+                    setSafra(safra);
+                    setGlebas(glebas); 
+
                     const custosPlanejados = custos.filter(custo => custo.type === 'Planejado');
                     const custosRealizados = custos.filter(custo => custo.type === 'Realizado');
                     setCustosPlanejados(custosPlanejados);
                     setCustosRealizados(custosRealizados);
-                    setSafra(safra)
-                    setGleba(gleba);
-                    setPropriedade(property);
-                    setOwner(owner);
+
+                    setOwner(glebas[0].property.users[0].name);
                     setIsHigher(safra.prodRealizada >= safra.prodPrevista);
                 } catch (error) {
-                    console.log("ERROR - ao buscar a safra.");
+                    console.log(`ERROR - ao buscar a safra de id = ${id}`);
+                    console.log(error);
                 }
             };
-            fetchGlebas();
+            fetchSafras();
         }
     }, [userData]);  
 
@@ -307,47 +311,35 @@ const SafrasPage = () => {
                             <Box display="flex" flexDirection="column" alignItems="flex-start" >
                                 <Box display="flex" alignItems="center" marginBottom="15px">
                                     <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
-                                    Nome da Fazenda:
+                                    Nome do Proprietário:
                                     </Typography>
                                     <Typography variant="body1" color={colors.grey[300]}>
-                                    {propriedade.name}
-                                    </Typography>
-                                </Box>
-                                <Box display="flex" alignItems="center" marginBottom="15px">
-                                    <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
-                                    Cidade:
-                                    </Typography>
-                                    <Typography variant="body1" color={colors.grey[300]}>
-                                    {propriedade.city}
-                                    </Typography>
-                                </Box>  
-                                <Box display="flex" alignItems="center" marginBottom="15px">
-                                    <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
-                                    Nome do Dono:
-                                    </Typography>
-                                    <Typography variant="body1" color={colors.grey[300]}>
-                                    {owner.name}
-                                    </Typography>
-                                </Box>
-                                
-                            </Box>
-
-                            {/* Segunda Coluna */}
-                            <Box display="flex" flexDirection="column" alignItems="flex-start">
-                                <Box display="flex" alignItems="center" marginBottom="15px" >
-                                    <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
-                                    Nome da Gleba:
-                                    </Typography>
-                                    <Typography variant="body1" color={colors.grey[300]}>
-                                    {gleba.name}
+                                    {owner}
                                     </Typography>
                                 </Box>
                                 <Box display="flex" alignItems="center" >
                                     <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
-                                    Área da Gleba:
+                                    Área da Safra:
                                     </Typography>
                                     <Typography variant="body1" color={colors.grey[300]}>
-                                    {gleba.area}
+                                    
+                                    </Typography>
+                                </Box>
+                            </Box>
+
+                            {/* Segunda Coluna */}
+                            <Box display="flex" flexDirection="column" alignItems="flex-start">
+                                <Box display="flex" alignItems="center" marginBottom="15px">
+                                    <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
+                                        Glebas:
+                                    </Typography>
+                                    <Typography variant="body1" color={colors.grey[300]}>
+                                        {glebas.slice(0, 5).map((gleba, index) => (
+                                        <span key={index}>
+                                            {gleba.name}{index < glebas.slice(0, 5).length - 1 && ', '}
+                                        </span>
+                                        ))}
+                                        {glebas.length > 5 && '...'}
                                     </Typography>
                                 </Box>
                             </Box>   

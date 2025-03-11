@@ -26,12 +26,40 @@ const Gleba = require("./database/Gleba");
 const Safra = require("./database/Safra");
 const Invite = require("./database/Invite");
 const Custo = require("./database/Custo");
+const SafraGleba = require("./database/SafraGleba");
+const Storage = require("./database/Storage");
 
 /*--------------------------------
     Relacionamentos dos Models
 ----------------------------------*/
 User.belongsToMany(Property, { through: UserProperty, onDelete: 'CASCADE', onUpdate: 'CASCADE' });
 Property.belongsToMany(User, { through: UserProperty, onDelete: 'CASCADE', onUpdate: 'CASCADE' });
+
+Safra.belongsToMany(Gleba, {
+    through: SafraGleba,  
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+});
+
+Gleba.belongsToMany(Safra, {
+    through: SafraGleba,  
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+});
+
+User.hasMany(Storage, {
+    foreignKey: 'userId',  
+    as: 'storages',           
+    onDelete: 'CASCADE',      
+    onUpdate: 'CASCADE'       
+});
+
+Storage.belongsTo(User, {
+    foreignKey: 'userId',  
+    as: 'user',            
+    onDelete: 'CASCADE',      
+    onUpdate: 'CASCADE'       
+});
 
 Property.hasMany(Gleba, { 
     foreignKey: 'propertyId',
@@ -47,20 +75,6 @@ Gleba.belongsTo(Property,  {
     onUpdate: 'CASCADE' 
 });
 
-Gleba.hasMany(Safra, {
-    foreignKey: 'glebaId',
-    as: 'safras',
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'  
-});
-
-Safra.belongsTo(Gleba,  {
-    foreignKey: 'glebaId',
-    as: 'safra',
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE' 
-});
-
 Safra.hasMany(Custo,{
     foreignKey: 'safraId',
     as: 'custos',
@@ -70,7 +84,7 @@ Safra.hasMany(Custo,{
 
 Custo.belongsTo(Safra,{
     foreignKey: 'safraId',
-    as: 'custo',
+    as: 'safra',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE' 
 });
@@ -437,35 +451,23 @@ app.get('/gleba/:id', async (req, res) => {
             return res.status(404).json({ error: 'Gleba não encontrada' });
         }
 
-        //Recebendo dados da propriedade
-        const property = await Property.findByPk(gleba.propertyId);
-
-        //Procurar dono da propriedade
-        const ownerProperty = await UserProperty.findOne({
-            where: { propertyId: gleba.propertyId },
-            attributes: ['userId', 'access']
-        }); 
-        
-        const userId = ownerProperty?.userId
-
-        const owner = await User.findByPk(userId);
-        if (!owner) {
-            return res.status(404).json({ error: 'Dono da gleba não encontrado' });
-        }
-
-        const safras = await Safra.findAll({
-            where:{glebaId: gleba.id}
+        const result = await Gleba.findOne({
+            where: { id: id},
+            include: [{
+                model: Safra,
+                through: { model: SafraGleba },  
+            },
+            {
+                model: Property,  
+                include: [{
+                    model: User,  
+                    through: { model: UserProperty },
+                    here: { '$user_properties.access$': 'owner' }
+                }],
+                as: 'property',  
+            },
+            ],
         })
-        const safrasPlanned = safras.filter(safra => safra.type === 'Planejado');
-        const safrasAchieved = safras.filter(safra => safra.type === 'Realizado');
-        
-        const result = {
-            gleba: gleba,
-            property: property,
-            owner: owner,
-            safrasPlanned: safrasPlanned,
-            safrasAchieved: safrasAchieved
-        };
 
         return res.status(200).json(result);
     } catch (error) {
@@ -565,36 +567,29 @@ app.get('/safras/:id', async (req, res) => {
         if (!safra) {
             return res.status(404).json({ error: 'Safra não encontrada' });
         }
-
-        const gleba = await Gleba.findByPk(safra.glebaId);
-
-        const property = await Property.findByPk(gleba.propertyId);
-
-        const ownerProperty = await UserProperty.findOne({
-            where: { propertyId: gleba.propertyId },
-            attributes: ['userId', 'access']
-        }); 
-        
-        const userId = ownerProperty?.userId
-
-        const owner = await User.findByPk(userId);
-        if (!owner) {
-            return res.status(404).json({ error: 'Dono da safra não encontrado' });
-        }
-
-        const custos = await Custo.findAll({
-            where: {
-                safraId: safra.id,
+        const result = await Safra.findOne({
+            where: { id: id},
+            include: [{
+                model: Gleba,
+                through: { model: SafraGleba },  
+                include: {
+                    model: Property,  
+                    include: [{
+                        model: User,  
+                        through: { model: UserProperty },
+                        here: { '$user_properties.access$': 'owner' }
+                    }],
+                    as: 'property',  
+                },
+            },
+            {
+                model: Custo, 
+                where: { safraId: id },
+                required: false, 
+                as: "custos"
             }
+            ],
         })
-        
-        const result = {
-            custos: custos,
-            safra: safra,
-            gleba: gleba,
-            property: property,
-            owner: owner
-        };
 
         return res.status(200).json(result);
     } catch (error) {
@@ -763,9 +758,29 @@ app.get('/custos/:id', async (req, res) => {
             return res.status(404).json({ error: 'Custo não encontrado' });
         }
 
-        const safra = await Safra.findByPk(custo.safraId);
-
-        const gleba = await Gleba.findByPk(safra.glebaId);
+        const result = await Custo.findOne({
+            where: { id: id},
+            include:[{
+                model: Safra,
+                include: [{
+                    model: Gleba,
+                through: { model: SafraGleba },  
+                include: {
+                  model: Property,  
+                  include: [{
+                    model: User,  // Incluir os usuários relacionados à Property
+                    through: { model: UserProperty },  // Tabela intermediária UserProperty
+                    attributes: ['id', 'name'],  // Coloque os atributos que você deseja do User
+                  }],
+                  as: 'property',  
+                },
+                }],
+                as: 'safra'
+            }]
+        })
+        
+        return res.status(200).json(result);
+        /*  
 
         const property = await Property.findByPk(gleba.propertyId);
 
@@ -789,7 +804,7 @@ app.get('/custos/:id', async (req, res) => {
             owner: owner
         };
 
-        return res.status(200).json(result);
+        return res.status(200).json(result);*/
     } catch (error) {
         console.error('Erro ao buscar custo:', error);
         return res.status(500).json({ error: 'Erro ao buscar custo' });

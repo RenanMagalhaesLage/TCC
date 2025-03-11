@@ -25,6 +25,7 @@ import Divider from '@mui/material/Divider';
 import WarehouseIcon from '@mui/icons-material/Warehouse';
 import PendingActionsIcon from '@mui/icons-material/PendingActions';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
+import GiteIcon from '@mui/icons-material/Gite';
 
 const Item = ({ title, to, icon, selected, setSelected, onClick }) => {
   const theme = useTheme();
@@ -179,6 +180,13 @@ const Sidebar = ({ onLogout }) => {
               title="Histórico Safras"
               to="/history"
               icon={<PendingActionsIcon/>}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Estoque"
+              to="/storage"
+              icon={<GiteIcon/>}
               selected={selected}
               setSelected={setSelected}
             />

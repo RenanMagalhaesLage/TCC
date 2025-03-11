@@ -18,7 +18,7 @@ import Propertie from './scenes/properties/propertie';
 import PropertiesForm from './scenes/properties/form';
 import PropertiesEditForm from './scenes/properties/editForm';
 import Glebas from './scenes/glebas';
-import Gleba from './scenes/glebas/gleba';
+import Gleba from './scenes/glebas/glebaPage';
 import GlebasForm from './scenes/glebas/form';
 import GlebasEditForm from './scenes/glebas/editForm';
 import Safras from './scenes/safras'
@@ -33,6 +33,7 @@ import CustosForm from './scenes/custos/form';
 import CustosEditPage from './scenes/custos/editPage';
 import SafrasEditPage from './scenes/safras/editPage';
 import DashboardProjetado from './scenes/dashboard/dashboardProjetado';
+import Storage from './scenes/storage/index';
 
 
 function App() {
@@ -90,6 +91,7 @@ function App() {
                   <Route path="/invites" element={<Invite />} />
                   <Route path="/invites/add" element={<InvitesForm />} />
                   <Route path="/projetado" element={<DashboardProjetado />} />
+                  <Route path="/storage" element={<Storage />} />
 
 
                 </Routes>

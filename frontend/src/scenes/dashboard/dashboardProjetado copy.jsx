@@ -20,7 +20,6 @@ const DashboardProjetado = () => {
     Propriedade: ["Propriedade A", "Propriedade B", "Propriedade C"],
     Gleba: ["Gleba X", "Gleba Y", "Gleba Z"],
     Safra: ["Safra 2023", "Safra 2024", "Safra 2025"],
-    Cultivo: ["Milho", "Soja", "Trigo"]
   };
 
   const [dependentOptions, setDependentOptions] = useState([]);
@@ -34,6 +33,7 @@ const DashboardProjetado = () => {
       {/* HEADER */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header title="Painel Custo Agrícola Projetado" subtitle="Visualize o painel do custo agricula projetado" />
+
       </Box>
 
       <Formik
@@ -54,27 +54,32 @@ const DashboardProjetado = () => {
             gap="20px"
           >
             <Box
-              gridColumn={isSmallDevice ? "span 12": "span 3"}
+              gridColumn={isSmallDevice ? "span 12": "span 4"}
               display="flex"
               alignItems="center"
               justifyContent="center"
             >
+              {/* Campo de Seleção Principal */}
               <TextField
                   select
                   fullWidth
                   variant="filled"
-                  label="Selecione uma Safra"
+                  label="Selecione uma categoria"
                   value={values.primarySelection}
                   onChange={(e) => {
                     const value = e.target.value;
                     setFieldValue("primarySelection", value);
-                    setFieldValue("secondarySelection", ""); 
+                    setFieldValue("secondarySelection", ""); // Reseta o campo dependente
                     handlePrimaryChange(value);
                   }}
+                  helperText="Escolha entre Propriedade, Gleba ou Safra"
                   InputLabelProps={{ shrink: true }}
-
+                  sx={{
+                    gridColumn: isSmallDevice ? "span 6" : "span 4",
+                    
+                  }}
               >
-                  {options.Safra.map((option) => (
+                  {["Propriedade", "Gleba", "Safra"].map((option) => (
                     <MenuItem key={option} value={option}>
                       {option}
                     </MenuItem>
@@ -82,97 +87,48 @@ const DashboardProjetado = () => {
               </TextField>
             </Box>
             <Box
-              gridColumn={isSmallDevice ? "span 12": "span 3"}
+              gridColumn={isSmallDevice ? "span 12": "span 4"}
               display="flex"
               alignItems="center"
               justifyContent="center"
             >
+              {/* Campo de Seleção Dependente */}
               <TextField
-                  select
-                  fullWidth
-                  variant="filled"
-                  label="Selecione uma Propriedade"
-                  value={values.primarySelection}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setFieldValue("primarySelection", value);
-                    setFieldValue("secondarySelection", ""); 
-                    handlePrimaryChange(value);
-                  }}
-                  InputLabelProps={{ shrink: true }}
-
+                select
+                fullWidth
+                variant="filled"
+                label={
+                  values.primarySelection
+                    ? `Selecione um(a) ${values.primarySelection}`
+                    : "Escolha a categoria primeiro"
+                }
+                value={values.secondarySelection}
+                onChange={(e) => setFieldValue("secondarySelection", e.target.value)}
+                disabled={!values.primarySelection}
+                helperText={`Escolha uma opção `}
+                InputLabelProps={{ shrink: true }}
+                sx={{
+                  gridColumn: isSmallDevice ? "span 6" : "span 4",
+    
+                }}
               >
-                  {options.Propriedade.map((option) => (
-                    <MenuItem key={option} value={option}>
-                      {option}
-                    </MenuItem>
-                  ))}
+                {dependentOptions.map((option) => (
+                  <MenuItem key={option} value={option}>
+                    {option}
+                  </MenuItem>
+                ))}
               </TextField>
             </Box>
-            <Box
-              gridColumn={isSmallDevice ? "span 12": "span 3"}
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-            >
-              <TextField
-                  select
-                  fullWidth
-                  variant="filled"
-                  label="Selecione uma Gleba"
-                  value={values.primarySelection}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setFieldValue("primarySelection", value);
-                    setFieldValue("secondarySelection", ""); 
-                    handlePrimaryChange(value);
-                  }}
-                  InputLabelProps={{ shrink: true }}
-
-              >
-                  {options.Propriedade.map((option) => (
-                    <MenuItem key={option} value={option}>
-                      {option}
-                    </MenuItem>
-                  ))}
-              </TextField>
-            </Box>
-            <Box
-              gridColumn={isSmallDevice ? "span 12": "span 3"}
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-            >
-              <TextField
-                  select
-                  fullWidth
-                  variant="filled"
-                  label="Selecione um Cultivo"
-                  value={values.primarySelection}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setFieldValue("primarySelection", value);
-                    setFieldValue("secondarySelection", ""); 
-                    handlePrimaryChange(value);
-                  }}
-                  InputLabelProps={{ shrink: true }}
-
-              >
-                  {options.Propriedade.map((option) => (
-                    <MenuItem key={option} value={option}>
-                      {option}
-                    </MenuItem>
-                  ))}
-              </TextField>
-            </Box>
-
 
             {/* Botão de Envio */}
             <Box
-              gridColumn={"span 12"}
+              gridColumn={isSmallDevice ? "span 12" : "span 4"}
               display="flex"
               alignItems="center"
-              justifyContent="flex-end"
+              justifyContent="center"
+              sx={{
+                marginTop: "-20px"
+              }}
             >
               <Button
                 type="submit"
@@ -228,23 +184,8 @@ const DashboardProjetado = () => {
           }}
         >
           <InfoBox
-            title="69,52"
-            subtitle="Prod / Hectare"
-          />
-        </Box>
-        <Box
-          gridColumn={isSmallDevice ? "span 6": "span 2"}
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          sx={{
-            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.09)", 
-          }}
-        >
-          <InfoBox
             title="R$ 165,00"
-            subtitle="Preço venda R$ / HA "
+            subtitle="Preço venda R$ / HÁ "
 
           />
         </Box>
@@ -260,11 +201,11 @@ const DashboardProjetado = () => {
         >
           <InfoBox
             title="R$ 7.547"
-            subtitle="Custo médio / HA "
+            subtitle="Custo médio / HÁ "
           />
         </Box>
         <Box
-          gridColumn={isSmallDevice ? "span 6": "span 2"}
+          gridColumn={isSmallDevice ? "span 6": "span 3"}
           backgroundColor={colors.primary[400]}
           display="flex"
           alignItems="center"
@@ -279,7 +220,7 @@ const DashboardProjetado = () => {
           />
         </Box>
         <Box
-          gridColumn={isSmallDevice ? "span 6": "span 2"}
+          gridColumn={isSmallDevice ? "span 6": "span 3"}
           backgroundColor={colors.primary[400]}
           display="flex"
           alignItems="center"
@@ -336,7 +277,7 @@ const DashboardProjetado = () => {
         >
           <InfoBox
             title="R$ 4.742"
-            subtitle="Lucro / Hectare"
+            subtitle="Lucro / HÁ"
           />
         </Box>
         <Box

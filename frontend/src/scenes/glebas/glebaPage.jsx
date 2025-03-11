@@ -5,7 +5,6 @@ import axios from "axios";
 import { Box, Typography, useTheme, Button, useMediaQuery,Checkbox,FormControlLabel,Modal,Backdrop,Fade,Tooltip,IconButton} from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
-import { mockDataUsers, mockDataGlebas } from "../../data/mockData";
 import Header from "../../components/Header";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -93,14 +92,18 @@ const Gleba = () => {
             const fetchGlebas = async () => {
                 try {
                     const response = await axios.get(`http://localhost:3000/gleba/${id}`);
-                    const { gleba, property, owner, safrasPlanned,safrasAchieved } = response.data;
+                    const gleba = response.data;
+                    const safras = gleba.safras;
                     setGleba(gleba);
-                    setPropriedade(property);
-                    setOwner(owner);
-                    setSafrasPlanejadas(safrasPlanned);
-                    setSafrasRealizadas(safrasAchieved);
+                    setPropriedade(gleba.property);
+                    setOwner(gleba.property.users[0].name);
+                    const safrasPlanejadas = safras.filter(safra => safra.type === 'Planejado');
+                    const safrasRealizadas = safras.filter(safra => safra.type === 'Realizado');
+                    setSafrasPlanejadas(safrasPlanejadas);
+                    setSafrasRealizadas(safrasRealizadas);
                 } catch (error) {
-                    console.log("ERROR - ao buscar a gleba.");
+                    console.log(`ERROR - ao buscar a gleba de id = ${id} .`);
+                    console.log(error);
                 }
             };
             fetchGlebas();
@@ -211,10 +214,10 @@ const Gleba = () => {
                                 </Box>
                                 <Box display="flex" alignItems="center" marginBottom={isMobile ? "15px" : "0px"}>
                                     <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
-                                    Nome do Dono:
+                                    Nome do Proprietário:
                                     </Typography>
                                     <Typography variant="body1" color={colors.grey[300]}>
-                                    {owner.name}
+                                    {owner}
                                     </Typography>
                                 </Box>
                                 
