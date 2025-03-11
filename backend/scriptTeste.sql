@@ -32,21 +32,22 @@ INSERT INTO custos (name, unit, quantity, price, category, total_value, date, no
 ('Equipamento', 'unidade', 1, 3000.00, 'Capital', 3000.00, NOW(), 'Compra de trator', 1, false, 'Planejado', NOW(), NOW()),
 ('Seguro', 'contrato', 1, 1100.00, 'Seguros', 1100.00, NOW(), 'Seguro da safra', 1, false, 'Planejado', NOW(), NOW());
 
-INSERT INTO storages (stored_location, name, unit, quantity, price, category, total_value, date, note, userId, createdAt, updatedAt) VALUES
-('Armazém de Fertilizantes', 'Fertilizante', 'kg', 500, 20.00, 'Insumos', 10000.00, NOW(), 'Fertilizante químico para solo', 1,NOW(), NOW()),
-('Armazém de Produtos Químicos', 'Pesticida', 'litro', 300, 25.00, 'Insumos', 7500.00, NOW(), 'Pesticida para controle de pragas em soja',1, NOW(), NOW()),
-('Armazém de Equipamentos', 'Sementes', 'saco', 100, 150.00, 'Insumos', 15000.00, NOW(), 'Sementes de milho para plantio',1, NOW(), NOW()),
-('Armazém de Ferramentas', 'Trator', 'unidade', 2, 50000.00, 'Capital', 100000.00, NOW(), 'Tratores para preparo do solo',1, NOW(), NOW()),
-('Armazém de Ferramentas', 'Plantar', 'unidade', 5, 3000.00, 'Capital', 15000.00, NOW(), 'Plantar para semear o milho',1, NOW(), NOW()),
-('Armazém de Proteção', 'Roupas de Proteção', 'unidade', 50, 100.00, 'Capital', 5000.00, NOW(), 'Roupas de proteção para operários',1, NOW(), NOW()),
+INSERT INTO storage_items (stored_location, name, unit, quantity, price, category, total_value, date, note, propertyId, createdAt, updatedAt)
+VALUES
+('Armazém de Fertilizantes', 'Fertilizante', 'kg', 500, 20.00, 'Insumos', 10000.00, NOW(), 'Fertilizante químico para solo', 1, NOW(), NOW()),
+('Armazém de Produtos Químicos', 'Pesticida', 'litro', 300, 25.00, 'Insumos', 7500.00, NOW(), 'Pesticida para controle de pragas em soja', 2, NOW(), NOW()),
+('Armazém de Equipamentos', 'Sementes', 'saco', 100, 150.00, 'Insumos', 15000.00, NOW(), 'Sementes de milho para plantio', 3, NOW(), NOW()),
+('Armazém de Ferramentas', 'Trator', 'unidade', 2, 50000.00, 'Capital', 100000.00, NOW(), 'Tratores para preparo do solo', 4, NOW(), NOW()),
+('Armazém de Ferramentas', 'Plantar', 'unidade', 5, 3000.00, 'Capital', 15000.00, NOW(), 'Plantar para semear o milho', 4, NOW(), NOW()),
+('Armazém de Proteção', 'Roupas de Proteção', 'unidade', 50, 100.00, 'Capital', 5000.00, NOW(), 'Roupas de proteção para operários', 1, NOW(), NOW()),
 ('Armazém de Fertilizantes', 'Calcário', 'kg', 1000, 10.00, 'Insumos', 10000.00, NOW(), 'Calcário para correção do solo', 1, NOW(), NOW()),
-('Armazém de Produtos Químicos', 'Herbicida', 'litro', 200, 30.00, 'Insumos', 6000.00, NOW(), 'Herbicida para controle de plantas daninhas', 1, NOW(), NOW()),
-('Armazém de Equipamentos', 'Colheitadeira', 'unidade', 1, 150000.00, 'Capital', 150000.00, NOW(), 'Colheitadeira para grãos', 1, NOW(), NOW()),
-('Armazém de Ferramentas', 'Roçadeira', 'unidade', 10, 2000.00, 'Capital', 20000.00, NOW(), 'Roçadeiras para corte de capim', 1, NOW(), NOW()),
-('Armazém de Proteção', 'Máscaras de Proteção', 'unidade', 200, 15.00, 'Capital', 3000.00, NOW(), 'Máscaras de proteção para pulverização', 1, NOW(), NOW()),
+('Armazém de Produtos Químicos', 'Herbicida', 'litro', 200, 30.00, 'Insumos', 6000.00, NOW(), 'Herbicida para controle de plantas daninhas', 2, NOW(), NOW()),
+('Armazém de Equipamentos', 'Colheitadeira', 'unidade', 1, 150000.00, 'Capital', 150000.00, NOW(), 'Colheitadeira para grãos', 3, NOW(), NOW()),
+('Armazém de Ferramentas', 'Roçadeira', 'unidade', 10, 2000.00, 'Capital', 20000.00, NOW(), 'Roçadeiras para corte de capim', 4, NOW(), NOW()),
+('Armazém de Proteção', 'Máscaras de Proteção', 'unidade', 200, 15.00, 'Capital', 3000.00, NOW(), 'Máscaras de proteção para pulverização', 3, NOW(), NOW()),
 ('Armazém de Insumos', 'Adubo Orgânico', 'kg', 800, 8.00, 'Insumos', 6400.00, NOW(), 'Adubo orgânico para plantio', 1, NOW(), NOW()),
 ('Armazém de Insumos', 'Fungicida', 'litro', 100, 40.00, 'Insumos', 4000.00, NOW(), 'Fungicida para controle de doenças', 1, NOW(), NOW()),
-('Armazém de Equipamentos', 'Arado', 'unidade', 4, 7000.00, 'Capital', 28000.00, NOW(), 'Arados para preparo do solo', 1, NOW(), NOW());
+('Armazém de Equipamentos', 'Arado', 'unidade', 4, 7000.00, 'Capital', 28000.00, NOW(), 'Arados para preparo do solo', 3, NOW(), NOW());
 
 INSERT INTO safra_glebas (safraId, glebaId, createdAt, updatedAt) VALUES
 (1, 1, NOW(), NOW()),  -- Safra 1 associada à Gleba 1

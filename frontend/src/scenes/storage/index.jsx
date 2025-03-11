@@ -24,12 +24,12 @@ const Storage = () => {
     const message = Number(query.get('message'));
     const [openSnackbar, setOpenSnackbar] = useState(!!message);
     const [snackbarMessage, setSnackbarMessage] = useState(""); 
-    const [custosData, setCustosData] = useState([]);
+    const [storageData, setStorageData] = useState([]);
 
     useEffect(() => {
         switch (message) {
           case 1:
-            setSnackbarMessage("Custo adicioando!");
+            setSnackbarMessage("Item no Estoque adicioando!");
             break;
     
           case 2:
@@ -47,7 +47,7 @@ const Storage = () => {
       }, [message]);
 
     const columns = [
-        { field: "stored_location", headerName: "Localização", flex: 1,  resizable: false },
+        { field: "localizacao", headerName: "Localização", flex: 1,minWidth: 250,  resizable: false },
         { field: "category", headerName: "Categoria", flex: 1,  resizable: false },
         { field: "name", headerName: "Nome", flex: 1,  resizable: false },
         { field: "unit", headerName: "Unidade", flex: 1, resizable: false },
@@ -115,49 +115,42 @@ const Storage = () => {
 
     useEffect(() => {
         if (userData && userData.email) { 
-            const fetchCustosData = async () => {
+            const fetchStorageData = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:3000/user`, {
+                    const response = await axios.get(`http://localhost:3000/storage`, {
                         params: { email: userData.email }
                     });
-                    const linhasDaTabela = response.data.flatMap(fazenda => {
-                        return fazenda.glebas.flatMap(gleba => { 
-                            return gleba.safras.flatMap(safra => {  
-                                return safra.custos.map(custo => ({
-                                    id: custo.id,
-                                    type: custo.type,
-                                    status: custo.status,
-                                    category: custo.category,
-                                    name: custo.name,
-                                    unit: custo.unit,
-                                    quantity: custo.quantity,
-                                    price: custo.price,
-                                    total_value: custo.total_value,
-                                    date: custo.date,
-                                    note: custo.note,
-                                }))
-                            });
-                        });
+                    const linhasDaTabela = response.data;
+
+                    const linhasComLocalizacao = linhasDaTabela.map(item => {
+                        // Concatenando dois itens (por exemplo, property.name e property.location)
+                        const localizacao = `${item.property.name} - ${item.stored_location}`;
+                        
+                        // Retorna o item original com a coluna Localização
+                        return {
+                            ...item,
+                            localizacao // Adiciona a coluna "Localização" ao item
+                        };
                     });
-
-                    setCustosData(linhasDaTabela);                      
-
+                    
+                    // Atualiza o estado com os dados modificados
+                    setStorageData(linhasComLocalizacao);   
                     
                 } catch (error) {
-                    console.log("ERRO - ao buscar os Custos.");
+                    console.log("ERRO - ao buscar estoque.");
                 }
             };
-            fetchCustosData();
+            fetchStorageData();
         }
     }, [userData]);  
 
     useEffect(() => {
         //console.log(glebas); 
-    }, [custosData]);
+    }, [storageData]);
 
     const navigate = useNavigate(); 
     const handleView = (id) => {
-        navigate(`/custos/${id}`);
+        navigate(`/storage/${id}`);
     };
 
     const handleAdd = () =>{
@@ -219,7 +212,7 @@ const Storage = () => {
                         color: `${colors.mygreen[200]} !important`,
                     },
                 }}>
-                {custosData.length === 0 ? (
+                {storageData.length === 0 ? (
                         <Box
                             display="flex"
                             flexDirection= "column"
@@ -229,12 +222,12 @@ const Storage = () => {
                             mt="50px"
                         >
                             <Typography variant={isMobile ? "h6": "h5"} fontWeight="bold" color={colors.grey[100]}>
-                                Nenhuma custo encontrado.
+                                Nenhuma item no estoque encontrado.
                             </Typography>
                         </Box>
                 ) : ( 
                     <DataGrid
-                        rows={custosData}
+                        rows={storageData}
                         columns={columns}
                         slots={{ toolbar: CustomToolbar }}
                         getRowId={(row) => row.id}

@@ -27,7 +27,7 @@ const Safra = require("./database/Safra");
 const Invite = require("./database/Invite");
 const Custo = require("./database/Custo");
 const SafraGleba = require("./database/SafraGleba");
-const Storage = require("./database/Storage");
+const StorageItem = require("./database/StorageItem");
 
 /*--------------------------------
     Relacionamentos dos Models
@@ -47,19 +47,19 @@ Gleba.belongsToMany(Safra, {
     onUpdate: 'CASCADE',
 });
 
-User.hasMany(Storage, {
-    foreignKey: 'userId',  
-    as: 'storages',           
-    onDelete: 'CASCADE',      
-    onUpdate: 'CASCADE'       
+Property.hasMany(StorageItem, {
+    foreignKey: 'propertyId',
+    as: 'storageItems',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'  
 });
 
-Storage.belongsTo(User, {
-    foreignKey: 'userId',  
-    as: 'user',            
-    onDelete: 'CASCADE',      
-    onUpdate: 'CASCADE'       
-});
+StorageItem.belongsTo(Property, {
+    foreignKey: 'propertyId',
+    as: 'property',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'  
+  });
 
 Property.hasMany(Gleba, { 
     foreignKey: 'propertyId',
@@ -440,8 +440,7 @@ app.delete('/propriedades/:id', async(req,res) =>{
         ROTAS GLEBAS
 --------------------------*/
 
-/*  Rota para --> BUSCAR GLEBA 
-    Retorno: Gleba e Safras associados à Gleba */
+/*  Rota para --> BUSCAR GLEBA */
 app.get('/gleba/:id', async (req, res) => {
     const { id } = req.params;
 
@@ -915,6 +914,70 @@ app.delete('/custos/:id', async(req,res) =>{
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Erro no servidor.' });
+    }
+});
+
+/*------------------------
+        ROTAS ESTOQUE
+--------------------------*/
+
+/*  Rota para --> BUSCAR ESTOQUE DO USUÁRIO*/
+app.get('/storage', async (req, res) => {
+    const { email } = req.query;
+
+    try {
+        const user = await User.findOne({
+            where: { email: email },
+            include: {
+                model: Property, 
+                as: 'properties', 
+                through: { attributes: [] } // Ignora os atributos da tabela de junção UserProperty
+            }
+        });
+    
+        if (!user) {
+            return res.status(404).json({ error: 'Usuário não encontrado' });
+        }
+    
+        const result = await StorageItem.findAll({
+            where: {
+                propertyId: user.properties.map(property => property.id) 
+            },
+            include: {
+                model: Property, 
+                as: 'property',  
+                attributes: ['id', 'name']  
+            }
+        });
+    
+        return res.status(200).json(result);
+    } catch (error) {
+        console.error('Erro ao buscar estoque:', error);
+        return res.status(500).json({ error: 'Erro ao buscar estoque' });
+    }
+});
+
+/*  Rota para --> BUSCAR ITEM ESTOQUE */
+app.get('/storage/:id', async (req, res) => {
+    const { id } = req.params;
+    
+    try {
+        const result = await StorageItem.findOne({
+            where: { id: id },
+            include: [{
+                model: Property,  
+                as: 'property'     
+            }]
+        });
+        if (!result) {
+            return res.status(404).json({ error: 'Item de Estoque não encontrado' });
+        }
+
+
+        return res.status(200).json(result);
+    } catch (error) {
+        console.error('Erro ao buscar estoque:', error);
+        return res.status(500).json({ error: 'Erro ao buscar estoque' });
     }
 });
 

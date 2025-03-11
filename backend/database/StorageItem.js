@@ -1,7 +1,7 @@
 const Sequelize = require("sequelize");
 const connection = require("./database");
 
-const Storage = connection.define('storages',{
+const StorageItem = connection.define('storage_items',{
     stored_location: {
         type: Sequelize.STRING,
         allowNull: false
@@ -42,4 +42,4 @@ const Storage = connection.define('storages',{
 });
 
 
-module.exports = Storage;
+module.exports = StorageItem;
