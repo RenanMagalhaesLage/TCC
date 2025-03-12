@@ -116,6 +116,10 @@ const Gleba = () => {
         navigate(`/glebas/edit/${id}`);
     }
 
+    const handleView = (id) => {
+        navigate(`/safras/${id}`);
+    };
+
     const handleOpen = () => setOpen(true);
     const handleClose = () => {
         setOpen(false);

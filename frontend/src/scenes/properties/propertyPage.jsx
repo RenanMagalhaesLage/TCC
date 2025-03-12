@@ -21,10 +21,11 @@ const Propertie = () => {
     const isMobile = useMediaQuery("(max-width: 800px)");
     const isSmallDivice = useMediaQuery("(max-width: 1300px)");
     const [userData, setUserData] = useState(null);
-    const [propriedade, setPropriedade] = useState("");
-    const [usuarios, setUsuarios] = useState([]);
+    const [property, setProperty] = useState("");
+    const [users, setUsers] = useState([]);
     const [glebas, setGlebas] = useState([]);
     const [owner, setOwner] = useState("");
+    const [storageItems, setStorageItems]= useState([]);
     const { id } = useParams(); 
     const [open, setOpen] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
@@ -38,7 +39,7 @@ const Propertie = () => {
             flex: 1,
             headerAlign: "center",
             resizable: false,
-            renderCell: ({ row: { access } }) => {        
+            renderCell: ({ row: { user_properties } }) => {        
                 return (
                     <Box
                         width="60%"
@@ -47,18 +48,18 @@ const Propertie = () => {
                         display="flex"
                         justifyContent="center"
                         backgroundColor={
-                            access === "owner" ? colors.orangeAccent[500] : colors.orangeAccent[300]
+                            user_properties.access === "owner" ? colors.orangeAccent[500] : colors.orangeAccent[300]
                         }
                         borderRadius="4px"
                         sx={{color: theme.palette.mode === 'dark' ?colors.primary[400]: colors.grey[100]}}
                     >
-                        {access === "owner" && <AdminPanelSettingsOutlinedIcon />}
-                        {access === "guest" && <LockOpenOutlinedIcon />}
+                        {user_properties.access === "owner" && <AdminPanelSettingsOutlinedIcon />}
+                        {user_properties.access === "guest" && <LockOpenOutlinedIcon />}
                         {!isSmallDivice && (
                             <Typography
                                 sx={{ ml: "5px", fontWeight: "bold", }}
                             >
-                                {access === "owner" ? "Proprietário" : "Permissão"}
+                                {user_properties.access === "owner" ? "Proprietário" : "Permissão"}
                             </Typography>
                         )}
                     </Box>
@@ -70,8 +71,7 @@ const Propertie = () => {
             headerName: "Ações",
             flex: 1,
             renderCell: (params) => {
-                const { access } = params.row;
-
+                const { user_properties } = params.row;
                 return (
                     <Box 
                         display="flex" 
@@ -82,7 +82,7 @@ const Propertie = () => {
                         {isMobile ? (
                             <>
                                 <Tooltip title="Remover">
-                                    <IconButton onClick={() => handleDelete(params.row.id)}  style={{ color: access !== "owner" ? colors.redAccent[500] : colors.grey[800] }}>
+                                    <IconButton onClick={() => handleDelete(params.row.id)}  style={{ color: user_properties.access !== "owner" ? colors.redAccent[500] : colors.grey[800] }}>
                                         <PersonRemoveIcon />
                                     </IconButton>
                                 </Tooltip>
@@ -92,10 +92,10 @@ const Propertie = () => {
                                 <Tooltip title="Remover">
                                     <Button 
                                         variant="contained" 
-                                        style={{ backgroundColor: access !== "owner" ? colors.redAccent[500] : colors.grey[800] }} 
+                                        style={{ backgroundColor: user_properties.access !== "owner" ? colors.redAccent[500] : colors.grey[800] }} 
                                         onClick={() => handleDelete(params.row.id)}
                                         sx={{ ml: 2 }} 
-                                        disabled={access === "owner"} 
+                                        disabled={user_properties.access === "owner"} 
                                     >
                                         <PersonRemoveIcon />
                                     </Button>
@@ -165,6 +165,66 @@ const Propertie = () => {
             headerAlign: "center"
         },
     ];
+
+    const columnsStorageItems = [
+        { field: "stored_location", headerName: "Localização", flex: 1,minWidth: 180,  resizable: false },
+        { field: "category", headerName: "Categoria", flex: 1,  resizable: false },
+        { field: "name", headerName: "Nome", flex: 1,  resizable: false },
+        { field: "unit", headerName: "Unidade", flex: 1, resizable: false },
+        { field: "quantity", headerName: "Quantidade", flex: 1, resizable: false },
+        { field: "price", headerName: "Preço", flex: 1,  resizable: false },
+        { field: "total_value", headerName: "Valor Total", flex: 1,  resizable: false },
+        { field: "date", headerName: "Data", flex: 1, resizable: false },
+        { field: "note", headerName: "Observação", flex: 1, resizable: false },
+        {
+            field: "actions",
+            headerName: "Ações",
+            flex: 1,
+            minWidth: 100,
+            renderCell: (params) => {
+                const { id } = params.row;
+
+                return (
+                    <Box 
+                        display="flex" 
+                        justifyContent="center" 
+                        width="100%"
+                        m="10px auto"
+                    >
+                        {isMobile ? (
+                            <>
+                                <Tooltip title="Visualizar">
+                                    <IconButton onClick={() => handleView(id)} sx={{ color: colors.greenAccent[500]}}>
+                                        <VisibilityIcon />
+                                    </IconButton>
+                                </Tooltip>
+                            </>
+                        ):(
+                            <>
+                                <Tooltip title="Visualizar">
+                                    <Button
+                                        variant="contained"
+                                        sx={{
+                                            backgroundColor: colors.greenAccent[500],
+                                            "&:hover": {
+                                                backgroundColor: colors.grey[700], 
+                                            },
+                                        }}
+                                        onClick={() => handleViewStorageItem(id)}
+                                    >
+                                        <VisibilityIcon />
+                                    </Button>
+                                </Tooltip>
+                            </>
+                        )}
+                    </Box>
+                );
+            },
+            headerAlign: "center"
+        },
+
+    ];
+    
     
     useEffect(() => {
         const storedUser = secureLocalStorage.getItem('userData'); 
@@ -177,14 +237,17 @@ const Propertie = () => {
         if (userData && userData.email) { 
             const fetchPropriedades = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:3000/propriedades/${id}`);
-                    const { property, users, owner, glebas } = response.data;
-                    setPropriedade(property);
-                    setUsuarios(users); 
-                    setOwner(owner);
-                    setGlebas(glebas)
+                    const response = await axios.get(`http://localhost:3000/properties/${id}`);
+                    const property = response.data;
+                    const users = property.users;
+                    setProperty(property);
+                    setUsers(users); 
+                    const owner = users.filter(user => user.user_properties.access == 'owner');
+                    setOwner(owner[0]);
+                    setGlebas(property.glebas);
+                    setStorageItems(property.storage_items);
                 } catch (error) {
-                    console.log("ERROR - ao buscar as propriedade.");
+                    console.log(`ERROR - ao buscar as propriedade de id = ${id}.`);
                 }
             };
             fetchPropriedades();
@@ -199,6 +262,10 @@ const Propertie = () => {
     const handleView = (id) => {
         navigate(`/glebas/${id}`);
     };
+
+    const handleViewStorageItem = (id) =>{
+        navigate(`/storage/${id}`);
+    }
 
     const handleAdd = () =>{
         navigate(`/glebas/add/${id}`);
@@ -289,7 +356,7 @@ const Propertie = () => {
                                     Nome da Fazenda:
                                     </Typography>
                                     <Typography variant="body1" color={colors.grey[300]}>
-                                    {propriedade.name}
+                                    {property.name}
                                     </Typography>
                                 </Box>
 
@@ -298,7 +365,7 @@ const Propertie = () => {
                                     Cidade:
                                     </Typography>
                                     <Typography variant="body1" color={colors.grey[300]}>
-                                    {propriedade.city}
+                                    {property.city}
                                     </Typography>
                                 </Box>
                             </Box>
@@ -307,7 +374,7 @@ const Propertie = () => {
                             <Box display="flex" flexDirection="column" alignItems="flex-start">
                                 <Box display="flex" alignItems="center" marginBottom="20px">
                                     <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
-                                    Nome do Dono:
+                                    Nome do Proprietário:
                                     </Typography>
                                     <Typography variant="body1" color={colors.grey[300]}>
                                         {owner.name}
@@ -319,7 +386,7 @@ const Propertie = () => {
                                     Área:
                                     </Typography>
                                     <Typography variant="body1" color={colors.grey[300]}>
-                                    {propriedade.area} hectares
+                                    {property.area} hectares
                                     </Typography>
                                 </Box>
                                 {userData && owner && userData.email === owner.email &&  (
@@ -511,6 +578,7 @@ const Propertie = () => {
                                 />
                             )}
                         </Box>
+
                         <Box
                             gridColumn="span 12"
                             display="flex"
@@ -524,19 +592,74 @@ const Propertie = () => {
                             </Typography>
                         </Box> 
                         <Box
-                        gridColumn="span 12"
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="center"
-                        minHeight="475px" 
-                        mt={isMobile ? "290px": "155px"}
+                            gridColumn="span 12"
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center"
+                            minHeight="475px" 
+                            mt={isMobile ? "290px": "155px"}
                         >
                             <DataGrid
-                            rows={usuarios}
-                            columns={columnsUsers}
-                            sx={{mb:"20px"}}
-                            localeText={{ noRowsLabel: <b>Nenhum usuário da propriedade foi encontrado.</b> }}
-                        />
+                                rows={users}
+                                columns={columnsUsers}
+                                sx={{mb:"20px"}}
+                                localeText={{ noRowsLabel: <b>Nenhum usuário da propriedade foi encontrado.</b> }}
+                            />
+                        </Box>
+                        <Box
+                            gridColumn="span 12"
+                            display="flex"
+                            alignItems="center"  
+                            justifyContent="left"  
+                            height="50px"
+                            mt={isMobile ? "370px": 60}
+                        >                       
+                            <Typography variant="h4" fontWeight="bold" color={colors.grey[100]}>
+                                Itens em Estoque na Propriedade
+                            </Typography>
+                        </Box> 
+                        <Box
+                            gridColumn="span 12"
+                            backgroundColor={glebas.length === 0 ? "":colors.primary[400]}
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center"
+                            minHeight="475px"
+                            mt={isMobile ? "30px": 49}
+                            >
+                            {storageItems.length === 0 ? (
+                                <Box
+                                    display="flex"
+                                    flexDirection= "column"
+                                    alignItems="center"  
+                                    justifyContent="center"
+                                    gap="20px"
+                                >
+                                    <Typography variant={isMobile ? "h6": "h5"} fontWeight="bold" color={colors.grey[100]}>
+                                        Nenhum item de estoque na propriedade foi encontrado.
+                                    </Typography>
+                                    <Button
+                                        sx={{
+                                        backgroundColor: colors.mygreen[400],
+                                        color: colors.grey[100],
+                                        fontSize: "14px",
+                                        fontWeight: "bold",
+                                        padding: "10px 20px",
+                                        }}
+                                        onClick={() => handleAdd()}
+                                    >
+                                        <AddCircleOutlineIcon sx={{ mr: "10px" }} />
+                                        {("Adicionar Item no estoque")}
+                                    </Button>
+                                </Box>
+                            ) : (
+                                <DataGrid
+                                    rows={storageItems}
+                                    sx={{mb:"20px"}}
+                                    columns={columnsStorageItems}
+
+                                />
+                            )}
                         </Box>
                     </Box>
             </Box>

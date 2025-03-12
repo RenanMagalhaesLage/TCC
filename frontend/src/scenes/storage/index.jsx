@@ -123,17 +123,13 @@ const Storage = () => {
                     const linhasDaTabela = response.data;
 
                     const linhasComLocalizacao = linhasDaTabela.map(item => {
-                        // Concatenando dois itens (por exemplo, property.name e property.location)
                         const localizacao = `${item.property.name} - ${item.stored_location}`;
                         
-                        // Retorna o item original com a coluna Localização
                         return {
                             ...item,
                             localizacao // Adiciona a coluna "Localização" ao item
                         };
                     });
-                    
-                    // Atualiza o estado com os dados modificados
                     setStorageData(linhasComLocalizacao);   
                     
                 } catch (error) {

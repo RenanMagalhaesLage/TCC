@@ -186,6 +186,10 @@ const SafrasPage = () => {
         navigate(`/safras/edit/${id}`);
     }
 
+    const handleView = (id) => {
+        navigate(`/custos/${id}`);
+    };
+
     const handleOpen = () => setOpen(true);
     const handleClose = () => {
         setOpen(false);

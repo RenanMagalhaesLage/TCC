@@ -14,7 +14,7 @@ import Pie from "./scenes/pie";
 import Line from "./scenes/line";
 import Login from './scenes/login';
 import Properties from './scenes/properties';
-import Propertie from './scenes/properties/propertie';
+import PropertyPage from './scenes/properties/propertyPage';
 import PropertiesForm from './scenes/properties/form';
 import PropertiesEditForm from './scenes/properties/editForm';
 import Glebas from './scenes/glebas';
@@ -71,7 +71,7 @@ function App() {
                   <Route path="/line" element={<Line />} />
                   <Route path="/faq" element={<FAQ />} />
                   <Route path="/propriedades" element={<Properties />} />
-                  <Route path="/propriedades/:id" element={<Propertie />} />
+                  <Route path="/propriedades/:id" element={<PropertyPage />} />
                   <Route path="/propriedades/add" element={<PropertiesForm />} />
                   <Route path="/propriedades/edit/:id" element={<PropertiesEditForm />} />
                   <Route path="/glebas" element={<Glebas />} />

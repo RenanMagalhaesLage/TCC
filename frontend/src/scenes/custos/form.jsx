@@ -32,7 +32,7 @@ const CustosForm = () => {
     "Administrativo",
     "Arrendamento",
     "Semente",
-     "Corretivos e Fertilizantes",
+    "Corretivos e Fertilizantes",
     "Defensivos",
     "Operações",
   ]
@@ -55,7 +55,7 @@ const CustosForm = () => {
               property.glebas.flatMap(gleba =>
                   gleba.safras.map(safra => ({
                       id: safra.id,
-                      name: `${safra.cultivo} - ${safra.dataFimPlantio} - ${gleba.name} - ${property.name}`
+                      name: `Safra ${safra.dataFimColheita} - ${safra.dataFimColheita} `
                   }))
               ) 
             );
@@ -67,7 +67,6 @@ const CustosForm = () => {
                     const response = await axios.get(`http://localhost:3000/gleba/${id}`);
                     const { gleba, propriedade, owner } = response.data;
                     setPropertie(propriedade);
-                    //console.log("info --> " + propriedade.name + " " + gleba.name )
                     setLoading(false); 
                 } catch (error) {
                     console.error("Erro ao buscar dados da gleba:", error);
@@ -78,7 +77,7 @@ const CustosForm = () => {
             }
 
         } catch (err) {
-            console.error('Erro ao buscar safras:', err);  
+            console.error('Erro ao buscar custos:', err);  
         }finally {
           setLoading(false);
         }

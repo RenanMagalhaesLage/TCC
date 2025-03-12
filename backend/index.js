@@ -49,7 +49,7 @@ Gleba.belongsToMany(Safra, {
 
 Property.hasMany(StorageItem, {
     foreignKey: 'propertyId',
-    as: 'storageItems',
+    as: 'storage_items',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'  
 });
@@ -281,66 +281,46 @@ app.get('/user', async (req, res) => {
 
 /* Rota para --> BUSCAR PROPRIEDADE 
    Retorno: Propriedade, Glebas e Users associados à Propriedade */
-app.get('/propriedades/:id', async (req, res) => {
+app.get('/properties/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
-        const property = await Property.findByPk(id);
-        if (!property) {
+        const result = await Property.findOne({
+            where: { id },
+            include: [
+                {
+                    model: Gleba,
+                    where: { propertyId: id },
+                    as: "glebas",
+                    required: false,
+                },
+                {
+                    model: User,
+                    through: {
+                        model: UserProperty,
+                        where: { propertyId: id },
+                    },
+                    required: false, 
+                },
+                {
+                    model: StorageItem,
+                    where: {propertyId: id},
+                    as: "storage_items",
+                    required: false, 
+                }
+            ],
+        });
+    
+        if (!result) {
             return res.status(404).json({ error: 'Propriedade não encontrada' });
-        }
-
-        const glebas =  await Gleba.findAll({
-            where: {propertyId: id},
-        })        
-
-        //Procurando todos os usuários dessa propriedade
-        const usersProperty = await UserProperty.findAll({
-            where: { propertyId: id },
-            attributes: ['userId', 'access']
-        });
-
-        const userIds = usersProperty.map(up => up.userId);
-
-        //Procurando dados dos usuários
-        const users = await User.findAll({
-            where: {
-                id: userIds
-            },
-            attributes: ['id', 'name', 'email'] 
-        });
-
-        //Juntando as informações dos usuários
-        const usersData = usersProperty.map(up => {
-            const user = users.find(u => u.id === up.userId);
-            return {
-                id: up.userId,
-                access: up.access,
-                name: user?.name,
-                email: user?.email
-            };
-        });
-
-        const owner = usersData.find(user => user.access === "owner");
-        
-        const result = {
-            property: {
-                id: property.id,
-                name: property.name,
-                city: property.city,
-                area: property.area 
-            },
-            users: usersData, 
-            owner: owner ? { name: owner.name, email: owner.email } : null,
-            glebas: glebas
-
-        };
-
-        return res.status(200).json(result);
+        }   
+    
+        res.json(result);
     } catch (error) {
-        //console.error('Erro ao buscar propriedade:', error);
-        return res.status(500).json({ error: 'Erro ao buscar propriedade' });
+        console.error(error);
+        res.status(500).json({ error: 'Erro ao buscar a propriedade' });
     }
+
 });
 
 /* Rota para --> CADASTRAR DE PROPRIEDADE */
@@ -980,7 +960,6 @@ app.get('/storage/:id', async (req, res) => {
         return res.status(500).json({ error: 'Erro ao buscar estoque' });
     }
 });
-
 
 /*------------------------
         ROTAS INVITE
