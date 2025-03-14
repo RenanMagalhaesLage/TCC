@@ -556,7 +556,6 @@ app.get('/safras/:id', async (req, res) => {
                     include: [{
                         model: User,  
                         through: { model: UserProperty },
-                        here: { '$user_properties.access$': 'owner' }
                     }],
                     as: 'property',  
                 },
@@ -960,6 +959,52 @@ app.get('/storage/:id', async (req, res) => {
         return res.status(500).json({ error: 'Erro ao buscar estoque' });
     }
 });
+
+app.post('/storage', async (req,res) => {
+    try{
+        const { email, propertyId, 
+            storedLocation,
+            name,
+            category,
+            unit,
+            quantity,
+            price,
+            totalValue,
+            date,
+            note
+        } = req.body;
+        const user = await User.findOne({ where: { email: email } });
+    
+        if (
+            !email || !propertyId || !name || !category || !unit || !quantity || !price || !totalValue
+        ) {
+            return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
+        }
+        const property = await Property.findByPk(propertyId)
+    
+        const result = await StorageItem.create({
+            storedLocation: storedLocation? storedLocation : null,
+            name: name,
+            category: category,
+            unit: unit,
+            quantity: quantity,
+            price: price,
+            totalValue: totalValue,
+            expirationDate: date ? date : null,
+            note: note ? note : null,
+            propertyId: propertyId       
+        });
+    
+    
+        return res.status(201).json({ 
+            storageItem: result
+        });
+    }catch (error) {
+        console.error('Erro ao salvar item no estoque:', error);
+        return res.status(500).json({ error: 'Erro ao salvar o item no estoque.' });
+    }
+    
+})
 
 /*------------------------
         ROTAS INVITE

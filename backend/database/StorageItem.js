@@ -2,9 +2,9 @@ const Sequelize = require("sequelize");
 const connection = require("./database");
 
 const StorageItem = connection.define('storage_items',{
-    stored_location: {
+    storedLocation: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
     },
     name: {
         type: Sequelize.STRING,
@@ -26,18 +26,18 @@ const StorageItem = connection.define('storage_items',{
         type: Sequelize.STRING,
         allowNull: false
     },
-    total_value: { 
+    totalValue: { 
         type: Sequelize.DOUBLE,
         allowNull: false
     },
-    date: { //Realizar a viabilidade desse campo
+    expirationDate: { //Realizar a viabilidade desse campo
         type: Sequelize.DATEONLY,
-        allowNull: false,
+        allowNull: true,
         defaultValue: Sequelize.NOW
     },
     note: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
     }
 });
 

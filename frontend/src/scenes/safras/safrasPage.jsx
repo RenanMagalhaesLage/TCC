@@ -15,14 +15,15 @@ import DoneAllIcon from '@mui/icons-material/DoneAll';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-
+import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
+import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 
 const SafrasPage = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const isMobile = useMediaQuery("(max-width: 1000px)");
     const isSmallDivice = useMediaQuery("(max-width: 1300px)");
-    const [owner, setOwner] = useState("");
+    const [owner, setOwner] = useState([]);
     const { id } = useParams();
     const [userData, setUserData] = useState(null);
     const [propriedade, setPropriedade] = useState("");
@@ -141,6 +142,109 @@ const SafrasPage = () => {
 
     ];
 
+    const glebasColumns = [
+        { field: "name", headerName: "Nome", flex: 1, cellClassName: "name-column--cell", resizable: false },
+        {
+            field: "property",
+            headerName: "Propriedade",
+            flex: 1,
+            cellClassName: "propertie-column--cell",
+            resizable: false,
+            renderCell: (params) => {
+                const property = params.row.property;  
+                return property ? property.name : "";  
+            },
+        },
+        { field: "area", headerName: "Área", type: "number", flex: 1,headerAlign: "left", align: "left", resizable: false },
+        {
+            field: "access",
+            headerName: "Nível de Acesso",
+            flex: 1,
+            headerAlign: "center",
+            resizable: false,
+            renderCell: (params) => {
+                const access = params.row.property.users[0].user_properties.access;
+                console.log(access);
+                return (
+                    <Box
+                        width="60%"
+                        m="10px auto"
+                        p="5px"
+                        display="flex"
+                        justifyContent="center"
+                        backgroundColor={
+                            access === "owner" ? colors.orangeAccent[500] : colors.orangeAccent[300]
+                        }
+                        borderRadius="4px"
+                        sx={{color: theme.palette.mode === 'dark' ?colors.primary[400]: colors.grey[100]}}
+                    >
+                        <Tooltip
+                            title={access === "owner" ? "Proprietário" : "Permissão"}
+                            arrow
+                        >
+                            <Box display="flex" alignItems="center">
+                                {access === "owner" && <AdminPanelSettingsOutlinedIcon />}
+                                {access === "guest" && <LockOpenOutlinedIcon />}
+                                {!isSmallDivice && (
+                                    <Typography sx={{ ml: "5px", fontWeight: "bold" }}>
+                                        {access === "owner" ? "Proprietário" : "Permissão"}
+                                    </Typography>
+                                )}
+                            </Box>
+                        </Tooltip>
+                    </Box>
+                );
+            }
+        },
+        {
+            field: "actions",
+            headerName: "Ações",
+            flex: 1,
+            minWidth: 100,
+            renderCell: (params) => {
+                const { id } = params.row;
+
+                return (
+                    <Box 
+                        display="flex" 
+                        justifyContent="center" 
+                        width="100%"
+                        m="10px auto"
+                    >
+                        {isMobile ? (
+                            <>
+                                <Tooltip title="Visualizar">
+                                    <IconButton onClick={() => handleView(id)} sx={{ color: colors.greenAccent[500]}}>
+                                        <VisibilityIcon />
+                                    </IconButton>
+                                </Tooltip>
+                            </>
+                        ):(
+                            <>
+                                <Tooltip title="Visualizar">
+                                    <Button
+                                        variant="contained"
+                                        sx={{
+                                            backgroundColor: colors.greenAccent[500],
+                                            "&:hover": {
+                                                backgroundColor: colors.grey[700], 
+                                            },
+                                        }}
+                                        onClick={() => handleViewGleba(id)}
+                                    >
+                                        <VisibilityIcon />
+                                    </Button>
+                                </Tooltip>
+                            </>
+                        )}
+                    </Box>
+                );
+            },
+            headerAlign: "center"
+        },
+        
+    ];
+
     useEffect(() => {
         const storedUser = secureLocalStorage.getItem('userData'); 
         if (storedUser) {
@@ -164,8 +268,10 @@ const SafrasPage = () => {
                     const custosRealizados = custos.filter(custo => custo.type === 'Realizado');
                     setCustosPlanejados(custosPlanejados);
                     setCustosRealizados(custosRealizados);
-
-                    setOwner(glebas[0].property.users[0].name);
+                    const users = glebas[0].property.users;
+                    //console.log(JSON.stringify(glebas, null, 2));
+                    const owner = users.filter(user => user.user_properties.access == 'owner');
+                    setOwner(owner[0]);
                     setIsHigher(safra.prodRealizada >= safra.prodPrevista);
                 } catch (error) {
                     console.log(`ERROR - ao buscar a safra de id = ${id}`);
@@ -188,6 +294,10 @@ const SafrasPage = () => {
 
     const handleView = (id) => {
         navigate(`/custos/${id}`);
+    };
+
+    const handleViewGleba = (id) => {
+        navigate(`/glebas/${id}`);
     };
 
     const handleOpen = () => setOpen(true);
@@ -305,45 +415,31 @@ const SafrasPage = () => {
                             display="grid"
                             gridTemplateColumns={isMobile ? "1fr" : "repeat(2, 1fr)"} 
                             padding="25px 35px 30px 35px"
-                            height={isMobile ? "auto" : "initial"} 
-                            minHeight={isMobile ? "220px" : "auto"} 
+                            height={isMobile ? "120px" : "80px"} 
                             marginBottom={isMobile ? "0px" :"118px"}
                             marginTop={"-130px"}
                             sx={{boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.07)",}}
                         >
                             {/* Primeira Coluna */}
                             <Box display="flex" flexDirection="column" alignItems="flex-start" >
-                                <Box display="flex" alignItems="center" marginBottom="15px">
+                                <Box display="flex" alignItems="center" >
                                     <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
                                     Nome do Proprietário:
                                     </Typography>
                                     <Typography variant="body1" color={colors.grey[300]}>
-                                    {owner}
-                                    </Typography>
-                                </Box>
-                                <Box display="flex" alignItems="center" >
-                                    <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
-                                    Área da Safra:
-                                    </Typography>
-                                    <Typography variant="body1" color={colors.grey[300]}>
-                                    
+                                    {owner.name}
                                     </Typography>
                                 </Box>
                             </Box>
 
                             {/* Segunda Coluna */}
                             <Box display="flex" flexDirection="column" alignItems="flex-start">
-                                <Box display="flex" alignItems="center" marginBottom="15px">
+                                <Box display="flex" alignItems="center" >
                                     <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
-                                        Glebas:
+                                    Área da Safra:
                                     </Typography>
                                     <Typography variant="body1" color={colors.grey[300]}>
-                                        {glebas.slice(0, 5).map((gleba, index) => (
-                                        <span key={index}>
-                                            {gleba.name}{index < glebas.slice(0, 5).length - 1 && ', '}
-                                        </span>
-                                        ))}
-                                        {glebas.length > 5 && '...'}
+                                    
                                     </Typography>
                                 </Box>
                             </Box>   
@@ -358,7 +454,7 @@ const SafrasPage = () => {
                             height={isMobile ? "auto" : "initial"} 
                             minHeight={isMobile ? "900px" : "550px"} 
                             marginBottom={isMobile ?"0px" :"80px"}
-                            marginTop={isMobile ? "10px":"-110px"}
+                            marginTop={isMobile ? "-150px":"-190px"}
                             sx={{boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.07)",}}
                         >
                             {/* Primeira Coluna */}
@@ -453,10 +549,11 @@ const SafrasPage = () => {
                             {userData && owner && userData.email === owner.email &&  (
                                     <Box 
                                         display="flex" 
-                                        justifyContent= {isMobile ? "flex-start" : "flex-end"} 
+                                        justifyContent="flex-end" 
                                         alignItems="flex-end" 
                                         flexGrow={1} 
                                         width="100%"
+                                        marginTop={isMobile ?"20px": "-30px"}
                                     >
                                         <Tooltip title='Deletar'>
                                             <Button 
@@ -508,7 +605,7 @@ const SafrasPage = () => {
                                                         Ao fazer isso, esteja ciente que:
                                                         <ul>
                                                             <li>Essa ação não pode ser revertida;</li>
-                                                            <li>Ao deletar a safra, os custos correspondentes também serão apagados.</li>
+                                                            <li>Os dados de custos relacionados a esta safra também serão deletados.</li>
                                                         </ul>
                                                     </Typography>
                                                     
@@ -558,22 +655,9 @@ const SafrasPage = () => {
                                                         backgroundColor: colors.grey[700], 
                                                     },
                                                 }}
+
                                             >
                                                 <EditIcon />
-                                            </Button>
-                                        </Tooltip>
-                                        <Tooltip title='Finalizar Safra'>
-                                            <Button 
-                                                variant="contained" 
-                                                onClick={() => handleFinalize()} 
-                                                sx={{ml:2,
-                                                    backgroundColor:colors.blueAccent[500],
-                                                    "&:hover": {
-                                                        backgroundColor: colors.grey[700], 
-                                                    },
-                                                }}
-                                            >
-                                                <DoneAllIcon />
                                             </Button>
                                         </Tooltip>
                                     </Box>
@@ -588,7 +672,62 @@ const SafrasPage = () => {
                             alignItems="center"  
                             justifyContent="left"  
                             height="50px"
-                            mt={isMobile ? "770px": "300px"}
+                            mt={isMobile ? "610px": "225px"}
+                        >
+                            <Typography variant="h4" fontWeight="bold" color={colors.grey[100]}>
+                                Glebas
+                            </Typography>
+                        </Box>
+                        <Box
+                            gridColumn="span 12"
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center"
+                            minHeight="475px"
+                            mt={isMobile ? "670px": "120px"}
+                        >
+                            {glebas.length === 0 ? (
+                                <Box
+                                    display="flex"
+                                    flexDirection= "column"
+                                    alignItems="center"  
+                                    justifyContent="center"
+                                    gap="20px"
+                                >
+                                    <Typography variant={isMobile ? "h6": "h5"} fontWeight="bold" color={colors.grey[100]}>
+                                        Nenhuma gleba da safra foi encontrada.
+                                    </Typography>
+                                    <Button
+                                        sx={{
+                                        backgroundColor: colors.mygreen[400],
+                                        color: colors.grey[100],
+                                        fontSize: "14px",
+                                        fontWeight: "bold",
+                                        padding: "10px 20px",
+                                        }}
+                                        onClick={() => handleAdd()}
+                                    >
+                                        <AddCircleOutlineIcon sx={{ mr: "10px" }} />
+                                        {("Adicionar Custo")}
+                                    </Button>
+                                </Box>
+                            ):(
+                                
+                                <DataGrid
+                                    rows={glebas}
+                                    columns={glebasColumns}
+                                    sx={{mb:"20px"}}
+                                    slots={{ toolbar: CustomToolbar }}
+                                />
+                            )}
+                        </Box>
+                        <Box
+                            gridColumn="span 12"
+                            display="flex"
+                            alignItems="center"  
+                            justifyContent="left"  
+                            height="50px"
+                            mt={isMobile ? "770px": "440px"}
                         >
                             <Typography variant="h4" fontWeight="bold" color={colors.grey[100]}>
                                 Custos Planejados da Safra
@@ -600,7 +739,7 @@ const SafrasPage = () => {
                             alignItems="center"
                             justifyContent="center"
                             minHeight="475px"
-                            mt={isMobile ? "670px": "205px"}
+                            mt={isMobile ? "670px": "340px"}
                         >
                             {custosPlanejados.length === 0 ? (
                                 <Box
@@ -644,7 +783,7 @@ const SafrasPage = () => {
                             alignItems="center"  
                             justifyContent="left"  
                             height="50px"
-                            mt={isMobile ? "990px": "530px"}
+                            mt={isMobile ? "990px": "660px"}
                         >
                             <Typography variant="h4" fontWeight="bold" color={colors.grey[100]}>
                                 Custos Realizados da Safra
@@ -656,7 +795,7 @@ const SafrasPage = () => {
                             alignItems="center"
                             justifyContent="center"
                             minHeight="475px"
-                            mt={isMobile ? "895px": "440px"}
+                            mt={isMobile ? "895px": "560px"}
                         >
                             {custosRealizados.length === 0 ? (
                                 <Box

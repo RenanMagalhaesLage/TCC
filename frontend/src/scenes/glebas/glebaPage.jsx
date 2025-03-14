@@ -15,70 +15,15 @@ const Gleba = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const isMobile = useMediaQuery("(max-width: 800px)");
-    const [owner, setOwner] = useState("");
+    const [owner, setOwner] = useState([]);
     const { id } = useParams();
     const [userData, setUserData] = useState(null);
     const [propriedade, setPropriedade] = useState("");
+    const [safra, setSafra] = useState("")
     const [gleba, setGleba] = useState("");
-    const [safrasPlanejadas,setSafrasPlanejadas] = useState([]);
-    const [safrasRealizadas,setSafrasRealizadas] = useState([]);
+
     const [open, setOpen] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
-
-
-    const columnsSafras = [
-        { field: "cultivo", headerName: "Cultivo", flex: 1, cellClassName: "city-column--cell", resizable: false },
-        { field: "semente", headerName: "Semente", type: "number", headerAlign: "left", align: "left", flex: 1,resizable: false },
-        { field: "dataFimPlantio", headerName: "Fim Plantio", type: "number", headerAlign: "left", align: "left", flex: 1, resizable: false },
-        { field: "dataFimColheita", headerName: "Fim Colheita", type: "number", headerAlign: "left", align: "left", flex: 1, resizable: false },
-        {
-            field: "actions",
-            headerName: "Ações",
-            flex: 1,
-            renderCell: (params) => {
-                const { access } = params.row;
-
-                return (
-                    <Box 
-                        display="flex" 
-                        justifyContent="center" 
-                        width="100%"
-                        m="10px auto"
-                    >
-                        {isMobile ? (
-                            <>
-                                <Tooltip title="Visualizar">
-                                    <IconButton onClick={() => handleView(id)} sx={{ color: colors.greenAccent[500]}}>
-                                        <VisibilityIcon />
-                                    </IconButton>
-                                </Tooltip>
-                            </>
-                        ):(
-                            <>
-                                <Tooltip title="Visualizar">
-                                    <Button
-                                        variant="contained"
-                                        sx={{
-                                            backgroundColor: colors.greenAccent[500],
-                                            "&:hover": {
-                                                backgroundColor: colors.grey[700], 
-                                            },
-                                        }}
-                                        onClick={() => handleView(id)}
-                                    >
-                                        <VisibilityIcon />
-                                    </Button>
-                                </Tooltip>
-                            </>
-                        )}                     
-
-                    </Box>
-                );
-            },
-            headerAlign: "center"
-        },
-    ];
-
 
     useEffect(() => {
         const storedUser = secureLocalStorage.getItem('userData'); 
@@ -96,11 +41,11 @@ const Gleba = () => {
                     const safras = gleba.safras;
                     setGleba(gleba);
                     setPropriedade(gleba.property);
-                    setOwner(gleba.property.users[0].name);
-                    const safrasPlanejadas = safras.filter(safra => safra.type === 'Planejado');
-                    const safrasRealizadas = safras.filter(safra => safra.type === 'Realizado');
-                    setSafrasPlanejadas(safrasPlanejadas);
-                    setSafrasRealizadas(safrasRealizadas);
+                    const users = gleba.property.users
+                    const owner = users.filter(user => user.user_properties.access == 'owner');
+                    setOwner(owner[0]);
+                    setSafra(safras[0]);
+
                 } catch (error) {
                     console.log(`ERROR - ao buscar a gleba de id = ${id} .`);
                     console.log(error);
@@ -139,21 +84,6 @@ const Gleba = () => {
         <Box m="20px">
             <Box display="flex" justifyContent="space-between" alignItems="center">
                 <Header title="Gleba" subtitle="Informações da gleba" />
-                <Box>
-                    <Button
-                        sx={{
-                        backgroundColor: colors.mygreen[400],
-                        color: colors.grey[100],
-                        fontSize: "14px",
-                        fontWeight: "bold",
-                        padding: "10px 20px",
-                        }}
-                        onClick={() => handleAdd()}
-                    >
-                        <AddCircleOutlineIcon sx={{ mr: isMobile? "0px" :"10px" }} />
-                        {!isMobile && ("Adicionar Safra")}
-                    </Button>
-                </Box>
             </Box>
             <Box m="20px 0 0 0" height="75vh" maxWidth="1600px" mx="auto"
                 sx={{
@@ -195,7 +125,7 @@ const Gleba = () => {
                             gridTemplateColumns={isMobile ? "1fr" : "repeat(2, 1fr)"} 
                             padding="25px 35px 30px 35px"
                             height={isMobile ? "auto" : "initial"} 
-                            minHeight={isMobile ? "260px" : "auto"} 
+                            minHeight={isMobile ? "320px" : "200px"} 
                             sx={{boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.07)",}}
                         >
                             
@@ -221,7 +151,7 @@ const Gleba = () => {
                                     Nome do Proprietário:
                                     </Typography>
                                     <Typography variant="body1" color={colors.grey[300]}>
-                                    {owner}
+                                        {owner.name}
                                     </Typography>
                                 </Box>
                                 
@@ -238,12 +168,21 @@ const Gleba = () => {
                                     </Typography>
                                 </Box>
 
-                                <Box display="flex" alignItems="center" marginBottom={isMobile ? "15px": "0px"}>
+                                <Box display="flex" alignItems="center" marginBottom="15px">
                                     <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
                                     Cidade:
                                     </Typography>
                                     <Typography variant="body1" color={colors.grey[300]}>
-                                    {propriedade.city}
+                                        {propriedade.city}
+                                    </Typography>
+                                </Box>
+
+                                <Box display="flex" alignItems="center" marginBottom={isMobile ? "15px": "0px"}>
+                                    <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
+                                    Safra atual:
+                                    </Typography>
+                                    <Typography variant="body1" color={colors.grey[300]}>
+                                        {safra.dataFimPlantio + " - " + safra.dataFimColheita}
                                     </Typography>
                                 </Box>
                                 {userData && owner && userData.email === owner.email &&  (
@@ -253,19 +192,21 @@ const Gleba = () => {
                                         alignItems="flex-end" 
                                         flexGrow={1} 
                                         width="100%"
+                                        marginTop={isMobile ?"20px": "-30px"}
                                     >
-                                        <Button 
-                                            variant="contained" 
-                                            onClick={handleOpen} 
-                                            sx={{ backgroundColor:  colors.redAccent[500],
-                                                "&:hover": {
-                                                    backgroundColor: colors.grey[700], 
-                                                },
-                                            }} 
-
-                                        >
-                                            <DeleteIcon />
-                                        </Button>
+                                        <Tooltip title='Deletar'>
+                                            <Button 
+                                                variant="contained" 
+                                                onClick={handleOpen} 
+                                                sx={{ backgroundColor:  colors.redAccent[500],
+                                                    "&:hover": {
+                                                        backgroundColor: colors.grey[700], 
+                                                    },
+                                                }} 
+                                            >
+                                                <DeleteIcon />
+                                            </Button>
+                                        </Tooltip>
                                         <Modal
                                             open={open}
                                             onClose={null} 
@@ -303,7 +244,7 @@ const Gleba = () => {
                                                         Ao fazer isso, esteja ciente que:
                                                         <ul>
                                                             <li>Essa ação não pode ser revertida;</li>
-                                                            <li>Ao deletar a gleba, as safras correspondentes também serão apagadas.</li>
+                                                            <li>Ao deletar a gleba, ela será removida da safra correspondente.</li>
                                                         </ul>
                                                     </Typography>
                                                     
@@ -343,132 +284,27 @@ const Gleba = () => {
                                                 </Box>
                                             </Fade>
                                         </Modal>
-                                        <Button 
-                                            variant="contained" 
-                                            onClick={() => handleEdit()} 
-                                            sx={{ml:2,
-                                                backgroundColor:colors.orangeAccent[500],
-                                                "&:hover": {
-                                                    backgroundColor: colors.grey[700], 
-                                                },
-                                            }}
+                                        <Tooltip title='Editar'>
+                                            <Button 
+                                                variant="contained" 
+                                                onClick={() => handleEdit()} 
+                                                sx={{ml:2,
+                                                    backgroundColor:colors.orangeAccent[500],
+                                                    "&:hover": {
+                                                        backgroundColor: colors.grey[700], 
+                                                    },
+                                                }}
 
-                                        >
-                                            <EditIcon />
-                                        </Button>
+                                            >
+                                                <EditIcon />
+                                            </Button>
+                                        </Tooltip>
                                     </Box>
                                 )}
                                 
                             </Box>   
                         </Box>
                         {/*Tabelas*/}
-                        <Box
-                            gridColumn="span 12"
-                            display="flex"
-                            alignItems="center"  
-                            justifyContent="left"  
-                            height="50px"
-                            mt={isMobile ? "120px": "0px"}
-                        >
-                            <Typography variant="h4" fontWeight="bold" color={colors.grey[100]}>
-                                Safras Planejadas
-                            </Typography>
-                        </Box>
-                        <Box
-                            gridColumn="span 12"
-                            backgroundColor={ safrasPlanejadas.length === 0 ? "" : colors.primary[400]}
-                            display="flex"
-                            alignItems="center"
-                            justifyContent="center"
-                            minHeight="475px"
-                            mt={isMobile ? "30px": -12}
-                        >
-                            {safrasPlanejadas.length === 0 ? (
-                                <Box
-                                    display="flex"
-                                    flexDirection= "column"
-                                    alignItems="center"  
-                                    justifyContent="center"
-                                    gap="20px"
-                                >
-                                    <Typography variant={isMobile ? "h6": "h5"} fontWeight="bold" color={colors.grey[100]}>
-                                        Nenhuma safra planejada da gleba foi encontrada.
-                                    </Typography>
-                                    <Button
-                                        sx={{
-                                        backgroundColor: colors.mygreen[400],
-                                        color: colors.grey[100],
-                                        fontSize: "14px",
-                                        fontWeight: "bold",
-                                        padding: "10px 20px",
-                                        }}
-                                        onClick={() => handleAdd()}
-                                    >
-                                        <AddCircleOutlineIcon sx={{ mr: "10px" }} />
-                                        {("Adicionar Safra")}
-                                    </Button>
-                                </Box>
-                            ):(                                
-                                <DataGrid
-                                    rows={safrasPlanejadas}
-                                    columns={columnsSafras}
-                                />
-                            )}
-                        </Box>        
-                        <Box
-                            gridColumn="span 12"
-                            display="flex"
-                            alignItems="center"  
-                            justifyContent="left"  
-                            height="50px"
-                            mt={isMobile ? "370px": 30}
-                        >                       
-                            <Typography variant="h4" fontWeight="bold" color={colors.grey[100]}>
-                                Safras Realizadas
-                            </Typography>
-                        </Box>        
-                        <Box
-                            gridColumn="span 12"
-                            backgroundColor={safrasRealizadas.length === 0 ? "": colors.primary[400]}
-                            display="flex"
-                            alignItems="center"
-                            justifyContent="center"
-                            minHeight="475px" 
-                            mt={isMobile ? "290px": "155px"}
-                        >
-                            {safrasRealizadas.length === 0 ? (
-                                <Box
-                                    display="flex"
-                                    flexDirection= "column"
-                                    alignItems="center"  
-                                    justifyContent="center"
-                                    gap="20px"
-                                >
-                                    <Typography variant={isMobile ? "h6": "h5"} fontWeight="bold" color={colors.grey[100]}>
-                                        Nenhuma safra planejada da gleba foi encontrada.
-                                    </Typography>
-                                    <Button
-                                        sx={{
-                                        backgroundColor: colors.mygreen[400],
-                                        color: colors.grey[100],
-                                        fontSize: "14px",
-                                        fontWeight: "bold",
-                                        padding: "10px 20px",
-                                        }}
-                                        onClick={() => handleAdd()}
-                                    >
-                                        <AddCircleOutlineIcon sx={{ mr: "10px" }} />
-                                        {("Adicionar Safra")}
-                                    </Button>
-                                </Box>
-                            ):(
-                                <DataGrid
-                                    rows={safrasRealizadas}
-                                    columns={columnsSafras}
-                                    sx={{mb:"20px"}}
-                                />
-                            )}
-                        </Box>
                         
                     </Box>
             </Box>

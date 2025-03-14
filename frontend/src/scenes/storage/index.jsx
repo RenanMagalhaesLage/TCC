@@ -37,7 +37,7 @@ const Storage = () => {
             break;
     
           case 3:
-            setSnackbarMessage("Custo excluído!");
+            setSnackbarMessage("Item do Estoque excluído!");
             break;
     
           default:
@@ -53,8 +53,8 @@ const Storage = () => {
         { field: "unit", headerName: "Unidade", flex: 1, resizable: false },
         { field: "quantity", headerName: "Quantidade", flex: 1, resizable: false },
         { field: "price", headerName: "Preço", flex: 1,  resizable: false },
-        { field: "total_value", headerName: "Valor Total", flex: 1,  resizable: false },
-        { field: "date", headerName: "Data", flex: 1, resizable: false },
+        { field: "totalValue", headerName: "Valor Total", flex: 1,  resizable: false },
+        { field: "expirationDate", headerName: "Data", flex: 1, resizable: false },
         { field: "note", headerName: "Observação", flex: 1, resizable: false },
         {
             field: "actions",
@@ -123,7 +123,12 @@ const Storage = () => {
                     const linhasDaTabela = response.data;
 
                     const linhasComLocalizacao = linhasDaTabela.map(item => {
-                        const localizacao = `${item.property.name} - ${item.stored_location}`;
+                        var localizacao = ""
+                        if(item.storedLocation === null){
+                            localizacao = `${item.property.name}`;
+                        }else{
+                            localizacao = `${item.property.name} - ${item.storedLocation}`;
+                        }
                         
                         return {
                             ...item,
@@ -150,7 +155,7 @@ const Storage = () => {
     };
 
     const handleAdd = () =>{
-        navigate(`/custos/add`);
+        navigate(`/storage/add`);
     }
 
     const handleCloseSnackbar = (event, reason) => {

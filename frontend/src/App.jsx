@@ -34,7 +34,8 @@ import CustosEditPage from './scenes/custos/editPage';
 import SafrasEditPage from './scenes/safras/editPage';
 import DashboardProjetado from './scenes/dashboard/dashboardProjetado';
 import Storage from './scenes/storage/index';
-import StoragePage from './scenes/storage/storagePage'
+import StoragePage from './scenes/storage/storagePage';
+import StorageForm from './scenes/storage/form';
 
 
 function App() {
@@ -94,6 +95,7 @@ function App() {
                   <Route path="/projetado" element={<DashboardProjetado />} />
                   <Route path="/storage" element={<Storage />} />
                   <Route path="/storage/:id" element={<StoragePage />} />
+                  <Route path="/storage/add" element={<StorageForm />} />
 
 
                 </Routes>

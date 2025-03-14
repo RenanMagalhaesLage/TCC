@@ -52,12 +52,14 @@ const Topbar = () =>{
     return (
         <Box display="flex" justifyContent="space-between" p={2}>
             {/* SEARCH BAR */}
+            {/*
             <Box display="flex" backgroundColor={colors.primary[400]} borderRadius="3px">
                 <InputBase sx={{ml:2, flex: 1 }} placeholder="Search"></InputBase>
                 <IconButton type="button" sx={{p:1}}>
                     <SearchIcon/>
                 </IconButton>
             </Box>
+            */}
             {/* ICONS */}
             <Box display="flex">
                 <Tooltip title="Tema de Tela" >
@@ -68,7 +70,8 @@ const Topbar = () =>{
                             <LightModeOutlinedIcon />
                         )}
                     </IconButton>
-                </Tooltip>                
+                </Tooltip>     
+                {/*           
                 <Tooltip title="Notificações" >
                     <IconButton onClick={handleToggle}>
                         <Badge variant="dot" color={"success"} invisible={invisible} 
@@ -79,6 +82,7 @@ const Topbar = () =>{
                 </Tooltip>
                 
                 {/* Campo de notificações */}
+                {/*
                 {open && (
                     <Paper
                         ref={notificationRef} 
@@ -109,7 +113,7 @@ const Topbar = () =>{
                         <Typography variant="body2" sx={{ marginTop: "5px" }}>• Notificação 3</Typography>
                         </Box>
                   </Paper>
-                )}
+                )}*/}
                 <Tooltip title="Dúvidas Frequentes" >
                     <IconButton>
                         <HelpOutlineOutlinedIcon />

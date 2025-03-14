@@ -86,7 +86,7 @@ const Custos = () => {
         { field: "unit", headerName: "Unidade", flex: 1, resizable: false },
         { field: "quantity", headerName: "Quantidade", flex: 1, resizable: false },
         { field: "price", headerName: "Preço", flex: 1,  resizable: false },
-        { field: "total_value", headerName: "Valor Total", flex: 1,  resizable: false },
+        { field: "totalValue", headerName: "Valor Total", flex: 1,  resizable: false },
         { field: "date", headerName: "Data", flex: 1, resizable: false },
         { field: "note", headerName: "Observação", flex: 1, resizable: false },
         {
@@ -165,7 +165,7 @@ const Custos = () => {
                                     unit: custo.unit,
                                     quantity: custo.quantity,
                                     price: custo.price,
-                                    total_value: custo.total_value,
+                                    totalValue: custo.totalValue,
                                     date: custo.date,
                                     note: custo.note,
                                 }))

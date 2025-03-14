@@ -33,7 +33,7 @@ const Custo = connection.define('custos',{
         type: Sequelize.STRING,
         allowNull: false
     },
-    total_value: { 
+    totalValue: { 
         type: Sequelize.DOUBLE,
         allowNull: false
     },
@@ -44,7 +44,7 @@ const Custo = connection.define('custos',{
     },
     note: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
     }
 });
 

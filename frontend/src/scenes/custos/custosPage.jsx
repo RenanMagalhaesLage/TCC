@@ -216,7 +216,7 @@ const CustosPage = () => {
                             height={isMobile ? "auto" : "initial"} 
                             minHeight={isMobile ? "400px" : "240px"} 
                             marginBottom={isMobile ? "0" :"118px"}
-                            marginTop={isMobile ? "10px":"-110px"}
+                            marginTop={isMobile ? "10px":"-130px"}
                             sx={{boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.07)",}}
                         >
                             {/* Primeira Coluna */}

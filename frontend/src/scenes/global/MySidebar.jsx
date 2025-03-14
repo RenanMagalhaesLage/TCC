@@ -26,25 +26,28 @@ import WarehouseIcon from '@mui/icons-material/Warehouse';
 import PendingActionsIcon from '@mui/icons-material/PendingActions';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import GiteIcon from '@mui/icons-material/Gite';
+import Tooltip from '@mui/material/Tooltip';
 
 const Item = ({ title, to, icon, selected, setSelected, onClick }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   return (
-    <MenuItem
-      active={selected === title}
-      style={{
-        color: colors.grey[100],
-      }}
-      onClick={() => {
-        setSelected(title);
-        if (onClick) onClick(); 
-      }}
-      icon={icon}
-    >
-      <Typography>{title}</Typography>
-      <Link to={to} />
-    </MenuItem>
+    <Tooltip title={title} arrow> {/* Tooltip com o título do item */}
+      <MenuItem
+        active={selected === title}
+        style={{
+          color: colors.grey[100],
+        }}
+        onClick={() => {
+          setSelected(title);
+          if (onClick) onClick(); 
+        }}
+        icon={icon}
+      >
+        <Typography>{title}</Typography>
+        <Link to={to} />
+      </MenuItem>
+    </Tooltip>
   );
 };
 
@@ -52,6 +55,7 @@ const Sidebar = ({ onLogout }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const isMobile = useMediaQuery("(max-width: 1000px)");
   const [selected, setSelected] = useState("Dashboard");
   const navigate = useNavigate(); 
 
@@ -77,7 +81,7 @@ const Sidebar = ({ onLogout }) => {
   }, [location.pathname]);
 
 
-  const isMobile = useMediaQuery("(max-width: 800px)");
+
 
   useEffect(() => {
     setIsCollapsed(isMobile);
@@ -115,7 +119,7 @@ const Sidebar = ({ onLogout }) => {
         <Menu iconShape="square">
           {/* LOGO AND MENU ICON */}
           <MenuItem
-            onClick={() => setIsCollapsed(!isCollapsed)}
+            onClick={isMobile? null: () => setIsCollapsed(!isCollapsed)}
             icon={isCollapsed ? <MenuOutlinedIcon /> : undefined}
             style={{
               margin: "10px 0 20px 0",
