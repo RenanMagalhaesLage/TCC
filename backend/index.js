@@ -1,4 +1,6 @@
 const express = require("express");
+const Sequelize = require('sequelize');
+const { QueryTypes } = require('sequelize');
 
 //Configurando autenticação Google
 const {OAuth2Client} = require('google-auth-library');
@@ -1004,7 +1006,57 @@ app.post('/storage', async (req,res) => {
         return res.status(500).json({ error: 'Erro ao salvar o item no estoque.' });
     }
     
-})
+});
+
+/*------------------------
+        ROTAS DASHBOARD 
+--------------------------*/
+app.get('/custoProjetado', async (req, res) => {
+    const { safraId } = req.query;
+
+    const safra = await Safra.findByPk(safraId);
+        if (!safra) {
+            return res.status(404).json({ error: 'Safra não encontrado' });
+    }
+
+    //Somando custos por categoria
+    const query = `
+      SELECT category, SUM(totalValue) AS value
+      FROM Custos
+      WHERE safraId = :safraId
+      GROUP BY category;
+    `;
+  
+    try {
+        const sumCustos = await connection.query(query, {
+          replacements: { safraId },  
+          type: QueryTypes.SELECT  
+        });
+
+        const categories = [
+            'Defensivos',
+            'Operações',
+            'Semente',
+            'Arrendamento',
+            'Administrativo',
+            'Corretivos e Fertilizantes'
+            
+          ];
+          
+        const result = categories.map(category => {
+            const categoryFound = Array.isArray(sumCustos) ? sumCustos.find(result => result.category === category) : null;
+            return {
+              id: category,  // Adiciona o atributo 'id' com o mesmo valor de 'category'
+              label: category,
+              value: categoryFound ? categoryFound.value : 0 
+            };
+        });
+        return res.json(result);
+      } catch (error) {
+        console.error('Erro ao executar a consulta:', error);
+        res.status(500).json({ error: 'Erro ao acessar o banco de dados' });
+      }
+});
 
 /*------------------------
         ROTAS INVITE

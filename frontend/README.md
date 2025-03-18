@@ -5,7 +5,7 @@
 - Sequelize
 - Axios
 - SideBar Pro
-- Gráficos
+- Gráficos --> nivo
 - react-secure-storage
 
 comando parea executar back --> node --watch index.js

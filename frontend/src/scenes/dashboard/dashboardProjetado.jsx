@@ -1,13 +1,16 @@
-import React, { useState } from "react";
-import { Box, Button,IconButton,Select, TextField,Grid, Typography, useTheme, Autocomplete, useMediaQuery,MenuItem, FormControl, InputLabel,} from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { Box, Button,IconButton,Select, TextField,Grid, Typography, useTheme, Autocomplete, useMediaQuery,MenuItem,Tooltip, FormControl, InputLabel,} from "@mui/material";
 import { tokens } from "../../theme";
 import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import Header from "../../components/Header";
 import LineChart from "../../components/LineChart";
 import BarChart from "../../components/BarChart";
 import PieChart from "../../components/PieChart";
 import InfoBox from "../../components/InfoBox";
 import { Formik, Form, Field } from "formik";
+import secureLocalStorage from 'react-secure-storage';
+import axios from "axios";
 
 const DashboardProjetado = () => {
   const isMobile = useMediaQuery("(max-width: 800px)");
@@ -15,19 +18,47 @@ const DashboardProjetado = () => {
   const isMediumDevice = useMediaQuery("(max-width: 1800px)");
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const [userData, setUserData] = useState(null);
+  const [pieData, setPieData] = useState([]);
+  const [safraOptions, setsafraOptions] = useState([]);
 
-  const options = {
-    Propriedade: ["Propriedade A", "Propriedade B", "Propriedade C"],
-    Gleba: ["Gleba X", "Gleba Y", "Gleba Z"],
-    Safra: ["Safra 2023", "Safra 2024", "Safra 2025"],
-    Cultivo: ["Milho", "Soja", "Trigo"]
-  };
+  const initialValues = {
+    safra: "",
+    property: ""
+  };  
 
-  const [dependentOptions, setDependentOptions] = useState([]);
+  useEffect(() => {
+    const storedUser = secureLocalStorage.getItem('userData'); 
+    if (storedUser) {
+      setUserData(JSON.parse(storedUser));
+    }
+  }, []);
+    
+  useEffect(() => {
+    if (userData && userData.email) { 
+      const fetchPieData = async () => {
+        try {
+          const response = await axios.get(`http://localhost:3000/custoProjetado`, {
+            params: { safraId: 1 }
+          });
+                      
+  
+          setPieData(response.data);   
+          setsafraOptions([
+            { id: 1, name: "Safra 1" },
+            { id: 2, name: "Safra 2" },
+            { id: 3, name: "Safra 3" }
+          ]);
 
-  const handlePrimaryChange = (value) => {
-    setDependentOptions(options[value] || []);
-  };
+                        
+        } catch (error) {
+          console.log("ERRO - ao buscar no banco de dados.");
+        }
+      };
+      fetchPieData();
+    }
+  }, [userData]);  
+  
 
   return (
     <Box m="20px">
@@ -37,50 +68,44 @@ const DashboardProjetado = () => {
       </Box>
 
       <Formik
-        initialValues={{
-          primarySelection: "",
-          secondarySelection: "",
-        }}
+        initialValues={initialValues}
         onSubmit={(values) => {
           console.log(values);
         }}
       >
-      {({ values, handleChange, setFieldValue }) => (
+      {({ values, handleChange,handleBlur, setFieldValue }) => (
         <Form>
+          <Box
+            display="grid"
+            gap="30px"
+            gridTemplateColumns="repeat(12, 1fr)"
+          >
+            <Autocomplete
+              disablePortal
+              id="properties"
+              options={safraOptions}
+              getOptionLabel={(option) => option.name || ""}
+              name="property"
+              sx={{ gridColumn: isMobile ? "span 12" : "span 4" }}
+              renderInput={(params) => (
+                <TextField 
+                  {...params} 
+                  label="Safra"
+                  variant="filled"
+                  name="property"
+                  onBlur={handleBlur} 
+                />
+              )}
+              noOptionsText="Não Encontrado"
+            />      
+          </Box>
           <Box
             display="grid"
             gridTemplateColumns="repeat(12, 1fr)"
             gridAutoRows="100px"
             gap="20px"
           >
-            <Box
-              gridColumn={isSmallDevice ? "span 12": "span 3"}
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-            >
-              <TextField
-                  select
-                  fullWidth
-                  variant="filled"
-                  label="Selecione uma Safra"
-                  value={values.primarySelection}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setFieldValue("primarySelection", value);
-                    setFieldValue("secondarySelection", ""); 
-                    handlePrimaryChange(value);
-                  }}
-                  InputLabelProps={{ shrink: true }}
-
-              >
-                  {options.Safra.map((option) => (
-                    <MenuItem key={option} value={option}>
-                      {option}
-                    </MenuItem>
-                  ))}
-              </TextField>
-            </Box>
+            {/*
             <Box
               gridColumn={isSmallDevice ? "span 12": "span 3"}
               display="flex"
@@ -165,7 +190,7 @@ const DashboardProjetado = () => {
                   ))}
               </TextField>
             </Box>
-
+            */}
 
             {/* Botão de Envio */}
             <Box
@@ -411,15 +436,18 @@ const DashboardProjetado = () => {
               
             </Box>
             <Box>
-              <IconButton>
-                <DownloadOutlinedIcon
-                  sx={{ fontSize: "26px", color: colors.mygreen[500] }}
-                />
-              </IconButton>
+              <Tooltip title="Visualizar">
+                <IconButton>
+                  <VisibilityIcon
+                    sx={{ fontSize: "26px", color: colors.mygreen[500] }}
+                  />
+                </IconButton>
+              </Tooltip>
+              
             </Box>
           </Box>
           <Box height="400px" m="-20px 0 0 0">
-            <PieChart isDashboard={true} />
+            <PieChart isDashboard={true} safraId={1}/>
           </Box>
         </Box>
         <Box
@@ -448,14 +476,16 @@ const DashboardProjetado = () => {
               
             </Box>
             <Box>
-              <IconButton>
-                <DownloadOutlinedIcon
-                  sx={{ fontSize: "26px", color: colors.mygreen[500] }}
-                />
-              </IconButton>
+              <Tooltip title="Visualizar">
+                <IconButton>
+                  <VisibilityIcon
+                    sx={{ fontSize: "26px", color: colors.mygreen[500] }}
+                  />
+                </IconButton>
+              </Tooltip>
             </Box>
           </Box>
-          <Box height="400px"  m="-20px -50px 0 0">
+          <Box height="400px"  m="-20px 0 0 0">
             <LineChart isDashboard={true} />
           </Box>
         </Box>
@@ -492,19 +522,21 @@ const DashboardProjetado = () => {
               </Typography>
             </Box>
             <Box>
-              <IconButton>
-                <DownloadOutlinedIcon
-                  sx={{ fontSize: "26px", color: colors.mygreen[500] }}
-                />
-              </IconButton>
+              <Tooltip title="Visualizar">
+                <IconButton>
+                  <VisibilityIcon
+                    sx={{ fontSize: "26px", color: colors.mygreen[500] }}
+                  />
+                </IconButton>
+              </Tooltip>
             </Box>
           </Box>
-          <Box height="400px" m={isSmallDevice ? "-20px -100px 0 0" : "-20px -50px 0 0"}>
+          <Box height="400px" m={isSmallDevice ? "-20px -0 0 0" : "-20px 0 0 0"}>
             <BarChart isDashboard={true} />
           </Box>
         </Box>
         {/* ROW 5 */}
-        
+
         
         
       </Box>

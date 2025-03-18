@@ -142,7 +142,7 @@ const GlebasForm = () => {
                   fullWidth
                   variant="filled"
                   type="number"
-                  label="Área"
+                  label="Área em Hectares"
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.area}

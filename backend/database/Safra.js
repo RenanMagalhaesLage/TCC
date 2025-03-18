@@ -2,6 +2,14 @@ const Sequelize = require("sequelize");
 const connection = require("./database");
 
 const Safra = connection.define('safra',{
+    name:{
+        type: Sequelize.STRING,
+        allowNull: false,
+    },
+    areaTotal:{
+        type: Sequelize.DOUBLE,
+        allowNull: false
+    },
     type:{
         type: Sequelize.STRING,
         allowNull: false,

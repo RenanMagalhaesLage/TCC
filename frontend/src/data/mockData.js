@@ -406,26 +406,22 @@ export const mockPieData = [
   {
     id: "Administrativo",
     label: "Administrativo",
-    value: 239,
-    color: "hsl(104, 70%, 50%)",
+    value: 239
   },
   {
     id: "Arrendamento",
     label: "Arrendamento",
-    value: 170,
-    color: "hsl(162, 70%, 50%)",
+    value: 170
   },
   {
     id: "Semente",
     label: "Semente",
-    value: 322,
-    color: "hsl(291, 70%, 50%)",
+    value: 322
   },
   {
     id: "Corretivos e Fertilizantes",
     label: "C. e Fertilizantes",
-    value: 503,
-    color: "hsl(229, 70%, 50%)",
+    value: 503
   },
   {
     id: "Defensivos",

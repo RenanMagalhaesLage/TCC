@@ -1,18 +1,50 @@
+import React, { useState, useEffect } from "react";
 import { ResponsivePie } from "@nivo/pie";
 import { tokens } from "../theme";
 import { useTheme, useMediaQuery } from "@mui/material";
-import { mockPieData as data } from "../data/mockData";
+//import { mockPieData as data } from "../data/mockData";
+import secureLocalStorage from 'react-secure-storage';
+import axios from "axios";
 
-const PieChart = () => {
+const PieChart = ({isDashboard, safraId }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const isMobile = useMediaQuery("(max-width: 800px)");
   const isSmallDivice = useMediaQuery("(max-width: 1000px)");
   const isMediumDivice = useMediaQuery("(max-width: 1800px)");
+  const [userData, setUserData] = useState(null);
+  const [pieData, setPieData] = useState([]);
+  
+  useEffect(() => {
+      const storedUser = secureLocalStorage.getItem('userData'); 
+      if (storedUser) {
+        setUserData(JSON.parse(storedUser));
+      }
+  }, []);
+
+  useEffect(() => {
+    if (userData && userData.email) { 
+      const fetchPieData = async () => {
+        try {
+          const response = await axios.get(`http://localhost:3000/custoProjetado`, {
+            params: { safraId: 1 }
+          });
+                      
+  
+          setPieData(response.data); 
+
+                        
+        } catch (error) {
+          console.log("ERRO - ao buscar no banco de dados.");
+        }
+      };
+      fetchPieData();
+    }
+  }, [userData]);  
 
   return (
     <ResponsivePie
-      data={data}
+      data={pieData}
       theme={{
         axis: {
           domain: {
@@ -51,19 +83,23 @@ const PieChart = () => {
       innerRadius={0.5}
       padAngle={0.7}
       cornerRadius={3}
-      sortByValue={true}
+      sortByValue={false}
       activeOuterRadiusOffset={8}
       borderColor={{
         from: "color",
         modifiers: [["darker", 0.2]],
       }}
-      enableArcLinkLabels={isMobile? false : true}
-      arcLinkLabelsSkipAngle={10}
+      arcLinkLabel={isMobile ? "value" : isDashboard ? "id" : e=>e.id+" ("+e.value+")"}
+      enableArcLinkLabels={isMobile? true : true}
+      arcLinkLabelsOffset={5}
+      arcLinkLabelsDiagonalLength={20}
+      arcLinkLabelsStraightLength={20}
+      arcLinkLabelsSkipAngle={5}
       arcLinkLabelsTextColor={colors.grey[100]}
       arcLinkLabelsThickness={2}
       arcLinkLabelsColor={{ from: "color" }}
       enableArcLabels={false}
-      arcLabelsRadiusOffset={0.4}
+      arcLabelsRadiusOffset={0.5}
       arcLabelsSkipAngle={7}
       arcLabelsTextColor={{
         from: "color",
@@ -90,8 +126,19 @@ const PieChart = () => {
         },
       ]}
       legends={
-        isSmallDivice
-          ? [] // Remove as legendas em telas pequenas
+        isSmallDivice 
+          ?  [{
+            anchor: 'bottom-left',
+            direction: 'column',
+            justify: false,
+            translateX: -60,
+            translateY: isDashboard ? 80 : 0,
+            itemWidth: 100,
+            itemHeight: 20,
+            itemsSpacing: 0,
+            symbolSize: 20,
+            itemDirection: 'left-to-right'
+          }] 
           : [
             {
               anchor: "bottom",
