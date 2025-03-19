@@ -93,9 +93,9 @@ function App() {
                   <Route path="/invites" element={<Invite />} />
                   <Route path="/invites/add" element={<InvitesForm />} />
                   <Route path="/projetado" element={<DashboardProjetado />} />
-                  <Route path="/storage" element={<Storage />} />
-                  <Route path="/storage/:id" element={<StoragePage />} />
-                  <Route path="/storage/add" element={<StorageForm />} />
+                  <Route path="/estoque" element={<Storage />} />
+                  <Route path="/estoque/:id" element={<StoragePage />} />
+                  <Route path="/estoque/add" element={<StorageForm />} />
 
 
                 </Routes>

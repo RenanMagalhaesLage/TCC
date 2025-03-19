@@ -228,10 +228,10 @@ const StoragePage = () => {
                             <Box  gridColumn={isMobile ? "span 12" : "span 1"} display="flex" flexDirection="column" alignItems="flex-start">
                                 <Box display="flex" alignItems="center" marginBottom="15px">
                                     <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
-                                    Data:
+                                    Data de Validade:
                                     </Typography>
                                     <Typography variant="body1" color={colors.grey[300]}>
-                                    {custo.date}
+                                    {custo.expirationDate}
                                     </Typography>
                                 </Box>
                                 <Box display="flex" alignItems="center" marginBottom="15px" >
@@ -255,7 +255,7 @@ const StoragePage = () => {
                                     Valor Total:
                                     </Typography>
                                     <Typography variant="body1" color={colors.grey[300]}>
-                                    {custo.total_value}
+                                    {custo.totalValue}
                                     </Typography>
                                 </Box>
                             </Box>

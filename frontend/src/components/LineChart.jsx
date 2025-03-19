@@ -1,15 +1,46 @@
+import React, { useState, useEffect } from "react";
 import { ResponsiveLine } from "@nivo/line";
 import { useTheme, useMediaQuery } from "@mui/material";
 import { tokens } from "../theme";
-import { mockLineData as data } from "../data/mockData";
+import { mockLineData2 as data } from "../data/mockData";
+import secureLocalStorage from 'react-secure-storage';
+import axios from "axios";
 
-const LineChart = ({ isCustomLineColors = false, isDashboard = false }) => {
+const LineChart = ({ isDashboard , safraId}) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const isMobile = useMediaQuery("(max-width: 800px)");
   const isSmallDivice = useMediaQuery("(max-width: 1000px)");
   const isMediumDivice = useMediaQuery("(max-width: 1800px)");
+  const [userData, setUserData] = useState(null);
+  const [lineData, setLineData] = useState([]);
 
+  useEffect(() => {
+    const storedUser = secureLocalStorage.getItem('userData'); 
+    if (storedUser) {
+      setUserData(JSON.parse(storedUser));
+    }
+  }, []);
+
+useEffect(() => {
+  if (userData && userData.email) { 
+    const fetchLineData = async () => {
+      try {
+        const response = await axios.get(`http://localhost:3000/custos-glebas-line-chart`, {
+          params: { safraId: 1 }
+        });
+                    
+
+        setLineData(response.data); 
+
+                      
+      } catch (error) {
+        console.log("ERRO - ao buscar no banco de dados.");
+      }
+    };
+    fetchLineData();
+  }
+}, [userData]);  
 
   // Função para formatação de valores em dinheiro
   const formatCurrency = (value) => {
@@ -18,7 +49,7 @@ const LineChart = ({ isCustomLineColors = false, isDashboard = false }) => {
 
   return (
     <ResponsiveLine
-      data={data}
+      data={lineData}
       theme={{
         axis: {
           domain: {
@@ -79,18 +110,18 @@ const LineChart = ({ isCustomLineColors = false, isDashboard = false }) => {
         tickSize: isMobile ? 0 : 5,
         tickPadding: isMobile ? 0 : 5,
         tickRotation: isMobile ? 0 : 0,
-        legend: isDashboard ? undefined : "transportation",
+        legend: undefined ,
         legendOffset: 36,
         legendPosition: "middle",
         format: isMobile ? () => "" : undefined,
       }}
       axisLeft={{
         orient: "left",
-        tickValues: 5,
-        tickSize: 3,
+        tickValues: isMobile ? 0 : 5,
+        tickSize: isMobile ? 0 : 3,
         tickPadding: 5,
         tickRotation: 0,
-        legend: isDashboard ? undefined : "count",
+        legend: undefined ,
         legendOffset: -40,
         legendPosition: "middle",
         //format:isMediumDivice ? (value) => formatCurrency(value): value
@@ -101,7 +132,10 @@ const LineChart = ({ isCustomLineColors = false, isDashboard = false }) => {
       pointColor={{ theme: "background" }}
       pointBorderWidth={2}
       pointBorderColor={{ from: "serieColor" }}
-      pointLabelYOffset={-12}
+      enablePointLabel={!isDashboard}
+      pointLabel={e=>e.data.x+": "+e.data.y}
+      pointLabelYOffset={-16}
+      enableTouchCrosshair={true}
       useMesh={true}
       legends={
         isSmallDivice
@@ -114,7 +148,7 @@ const LineChart = ({ isCustomLineColors = false, isDashboard = false }) => {
                 translateX: 0,
                 translateY: 50,
                 itemsSpacing: 0,
-                itemDirection: "left-to-right",
+                itemDirection: "right-to-left",
                 itemWidth: 110,
                 itemHeight: 20,
                 itemOpacity: 0.75,

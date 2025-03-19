@@ -6,6 +6,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import Header from "../../components/Header";
 import LineChart from "../../components/LineChart";
 import BarChart from "../../components/BarChart";
+import BarChart2 from "../../components/BarChart2";
 import PieChart from "../../components/PieChart";
 import InfoBox from "../../components/InfoBox";
 import { Formik, Form, Field } from "formik";
@@ -38,7 +39,7 @@ const DashboardProjetado = () => {
     if (userData && userData.email) { 
       const fetchPieData = async () => {
         try {
-          const response = await axios.get(`http://localhost:3000/custoProjetado`, {
+          const response = await axios.get(`http://localhost:3000/custos-pie-chart`, {
             params: { safraId: 1 }
           });
                       
@@ -486,7 +487,7 @@ const DashboardProjetado = () => {
             </Box>
           </Box>
           <Box height="400px"  m="-20px 0 0 0">
-            <LineChart isDashboard={true} />
+            <BarChart2 isDashboard={true} />
           </Box>
         </Box>
         {/* ROW 4 */}

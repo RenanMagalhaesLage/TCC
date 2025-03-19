@@ -287,9 +287,8 @@ const Safras = () => {
     ];
 
     const columnsPlanejadas = [
-        { field: "propertie", headerName: "Propriedade", flex: 1, minWidth: 150, cellClassName: "name-column--cell", resizable: false },
-        { field: "gleba", headerName: "Gleba", flex: 1, minWidth: 100, cellClassName: "name-column--cell", resizable: false },
-        { field: "area", headerName: "Área da Gleba", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },    
+        { field: "name", headerName: "Nome", flex: 1, minWidth: 100, cellClassName: "name-column--cell", resizable: false },
+        { field: "areaTotal", headerName: "Área", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },    
         { field: "cultivo", headerName: "Cultivo", flex: 1, minWidth: 100, cellClassName: "city-column--cell", resizable: false },
         { field: "semente", headerName: "Semente", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
         { field: "metroLinear", headerName: "Metro Linear", type: "number", headerAlign: "left", align: "left", minWidth: 120, resizable: false },
@@ -350,8 +349,7 @@ const Safras = () => {
     ];
 
     const columnsRealizadas = [
-        { field: "propertie", headerName: "Propriedade", flex: 1, minWidth: 150, cellClassName: "name-column--cell", resizable: false },
-        { field: "gleba", headerName: "Gleba", flex: 1, minWidth: 100, cellClassName: "nameGleba-column--cell", resizable: false },
+        { field: "name", headerName: "Nome", flex: 1, minWidth: 100, cellClassName: "name-column--cell", resizable: false },
         { field: "area", headerName: "Área da Gleba", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },    
         { field: "cultivo", headerName: "Cultivo", flex: 1, minWidth: 70, cellClassName: "city-column--cell", resizable: false },
         { field: "precMilimetrica", headerName: "Precipitação Milimetrica", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
@@ -490,43 +488,14 @@ const Safras = () => {
         if (userData && userData.email) { 
             const fetchSafrasData = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:3000/user`, {
+                    const response = await axios.get(`http://localhost:3000/safras-by-user`, {
                         params: { email: userData.email }
                     });
-                    const linhasDaTabela = response.data.flatMap(property => {
-                        return property.glebas.flatMap(gleba => { 
-                            return gleba.safras.map(safra => ({  
-                                id: safra.id,   
-                                gleba: gleba.name,
-                                propertie: property.name,
-                                area: gleba.area,
-                                type: safra.type,  
-                                status: safra.status,
-                                cultivo: safra.cultivo,
-                                semente: safra.semente, 
-                                metroLinear: safra.metroLinear, 
-                                dosagem: safra.dosagem, 
-                                toneladas: safra.toneladas, 
-                                adubo: safra.adubo, 
-                                dataFimPlantio: safra.dataFimPlantio, 
-                                dataFimColheita: safra.dataFimColheita, 
-                                tempoLavoura: safra.tempoLavoura, 
-                                precMilimetrica: safra.precMilimetrica, 
-                                umidade: safra.umidade, 
-                                impureza: safra.impureza, 
-                                graosAvariados: safra.graosAvariados, 
-                                graosEsverdeados: safra.graosEsverdeados, 
-                                graosQuebrados: safra.graosQuebrados, 
-                                prodTotal: safra.prodTotal, 
-                                prodPrevista: safra.prodPrevista, 
-                                prodRealizada: safra.prodRealizada, 
-                                porcentHect: safra.porcentHect,
-                                access: property.access
-                            }));
-                        });
-                    });
-                    const safrasPlanejadas = linhasDaTabela.filter(safra => safra.type === 'Planejado');
-                    const safrasRealizadas = linhasDaTabela.filter(safra => safra.type === 'Realizado');
+
+                    const safrasEmAndamento = response.data.filter(safra => safra.status === false);
+
+                    const safrasPlanejadas = safrasEmAndamento.filter(safra => safra.type === 'Planejado');
+                    const safrasRealizadas = safrasEmAndamento.filter(safra => safra.type === 'Realizado');
                     
                     setSafrasPlanejadas(safrasPlanejadas);
                     setSafrasRealizadas(safrasRealizadas);
@@ -696,11 +665,20 @@ export default Safras;
 
 
 function CustomToolbar() {
+    const theme = useTheme();
+    const colors = theme.palette.mode;
     return (
-      <GridToolbarContainer>
-        <GridToolbarColumnsButton /> {/* Botão de exibição de colunas */}
-        <GridToolbarFilterButton />  {/* Botão de filtro */}
-        <GridToolbarDensitySelector /> {/* Seletor de densidade */}
+      <GridToolbarContainer >
+        <Box sx={{
+            '& .MuiButton-root': { 
+              color: colors === 'dark' ?'#f2f0f0' :  "#1F2A40" , 
+            },
+            display: 'flex',
+          }}>
+          <GridToolbarColumnsButton  /> 
+          <GridToolbarFilterButton /> 
+          <GridToolbarDensitySelector  /> 
+        </Box>
       </GridToolbarContainer>
     );
-}
+};

@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, TextField, Typography, useTheme, Autocomplete, useMediaQuery } from "@mui/material";
+import { Box, Button, TextField,Switch, Typography, useTheme, FormGroup, FormControlLabel,Autocomplete, useMediaQuery,FormHelperText,IconButton } from "@mui/material";
 import { useNavigate,useParams } from 'react-router-dom';
-import { Formik } from "formik";
+import { Formik, Field } from "formik";
 import { tokens } from "../../theme";
 import * as yup from "yup";
 import Header from "../../components/Header";
 import axios from 'axios';
 import secureLocalStorage from 'react-secure-storage'; 
+import InfoIcon from '@mui/icons-material/Info';
 
 
 const SafrasForm = () => {
+  const isSmallDevice = useMediaQuery("(max-width: 800px)");
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const isNonMobile = useMediaQuery("(min-width:600px)");
@@ -19,6 +21,7 @@ const SafrasForm = () => {
   const [loading, setLoading] = useState(true);
   const { id } = useParams(); 
 
+  const [useDefault, setUseDefault] = useState(true); 
 
   const fields = [
     { name: "cultivo", label: "Cultivo", type: "text" },
@@ -47,21 +50,20 @@ const SafrasForm = () => {
     if (userData && userData.email) {
       const fetchSafras = async () => {
         try {
-            const response = await axios.get(`http://localhost:3000/user`, {
+            const response = await axios.get(`http://localhost:3000/glebas-available`, {
               params: { email: userData.email }
             });
-            const glebaData = response.data.flatMap(property =>
-              property.glebas.map(gleba =>({
-                      id: gleba.id,
-                      name: `${gleba.name} - ${property.name}`
-                  }))
-              );
+
+            const glebaData = response.data.map(gleba => ({
+              id: gleba.id,
+              name: `${gleba.name} - ${gleba.property.name}`
+            }));
             setGlebaOptions(glebaData);
 
             if(id){
               const fetchSafraData = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:3000/gleba/${id}`);
+                    const response = await axios.get(`http://localhost:3000/glebas/${id}`);
                     const { gleba, propriedade, owner } = response.data;
                     setPropertie(propriedade);
                     //console.log("info --> " + propriedade.name + " " + gleba.name )
@@ -92,7 +94,15 @@ const SafrasForm = () => {
     return "";
   };
 
+  //Definindo o nome padrão da safra --> ANO/SEMESTRE
+  const currentYear = new Date().getFullYear(); 
+  const currentMonth = new Date().getMonth() + 1; 
+
+  const period = (currentMonth >= 1 && currentMonth <= 6) ? '/1' : '/2';
+
   const initialValues = {
+    safraName: `Safra - ${currentYear}${period}`,
+    useDefault: true,
     cultivo: "",
     semente: "",
     metroLinear: "",
@@ -107,12 +117,23 @@ const SafrasForm = () => {
     gleba: "",
   };  
 
+  const handleSwitchChange = (event, setFieldValue) => {
+    const value = event.target.checked;
+    setFieldValue('useDefault', value); // Atualiza o Formik com o valor do switch
+    if (value) {
+      setFieldValue('safraName', 'Safra - 2025/1'); // Preenche com o valor padrão
+    } else {
+      setFieldValue('safraName', ''); // Limpa o campo quando desmarcado
+    }
+  };
+
   const navigate = useNavigate(); 
   const handleFormSubmit = async (values) => {
     try {
       const response = await axios.post("http://localhost:3000/safras", {
         email: userData.email,
-        glebaId: values.gleba,
+        glebaIds: values.gleba,
+        safraName: values.safraName,
         cultivo: values.cultivo, 
         semente: values.semente,
         metroLinear: values.metroLinear,
@@ -141,8 +162,11 @@ const SafrasForm = () => {
   return (
     <Box m="20px">
       <Header title="Adicionar Safra" subtitle="Preencha os campos para que seja cadastrado uma safra" />
-      <Typography variant="body1" sx={{ mb: "20px", color: colors.grey[600] }}>
-        Toda safra criada inicialmente possui o status de <i>Planejada</i>.
+      <Typography variant="body1" sx={{ mb: "20px", color: theme.palette.mode === 'dark' ? colors.primary[100] : colors.grey[600] }}>
+        <IconButton sx={{ p: 0, mr: 1 }}>
+          <InfoIcon fontSize="small" />
+        </IconButton>
+        Toda safra criada, inicialmente, possui o status de <i>Planejada</i>.
       </Typography>
       <Formik
         onSubmit={handleFormSubmit}
@@ -167,45 +191,88 @@ const SafrasForm = () => {
                 "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
               }}
             >
-                {gleba ? (
-                  <TextField
-                    fullWidth
-                    variant="filled"
-                    label="Gleba"
-                    value={gleba.name}
-                    disabled 
-                    sx={{ gridColumn: "span 2" }}
-                    
-                  />
-                ) : (
-                  <Autocomplete
-                    disablePortal
-                    id="glebas"
-                    options={glebaOptions}
-                    getOptionLabel={(option) => option.name || ""}
-                    name="gleba"
-                    value={
-                      values.gleba 
-                        ? glebaOptions.find((option) => option.id === values.gleba) 
-                        : null
-                    } 
-                    onChange={(event, value) => setFieldValue('gleba', value?.id || null)} 
-                    onBlur={handleBlur} 
-                    sx={{ gridColumn: "span 2" }}
-                    renderInput={(params) => (
-                      <TextField 
-                        {...params} 
-                        label="Gleba"
-                        variant="filled"
-                        name="gleba"
-                        error={!!touched.gleba && !!errors.gleba}
-                        helperText={touched.gleba && errors.gleba}
-                        onBlur={handleBlur} 
+              <Box
+                display="flex"
+                flexDirection="column"
+                gridColumn={isSmallDevice ? "span 4" : "span 2"}
+              >
+                <Field name="safraName">
+                  {({ field }) => (
+                    <TextField
+                      {...field}
+                      label="Nome da Safra"
+                      variant="filled"
+                      fullWidth
+                      disabled={values.useDefault} // Desativa o campo se o radio button estiver selecionado
+                      value={values.safraName}
+                      onChange={(e) => setFieldValue('safraName', e.target.value)} // Atualiza o valor
+                      onBlur={handleBlur}
+                      error={touched.safraName && !!errors.safraName}
+                      helperText={touched.safraName && errors.safraName}
                       />
-                    )}
-                    noOptionsText="Não Encontrado"
+                  )}
+                </Field>
+
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={values.useDefault}
+                      onChange={(e) => handleSwitchChange(e, setFieldValue)}
+                      name="useDefault"
+                      color={theme.palette.mode === 'dark' ? colors.primary[100] : colors.grey[600] }
+                      sx={{
+                        '& .MuiSwitch-thumb': {
+                          backgroundColor: theme.palette.mode === 'dark' ? colors.primary[100] : colors.grey[900], // Altera a cor do botão deslizante (thumb)
+                        },
+                        '& .Mui-checked .MuiSwitch-thumb': {
+                          backgroundColor: theme.palette.mode === 'dark' ? colors.primary[100] : colors.grey[900], // Cor quando o switch está ativado
+                        },
+                      }}
+                    />
+                  }
+                  label="Usar nome padrão para a safra"
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    whiteSpace: 'nowrap', // Evita a quebra de linha no texto
+                  }}
+                />
+              </Box>
+
+              <Autocomplete
+                disablePortal
+                id="glebas"
+                multiple // Permite a seleção de múltiplas opções
+                options={glebaOptions}
+                getOptionLabel={(option) => option.name || ""}
+                name="gleba"
+                value={
+                  values.gleba && values.gleba.length > 0
+                    ? glebaOptions.filter((option) => values.gleba.includes(option.id)) // Filtra as opções selecionadas com base nos IDs
+                    : []
+                }
+                onChange={(event, newValue) => {
+                  // Atualiza os valores selecionados, salvando os IDs das opções selecionadas
+                  setFieldValue('gleba', newValue.map((option) => option.id));
+                }}
+                onBlur={handleBlur}
+                sx={{ gridColumn: isSmallDevice ? "span 4" : "span 2" }}
+
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Gleba"
+                    variant="filled"
+                    name="gleba"
+                    error={!!touched.gleba && !!errors.gleba}
+                    helperText={touched.gleba && errors.gleba}
+                    onBlur={handleBlur}
                   />
                 )}
+                noOptionsText="Não Encontrado"
+              />
+
 
                 {fields.map(({ name, label, type, disabled }) => (
                   <TextField
@@ -276,6 +343,7 @@ const checkoutSchema = yup.object().shape({
     //tempoLavoura: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
     prodTotal: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
     prodPrevista: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
-    gleba: yup.string().required("Campo de preenchimento obrigatório"),
+    gleba: yup.array().min(1, "Selecione ao menos uma gleba").required("Campo de preenchimento obrigatório"),  
+    safraName:yup.string().required("Campo de preenchimento obrigatório"),
 });
 export default SafrasForm;

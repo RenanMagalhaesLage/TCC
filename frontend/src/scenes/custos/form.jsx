@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Button, TextField, Typography, useTheme, Autocomplete, useMediaQuery } from "@mui/material";
+import React, { useState, useEffect, useCallback  } from 'react';
+import { Box, Button, TextField, Typography, useTheme, Autocomplete, useMediaQuery,IconButton } from "@mui/material";
+import InfoIcon from '@mui/icons-material/Info';
 import { useNavigate,useParams } from 'react-router-dom';
 import { Formik } from "formik";
 import { tokens } from "../../theme";
@@ -15,6 +16,7 @@ const CustosForm = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const [gleba,setGleba] = useState(null);
   const [safraOptions, setSafraOptions] = useState([]);
+  const [glebaOptions, setGlebaOptions] = useState([]);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const { id } = useParams(); 
@@ -25,7 +27,7 @@ const CustosForm = () => {
     { name: "quantity", label: "Quantidade", type: "number" },
     //{ name: "price", label: "Preço", type: "number" },
     //{ name: "totalValue", label: "Valor total", type: "number", disabled: true },
-    { name: "date", label: "Data", type: "date" },
+    { name: "date", label: "Data de Validade", type: "date" },
   ];
 
   const categoryOptions = [
@@ -48,23 +50,21 @@ const CustosForm = () => {
     if (userData && userData.email) {
       const fetchCustosData = async () => {
         try {
-            const response = await axios.get(`http://localhost:3000/user`, {
+            const response = await axios.get(`http://localhost:3000/safras-by-user`, {
               params: { email: userData.email }
             });
-            const safraData = response.data.flatMap(property =>
-              property.glebas.flatMap(gleba =>
-                  gleba.safras.map(safra => ({
-                      id: safra.id,
-                      name: `Safra ${safra.dataFimColheita} - ${safra.dataFimColheita} `
-                  }))
-              ) 
-            );
+            const safraData = response.data
+            .filter(safra => safra.status === false)
+            .map(safra => ({
+              id: safra.id,
+              name: `${safra.name} - ${safra.cultivo}`
+            }));
             setSafraOptions(safraData);
 
             if(id){
               const fetchSafraData = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:3000/gleba/${id}`);
+                    const response = await axios.get(`http://localhost:3000/glebas/${id}`);
                     const { gleba, propriedade, owner } = response.data;
                     setPropertie(propriedade);
                     setLoading(false); 
@@ -100,6 +100,7 @@ const CustosForm = () => {
     date: "",
     note: "",
     safra: "",
+    gleba: ""
   };  
 
   const NumericFormatCustom = React.forwardRef(function NumericFormatCustom(props, ref) {
@@ -123,22 +124,39 @@ const CustosForm = () => {
       />
     );
   });
+
+  const fetchGlebaData = useCallback(async (safraId) => {
+    try {
+      const response = await axios.get(`http://localhost:3000/glebas-by-safra`, {
+        params: { id: safraId }
+      });
+      const glebaData = response.data.map(gleba => ({
+        id: gleba.id,
+        name: `${gleba.name} - ${gleba.property.name}`
+      }));
+      setGlebaOptions(response.data);
+    } catch (error) {
+      console.error('Erro ao buscar dados da safra:', error);
+    }
+  }, []);
   
 
   const navigate = useNavigate(); 
   const handleFormSubmit = async (values) => {
+    console.log(values);
     try {
       const response = await axios.post("http://localhost:3000/custos", {
         email: userData.email,
         safraId: values.safra,
+        glebaId: values.gleba,
         name: values.name,
         category: values.category,
         unit: values.unit,
         quantity: values.quantity,
         price: values.price,
         totalValue: values.totalValue,
-        date: values.date,
-        note: values.note
+        date: values.date || null,
+        note: values.note || null,
       });
       if (response.status === 201) {  
         navigate(`/custos?message=${encodeURIComponent("1")}`);
@@ -156,6 +174,12 @@ const CustosForm = () => {
   return (
     <Box m="20px">
       <Header title="Adicionar Custo" subtitle="Preencha os campos para que seja cadastrado um custo" />
+      <Typography variant="body1" sx={{ mb: "20px", color: theme.palette.mode === 'dark' ? colors.primary[100] : colors.grey[600] }}>
+        <IconButton sx={{ p: 0, mr: 1 }}>
+          <InfoIcon fontSize="small" />
+        </IconButton>
+            Verifique o seu estoque antes de adicionar um custo.
+      </Typography>
       <Formik
         onSubmit={handleFormSubmit}
         initialValues={initialValues}
@@ -201,8 +225,15 @@ const CustosForm = () => {
                             ? safraOptions.find((option) => option.id === values.safra) 
                             : null
                       } 
-                      onChange={(event, value) => setFieldValue('safra', value?.id || null)} 
-                      onBlur={handleBlur} 
+                      onChange={(event, value) => {
+                        // Atualiza o valor no Formik
+                        setFieldValue('safra', value?.id || null);
+                
+                        // Chama a função para buscar dados no backend
+                        if (value) {
+                          fetchGlebaData(value.id); // Passa o id da safra selecionada
+                        }
+                      }}                      onBlur={handleBlur} 
                       sx={{ gridColumn: "span 2" }}
                       renderInput={(params) => (
                           <TextField 
@@ -217,6 +248,33 @@ const CustosForm = () => {
                       )}
                   />
                 )}
+
+                <Autocomplete
+                      disablePortal
+                      id="glebas"
+                      options={glebaOptions} 
+                      getOptionLabel={(option) => option.name || ""} 
+                      name="gleba"
+                      value={
+                          values.gleba 
+                            ? glebaOptions.find((option) => option.id === values.gleba) 
+                            : null
+                      } 
+                      onChange={(event, value) => setFieldValue('gleba', value?.id || null)} 
+                      onBlur={handleBlur} 
+                      sx={{ gridColumn: "span 2" }}
+                      renderInput={(params) => (
+                          <TextField 
+                              {...params} 
+                              label="Gleba"
+                              variant="filled"
+                              name="gleba"
+                              error={!!touched.gleba && !!errors.gleba}
+                              helperText={touched.gleba && errors.gleba}
+                              onBlur={handleBlur} 
+                          />
+                      )}
+                  />
                 <TextField
                     fullWidth
                     variant="filled"
@@ -354,13 +412,13 @@ const CustosForm = () => {
               <Button 
                     type="submit"
                     sx={{ 
-                            backgroundColor: colors.mygreen[400],
-                            color: colors.grey[100],
-                            fontSize: "12px",
-                            fontWeight: "bold",
-                            "&:hover": {
-                                    backgroundColor: colors.grey[700], 
-                                },
+                        backgroundColor: colors.mygreen[400],
+                        color: colors.grey[100],
+                        fontSize: "12px",
+                        fontWeight: "bold",
+                          "&:hover": {
+                              backgroundColor: colors.grey[700], 
+                          },
                     }} 
                     variant="contained">
                 Adicionar
@@ -380,14 +438,16 @@ const CustosForm = () => {
 
 
 const checkoutSchema = yup.object().shape({
-    name: yup.string().required("Campo de preenchimento obrigatório"),
-    category: yup.string().required("Campo de preenchimento obrigatório"),
-    unit: yup.string().required("Campo de preenchimento obrigatório"),
-    quantity: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
-    price: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
-    totalValue: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
-    date: yup.date().required("Campo de preenchimento obrigatório").typeError("Deve ser uma data válida"),
-    note: yup.string().required("Campo de preenchimento obrigatório"),
-    safra: yup.string().required("Campo de preenchimento obrigatório"),
+  name: yup.string().required("Campo de preenchimento obrigatório"),
+  category: yup.string().required("Campo de preenchimento obrigatório"),
+  unit: yup.string().required("Campo de preenchimento obrigatório"),
+  quantity: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+  price: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+  totalValue: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+  //date: yup.date().required("Campo de preenchimento obrigatório").typeError("Deve ser uma data válida"),
+  date: yup.date(),  
+  note: yup.string(),
+  safra: yup.string().required("Campo de preenchimento obrigatório"),
+  gleba: yup.string().required("Campo de preenchimento obrigatório"),
 });
 export default CustosForm;

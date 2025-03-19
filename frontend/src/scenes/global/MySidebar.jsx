@@ -75,7 +75,7 @@ const Sidebar = ({ onLogout }) => {
       setSelected('Safras')
     }else if(location.pathname.startsWith('/custos')){
       setSelected('Custos')
-    }else if(location.pathname.startsWith('/storage')){
+    }else if(location.pathname.startsWith('/estoque')){
       setSelected('Estoque')
     }
   }, [location.pathname]);
@@ -195,7 +195,7 @@ const Sidebar = ({ onLogout }) => {
             />
             <Item
               title="Estoque"
-              to="/storage"
+              to="/estoque"
               icon={<GiteIcon/>}
               selected={selected}
               setSelected={setSelected}

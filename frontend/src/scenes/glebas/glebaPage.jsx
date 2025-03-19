@@ -36,7 +36,7 @@ const Gleba = () => {
         if (userData && userData.email) { 
             const fetchGlebas = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:3000/gleba/${id}`);
+                    const response = await axios.get(`http://localhost:3000/glebas/${id}`);
                     const gleba = response.data;
                     const safras = gleba.safras;
                     setGleba(gleba);

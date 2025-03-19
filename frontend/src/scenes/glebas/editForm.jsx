@@ -33,7 +33,7 @@ const GlebasEditForm = () => {
     if (userData && userData.email) {
         const fetchPropertyData = async () => {
             try {
-                const response = await axios.get(`http://localhost:3000/gleba/${id}`);
+                const response = await axios.get(`http://localhost:3000/glebas/${id}`);
                 const { gleba, property, owner } = response.data;
                 setGleba(gleba);
                 setProperty(property);

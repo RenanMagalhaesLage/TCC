@@ -122,7 +122,7 @@ const StorageForm = () => {
         note: values.note || null
       });
       if (response.status === 201) {  
-        navigate(`/storage?message=${encodeURIComponent("1")}`);
+        navigate(`/estoque?message=${encodeURIComponent("1")}`);
       }
       
     } catch (error) {
@@ -364,15 +364,15 @@ const StorageForm = () => {
 
 
 const checkoutSchema = yup.object().shape({
-    name: yup.string().required("Campo de preenchimento obrigatório"),
-    category: yup.string().required("Campo de preenchimento obrigatório"),
-    unit: yup.string().required("Campo de preenchimento obrigatório"),
-    quantity: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
-    price: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
-    totalValue: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
-    date: yup.date(),
-    note: yup.string(),
-    property: yup.string().required("Campo de preenchimento obrigatório"),
-    storedLocation: yup.string(),
+  name: yup.string().required("Campo de preenchimento obrigatório"),
+  category: yup.string().required("Campo de preenchimento obrigatório"),
+  unit: yup.string().required("Campo de preenchimento obrigatório"),
+  quantity: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+  price: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+  totalValue: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+  date: yup.date(),
+  note: yup.string(),
+  property: yup.string().required("Campo de preenchimento obrigatório"),
+  storedLocation: yup.string(),
 });
 export default StorageForm;

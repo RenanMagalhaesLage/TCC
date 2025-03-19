@@ -440,98 +440,204 @@ export const mockLineData = [
     id: "Corretivos e Fertilizantes",
     color: tokens("dark").purpleAccent[400],
     data: [
-      { x: "Gleba A", y: 130000 },
-      { x: "Gleba B", y: 200000 },
-      { x: "Gleba C", y: 90000 },
-      { x: "Gleba D", y: 140000 },
-      { x: "Gleba E", y: 180000 },
-      { x: "Gleba F", y: 110000 },
-      { x: "Gleba G", y: 50000 },
-      { x: "Gleba H", y: 160000 },
-      { x: "Gleba I", y: 210000 },
-      { x: "Gleba J", y: 30000 },
+      { x: "Gleba A", y: 1300 },
+      { x: "Gleba B", y: 2000 },
+      { x: "Gleba C", y: 900 },
+      { x: "Gleba D", y: 1400 },
+      { x: "Gleba E", y: 1800 },
+      { x: "Gleba F", y: 1100 },
+      { x: "Gleba G", y: 500 },
+      { x: "Gleba H", y: 1600 },
+      { x: "Gleba I", y: 2100 },
+      { x: "Gleba J", y: 300 },
     ],
   },
   {
     id: "Administrativo",
     color: tokens("dark").greenAccent[500],
     data: [
-      { x: "Gleba A", y: 101000 },
-      { x: "Gleba B", y: 75000 },
-      { x: "Gleba C", y: 36000 },
-      { x: "Gleba D", y: 216000 },
-      { x: "Gleba E", y: 35000 },
-      { x: "Gleba F", y: 236000 },
-      { x: "Gleba G", y: 88000 },
-      { x: "Gleba H", y: 232000 },
-      { x: "Gleba I", y: 281000 },
-      { x: "Gleba J", y: 1000 },
+      { x: "Gleba A", y: 1010 },
+      { x: "Gleba B", y: 750 },
+      { x: "Gleba C", y: 360 },
+      { x: "Gleba D", y: 2160 },
+      { x: "Gleba E", y: 350 },
+      { x: "Gleba F", y: 2360 },
+      { x: "Gleba G", y: 880 },
+      { x: "Gleba H", y: 2320 },
+      { x: "Gleba I", y: 2810 },
+      { x: "Gleba J", y: 100},
     ],
   },
   {
     id: "Arrendamento",
     color: tokens("dark").blueAccent[300],
     data: [
-      { x: "Gleba A", y: 212000 },
-      { x: "Gleba B", y: 190000 },
-      { x: "Gleba C", y: 270000 },
-      { x: "Gleba D", y: 9000 },
-      { x: "Gleba E", y: 75000 },
-      { x: "Gleba F", y: 175000 },
-      { x: "Gleba G", y: 33000 },
-      { x: "Gleba H", y: 189000 },
-      { x: "Gleba I", y: 97000 },
-      { x: "Gleba J", y: 87000 },
+      { x: "Gleba A", y: 2120 },
+      { x: "Gleba B", y: 1900 },
+      { x: "Gleba C", y: 2700 },
+      { x: "Gleba D", y: 90 },
+      { x: "Gleba E", y: 750 },
+      { x: "Gleba F", y: 1750 },
+      { x: "Gleba G", y: 330 },
+      { x: "Gleba H", y: 1890 },
+      { x: "Gleba I", y: 970 },
+      { x: "Gleba J", y: 870 },
     ],
   },
   {
     id: "Semente",
     color: tokens("dark").redAccent[200],
     data: [
-      { x: "Gleba A", y: 191000 },
-      { x: "Gleba B", y: 136000 },
-      { x: "Gleba C", y: 91000 },
-      { x: "Gleba D", y: 190000 },
-      { x: "Gleba E", y: 211000 },
-      { x: "Gleba F", y: 152000 },
-      { x: "Gleba G", y: 189000 },
-      { x: "Gleba H", y: 152000 },
+      { x: "Gleba A", y: 1910 },
+      { x: "Gleba B", y: 1360 },
+      { x: "Gleba C", y: 910 },
+      { x: "Gleba D", y: 1900 },
+      { x: "Gleba E", y: 2110 },
+      { x: "Gleba F", y: 15 },
+      { x: "Gleba G", y: 1890 },
+      { x: "Gleba H", y: 1520 },
       { x: "Gleba I", y: 8000 },
-      { x: "Gleba J", y: 197000 },
+      { x: "Gleba J", y: 1970 },
     ],
   },
   {
     id: "Defensivos",
     color: tokens("dark").orangeAccent[300],
     data: [
-      { x: "Gleba A", y: 50000 },
-      { x: "Gleba B", y: 90000 },
-      { x: "Gleba C", y: 130000 },
-      { x: "Gleba D", y: 110000 },
-      { x: "Gleba E", y: 140000 },
-      { x: "Gleba F", y: 170000 },
-      { x: "Gleba G", y: 100000 },
-      { x: "Gleba H", y: 180000 },
-      { x: "Gleba I", y: 90000 },
-      { x: "Gleba J", y: 120000 },
+      { x: "Gleba A", y: 500 },
+      { x: "Gleba B", y: 900 },
+      { x: "Gleba C", y: 1300 },
+      { x: "Gleba D", y: 1100 },
+      { x: "Gleba E", y: 1400 },
+      { x: "Gleba F", y: 1700 },
+      { x: "Gleba G", y: 1000 },
+      { x: "Gleba H", y: 1800 },
+      { x: "Gleba I", y: 900 },
+      { x: "Gleba J", y: 1200 },
     ],
   },
   {
     id: "Operações",
     color: tokens("dark").yellowAccent[200],
     data: [
-      { x: "Gleba A", y: 180000 },
-      { x: "Gleba B", y: 160000 },
-      { x: "Gleba C", y: 100000 },
-      { x: "Gleba D", y: 130000 },
-      { x: "Gleba E", y: 120000 },
-      { x: "Gleba F", y: 140000 },
-      { x: "Gleba G", y: 80000 },
-      { x: "Gleba H", y: 170000 },
-      { x: "Gleba I", y: 190000 },
-      { x: "Gleba J", y: 150000 },
+      { x: "Gleba A", y: 1800 },
+      { x: "Gleba B", y: 1600 },
+      { x: "Gleba C", y: 1000 },
+      { x: "Gleba D", y: 1300 },
+      { x: "Gleba E", y: 120 },
+      { x: "Gleba F", y: 1400 },
+      { x: "Gleba G", y: 800 },
+      { x: "Gleba H", y: 1700 },
+      { x: "Gleba I", y: 1900 },
+      { x: "Gleba J", y: 1500 },
     ],
   },
+];
+
+export const mockLineData2= [
+  {
+      id: "Defensivos",
+      data: [
+        {
+          "x": "Gleba 1",
+          "y": 0
+      },
+          {
+              "x": "Gleba 2",
+              "y": 540
+          },
+          
+          {
+            "x": "Gleba 3",
+            "y": 1496
+        }
+      ]
+  },
+  {
+      id: "Operações",
+      data: [
+          {
+              "x": "Gleba 1",
+              "y": 7000
+          },
+          {
+              "x": "Gleba 2",
+              "y": 1200
+          },
+          {
+            "x": "Gleba 3",
+            "y": 145
+        }
+      ]
+  },
+  {
+      id: "Semente",
+      data: [
+          {
+            "x": "Gleba 1",
+            "y": 7000
+          },
+          {
+              "x": "Gleba 2",
+              "y": 20000
+          },
+          {
+            "x": "Gleba 3",
+            "y": 2456
+        }
+      ]
+  },
+  {
+      id: "Arrendamento",
+      data: [
+          {
+              "x": "Gleba 1",
+              "y": 50000
+          },
+          {
+            "x": "Gleba 2",
+            "y": 7000
+          },
+          {
+            "x": "Gleba 3",
+            "y": 3100
+        }
+      ]
+  },
+  {
+      id: "Administrativo",
+      data: [
+          {
+              "x": "Gleba 2",
+              "y": 8000
+          },
+          {
+              "x": "Gleba 1",
+              "y": 17105
+          },
+          {
+            "x": "Gleba 3",
+            "y": 3100
+        }
+      ]
+  },
+  {
+      id: "Corretivos e Fertilizantes",
+      data: [
+          {
+              "x": "Gleba 1",
+              "y": 1200
+          },
+          {
+              "x": "Gleba 2",
+              "y": 3100
+          },
+          {
+            "x": "Gleba 3",
+            "y": 500
+        }
+      ]
+  }
 ];
 
 

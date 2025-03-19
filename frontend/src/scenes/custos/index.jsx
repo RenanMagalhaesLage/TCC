@@ -87,7 +87,7 @@ const Custos = () => {
         { field: "quantity", headerName: "Quantidade", flex: 1, resizable: false },
         { field: "price", headerName: "Preço", flex: 1,  resizable: false },
         { field: "totalValue", headerName: "Valor Total", flex: 1,  resizable: false },
-        { field: "date", headerName: "Data", flex: 1, resizable: false },
+        { field: "expirationDate", headerName: "Data de Validade", flex: 1, resizable: false },
         { field: "note", headerName: "Observação", flex: 1, resizable: false },
         {
             field: "actions",
@@ -150,30 +150,13 @@ const Custos = () => {
         if (userData && userData.email) { 
             const fetchCustosData = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:3000/user`, {
+                    const response = await axios.get(`http://localhost:3000/custos-by-user`, {
                         params: { email: userData.email }
                     });
-                    const linhasDaTabela = response.data.flatMap(fazenda => {
-                        return fazenda.glebas.flatMap(gleba => { 
-                            return gleba.safras.flatMap(safra => {  
-                                return safra.custos.map(custo => ({
-                                    id: custo.id,
-                                    type: custo.type,
-                                    status: custo.status,
-                                    category: custo.category,
-                                    name: custo.name,
-                                    unit: custo.unit,
-                                    quantity: custo.quantity,
-                                    price: custo.price,
-                                    totalValue: custo.totalValue,
-                                    date: custo.date,
-                                    note: custo.note,
-                                }))
-                            });
-                        });
-                    });
+                    const custos = response.data.filter(custo => custo.status === false);
 
-                    setCustosData(linhasDaTabela);                      
+
+                    setCustosData(custos);                      
 
                     
                 } catch (error) {
@@ -308,11 +291,20 @@ export default Custos;
 
 
 function CustomToolbar() {
+    const theme = useTheme();
+    const colors = theme.palette.mode;
     return (
-      <GridToolbarContainer>
-        <GridToolbarColumnsButton /> {/* Botão de exibição de colunas */}
-        <GridToolbarFilterButton />  {/* Botão de filtro */}
-        <GridToolbarDensitySelector /> {/* Seletor de densidade */}
+      <GridToolbarContainer >
+        <Box sx={{
+            '& .MuiButton-root': { 
+              color: colors === 'dark' ?'#f2f0f0' :  "#1F2A40" , 
+            },
+            display: 'flex',
+          }}>
+          <GridToolbarColumnsButton  /> 
+          <GridToolbarFilterButton /> 
+          <GridToolbarDensitySelector  /> 
+        </Box>
       </GridToolbarContainer>
     );
-}
+};

@@ -277,14 +277,23 @@ const Properties = () => {
     );
 };
 
+export default Properties;
+
 function CustomToolbar() {
+    const theme = useTheme();
+    const colors = theme.palette.mode;
     return (
-      <GridToolbarContainer>
-        <GridToolbarColumnsButton /> {/* Botão de exibição de colunas */}
-        <GridToolbarFilterButton />  {/* Botão de filtro */}
-        <GridToolbarDensitySelector /> {/* Seletor de densidade */}
+      <GridToolbarContainer >
+        <Box sx={{
+            '& .MuiButton-root': { 
+              color: colors === 'dark' ?'#f2f0f0' :  "#1F2A40" , 
+            },
+            display: 'flex',
+          }}>
+          <GridToolbarColumnsButton  /> 
+          <GridToolbarFilterButton /> 
+          <GridToolbarDensitySelector  /> 
+        </Box>
       </GridToolbarContainer>
     );
-}
-
-export default Properties;
+};

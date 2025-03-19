@@ -164,7 +164,6 @@ const SafrasPage = () => {
             resizable: false,
             renderCell: (params) => {
                 const access = params.row.property.users[0].user_properties.access;
-                console.log(access);
                 return (
                     <Box
                         width="60%"
@@ -424,6 +423,14 @@ const SafrasPage = () => {
                             <Box display="flex" flexDirection="column" alignItems="flex-start" >
                                 <Box display="flex" alignItems="center" >
                                     <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
+                                    Nome da Safra:
+                                    </Typography>
+                                    <Typography variant="body1" color={colors.grey[300]}>
+                                    {safra.name}
+                                    </Typography>
+                                </Box>
+                                <Box display="flex" alignItems="center" >
+                                    <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
                                     Nome do Proprietário:
                                     </Typography>
                                     <Typography variant="body1" color={colors.grey[300]}>
@@ -439,7 +446,7 @@ const SafrasPage = () => {
                                     Área da Safra:
                                     </Typography>
                                     <Typography variant="body1" color={colors.grey[300]}>
-                                    
+                                    {safra.areaTotal}
                                     </Typography>
                                 </Box>
                             </Box>   
@@ -684,7 +691,7 @@ const SafrasPage = () => {
                             alignItems="center"
                             justifyContent="center"
                             minHeight="475px"
-                            mt={isMobile ? "670px": "120px"}
+                            mt={isMobile ? "500px": "120px"}
                         >
                             {glebas.length === 0 ? (
                                 <Box
@@ -708,7 +715,7 @@ const SafrasPage = () => {
                                         onClick={() => handleAdd()}
                                     >
                                         <AddCircleOutlineIcon sx={{ mr: "10px" }} />
-                                        {("Adicionar Custo")}
+                                        {("Adicionar Gleba")}
                                     </Button>
                                 </Box>
                             ):(
@@ -727,7 +734,7 @@ const SafrasPage = () => {
                             alignItems="center"  
                             justifyContent="left"  
                             height="50px"
-                            mt={isMobile ? "770px": "440px"}
+                            mt={isMobile ? "820px": "440px"}
                         >
                             <Typography variant="h4" fontWeight="bold" color={colors.grey[100]}>
                                 Custos Planejados da Safra
@@ -739,7 +746,7 @@ const SafrasPage = () => {
                             alignItems="center"
                             justifyContent="center"
                             minHeight="475px"
-                            mt={isMobile ? "670px": "340px"}
+                            mt={isMobile ? "715px": "340px"}
                         >
                             {custosPlanejados.length === 0 ? (
                                 <Box
@@ -783,7 +790,7 @@ const SafrasPage = () => {
                             alignItems="center"  
                             justifyContent="left"  
                             height="50px"
-                            mt={isMobile ? "990px": "660px"}
+                            mt={isMobile ? "1030px": "660px"}
                         >
                             <Typography variant="h4" fontWeight="bold" color={colors.grey[100]}>
                                 Custos Realizados da Safra
@@ -795,7 +802,7 @@ const SafrasPage = () => {
                             alignItems="center"
                             justifyContent="center"
                             minHeight="475px"
-                            mt={isMobile ? "895px": "560px"}
+                            mt={isMobile ? "925px": "560px"}
                         >
                             {custosRealizados.length === 0 ? (
                                 <Box

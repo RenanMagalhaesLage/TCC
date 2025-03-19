@@ -37,9 +37,9 @@ const Custo = connection.define('custos',{
         type: Sequelize.DOUBLE,
         allowNull: false
     },
-    date: { //Realizar a viabilidade desse campo
+    expirationDate: { 
         type: Sequelize.DATEONLY,
-        allowNull: false,
+        allowNull: true,
         defaultValue: Sequelize.NOW
     },
     note: {

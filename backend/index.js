@@ -91,6 +91,20 @@ Custo.belongsTo(Safra,{
     onUpdate: 'CASCADE' 
 });
 
+Gleba.hasMany(Custo,{
+    foreignKey: 'glebaId',
+    as: 'custos',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE' 
+});
+
+Custo.belongsTo(Gleba,{
+    foreignKey: 'glebaId',
+    as: 'gleba',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE' 
+});
+
 Invite.belongsTo(Property, {
     foreignKey: 'propertyId', 
     onDelete: 'CASCADE',
@@ -325,7 +339,7 @@ app.get('/properties/:id', async (req, res) => {
 
 });
 
-/* Rota para --> CADASTRAR DE PROPRIEDADE */
+/* Rota para --> CADASTRAR PROPRIEDADE */
 app.post('/propriedades', async (req, res) => {
     try {
         const { name, city, area, email } = req.body;
@@ -423,7 +437,7 @@ app.delete('/propriedades/:id', async(req,res) =>{
 --------------------------*/
 
 /*  Rota para --> BUSCAR GLEBA */
-app.get('/gleba/:id', async (req, res) => {
+app.get('/glebas/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -457,7 +471,110 @@ app.get('/gleba/:id', async (req, res) => {
     }
 });
 
-/* Rota para --> CADASTRAR DE GLEBA*/
+/*  Rota para --> BUSCAR GLEBAS DISPONÍVEIS PARA SAFRA */
+app.get('/glebas-available', async (req, res) => {
+    const { email }  = req.query;
+
+    try {
+        const user = await User.findOne({ where: { email: email } });
+        if (!user) {
+            return res.status(404).json({ error: 'Usuário não encontrado' });
+        }
+
+        const userProperties = await UserProperty.findAll({
+            where: { userId: user.id },
+            attributes: ['propertyId', 'access']
+        });
+        
+        const propertyIds = userProperties.map(up => up.propertyId);
+        const access = userProperties.map(up => up.access);
+
+        const properties  = await Property.findAll({
+            where: {
+                id: propertyIds
+            },
+            include: {
+                model: Gleba, as: 'glebas', 
+                attributes: ['id'],  
+            }
+        });
+
+        const glebaIds = properties.flatMap(property =>
+            property.glebas.map(gleba => gleba.id)
+        );
+
+        const glebasComStatus = await SafraGleba.findAll({
+            where: { 
+                glebaId: glebaIds
+            }
+        });
+        
+        const glebaIdsComStatusTrue = glebasComStatus
+            .filter(gleba => gleba.statusSafra === true) 
+            .map(gleba => gleba.glebaId); 
+        
+        const glebaIdsFiltrados = glebaIdsComStatusTrue.filter(glebaId => {
+            return !glebasComStatus.some(gleba => gleba.glebaId === glebaId && gleba.statusSafra === false);
+        });
+
+        const glebasRegistradas = await SafraGleba.findAll({
+            where: { glebaId: glebaIds }
+        });
+
+        const glebaIdsRegistradas = glebasRegistradas.map(gleba => gleba.glebaId);
+
+        const glebaIdsNaoRegistradas = glebaIds.filter(glebaId => !glebaIdsRegistradas.includes(glebaId));
+
+        const ids = [
+            ...glebaIdsFiltrados,       
+            ...glebaIdsNaoRegistradas      
+        ];
+
+        const result = await Gleba.findAll({
+            where: {
+                id: ids
+            },
+            include: {
+                model: Property, as: 'property'
+            }
+        })
+        return res.status(200).json(result);
+    } catch (error) {
+        console.error('Erro ao buscar gleba:', error);
+        return res.status(500).json({ error: 'Erro ao buscar gleba' });
+    }
+});
+
+/*  Rota para --> BUSCAR GLEBA PELA SAFRA*/
+app.get('/glebas-by-safra', async (req, res) => {
+    const { id }  = req.query;
+
+    try {
+        const safra = await Safra.findByPk(id);
+        if (!safra) {
+            return res.status(404).json({ error: 'Safra não encontrada' });
+        }
+        const result = await Safra.findOne({
+            where: { id: id},
+            include: [{
+                model: Gleba,
+                through: { model: SafraGleba },  
+                include: {
+                    model: Property,  
+                    as: 'property',  
+                },
+            }
+            ],
+        })
+
+        return res.status(200).json(result.glebas);
+    } catch (error) {
+        console.error('Erro ao buscar safra:', error);
+        return res.status(500).json({ error: 'Erro ao buscar safra' });
+    }
+});
+
+/* Rota para --> CADASTRAR GLEBA*/
 app.post('/glebas', async (req, res) => {
     try {
         const { name, propertyId, area, email } = req.body;
@@ -484,7 +601,7 @@ app.post('/glebas', async (req, res) => {
     }
 });
 
-/*  Rota para --> EDITAR DE GLEBAS */
+/*  Rota para --> EDITAR GLEBAS */
 app.put('/glebas/:id', async (req, res) => {
     try {
         const { name, area } = req.body;
@@ -505,7 +622,7 @@ app.put('/glebas/:id', async (req, res) => {
     }
 });
 
-/* Rota para --> REMOVER DE GLEBA */
+/* Rota para --> REMOVER GLEBA */
 app.delete('/glebas/:id', async(req,res) =>{
     try {
         const { id } = req.params;
@@ -533,6 +650,7 @@ app.delete('/glebas/:id', async(req,res) =>{
         res.status(500).json({ error: 'Erro no servidor.' });
     }
 });
+
 
 
 /*------------------------
@@ -578,10 +696,64 @@ app.get('/safras/:id', async (req, res) => {
     }
 });
 
+/*  Rota para --> BUSCAR SAFRA POR USER*/
+app.get('/safras-by-user', async (req, res) => {
+    const { email }  = req.query;
+
+    try {
+        const user = await User.findOne({ where: { email: email } });
+        if (!user) {
+            return res.status(404).json({ error: 'Usuário não encontrado' });
+        }
+
+        const userProperties = await UserProperty.findAll({
+            where: { userId: user.id },
+            attributes: ['propertyId', 'access']
+        });
+        
+        const propertyIds = userProperties.map(up => up.propertyId);
+        const access = userProperties.map(up => up.access);
+        
+        const properties  = await Property.findAll({
+            where: {
+                id: propertyIds
+            },
+            include: {
+                model: Gleba, as: 'glebas', 
+                attributes: ['id'],  
+
+            }
+        });
+
+        const glebaIds = properties.flatMap(property =>
+            property.glebas.map(gleba => gleba.id)
+        );
+
+        const safras = await SafraGleba.findAll({
+            where:{ glebaId: glebaIds }
+        })
+
+        const safraIds = [...new Set(safras.map(safra => safra.safraId))];
+        const result = await Safra.findAll({
+            where:{
+                id: safraIds
+            }
+        });
+
+        return res.status(200).json(result);
+
+    } catch (error) {
+        console.error('Erro ao buscar safra:', error);
+        return res.status(500).json({ error: 'Erro ao buscar safra' });
+    }
+});
+
 /* Rota para --> CADASTRAR SAFRAS*/
 app.post('/safras', async (req, res) => {
     try {
-        const { email, glebaId, 
+        const { email, 
+            glebaIds, 
+            safraName,
             cultivo, 
             semente,
             metroLinear,
@@ -596,9 +768,16 @@ app.post('/safras', async (req, res) => {
         } = req.body;
         const user = await User.findOne({ where: { email: email } });
 
+        const ids = glebaIds.map(id => Number(id));
+
+        const totalArea = await Gleba.sum('area', {
+            where: {
+              id: ids
+            }
+        });
 
         if (
-            !email || !glebaId || !cultivo || !semente || !metroLinear || !dosagem || !toneladas || 
+            !email || !glebaIds || !safraName || !cultivo || !semente || !metroLinear || !dosagem || !toneladas || 
             !adubo || !dataFimPlantio || !dataFimColheita || !tempoLavoura || !prodTotal || !prodPrevista
         ) {
             return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
@@ -606,6 +785,8 @@ app.post('/safras', async (req, res) => {
 
         const newSafra = await Safra.create({
             type: "Planejado",
+            name: safraName,
+            areaTotal: totalArea,
             status: false,
             cultivo: cultivo,
             semente: semente,
@@ -626,9 +807,17 @@ app.post('/safras', async (req, res) => {
             graosQuebrados: 0,   
             prodRealizada: 0,  
             porcentHect: 0,
-            glebaId: glebaId       
         });
 
+        if (glebaIds && glebaIds.length > 0) {
+            for (let glebaId of glebaIds) {
+                await SafraGleba.create({
+                    safraId: newSafra.id,   
+                    glebaId: glebaId, 
+                    statusSafra: newSafra.status    
+                });
+            }
+        }
 
         return res.status(201).json({ 
             safra: newSafra
@@ -749,8 +938,8 @@ app.get('/custos/:id', async (req, res) => {
                   model: Property,  
                   include: [{
                     model: User,  // Incluir os usuários relacionados à Property
-                    through: { model: UserProperty },  // Tabela intermediária UserProperty
-                    attributes: ['id', 'name'],  // Coloque os atributos que você deseja do User
+                    through: { model: UserProperty },  
+                    attributes: ['id', 'name'],  
                   }],
                   as: 'property',  
                 },
@@ -791,10 +980,64 @@ app.get('/custos/:id', async (req, res) => {
     }
 });
 
+/*  Rota para --> BUSCAR CUSTO POR USER*/
+app.get('/custos-by-user', async (req, res) => {
+    const { email }  = req.query;
+
+    try {
+        const user = await User.findOne({ where: { email: email } });
+        if (!user) {
+            return res.status(404).json({ error: 'Usuário não encontrado' });
+        }
+
+        const userProperties = await UserProperty.findAll({
+            where: { userId: user.id },
+            attributes: ['propertyId', 'access']
+        });
+        
+        const propertyIds = userProperties.map(up => up.propertyId);
+        const access = userProperties.map(up => up.access);
+        
+        const properties  = await Property.findAll({
+            where: {
+                id: propertyIds
+            },
+            include: {
+                model: Gleba, as: 'glebas', 
+                attributes: ['id'],  
+
+            }
+        });
+
+        const glebaIds = properties.flatMap(property =>
+            property.glebas.map(gleba => gleba.id)
+        );
+
+        const safras = await SafraGleba.findAll({
+            where:{ glebaId: glebaIds }
+        });
+
+        const safraIds = [...new Set(safras.map(safra => safra.safraId))];
+        const result = await Custo.findAll({
+            where:{
+                safraId: safraIds
+            }
+        });
+
+        return res.status(200).json(result);
+
+    } catch (error) {
+        console.error('Erro ao buscar safra:', error);
+        return res.status(500).json({ error: 'Erro ao buscar safra' });
+    }
+});
+
 /* Rota para --> CADASTRAR CUSTOS */
 app.post('/custos', async (req, res) => {
     try {
-        const { email, safraId, 
+        const { email, 
+            safraId, 
+            glebaId,
             name,
             category,
             unit,
@@ -804,11 +1047,9 @@ app.post('/custos', async (req, res) => {
             date,
             note
         } = req.body;
-        const user = await User.findOne({ where: { email: email } });
-
 
         if (
-            !email || !safraId || !name || !category || !unit || !quantity || !price || !totalValue || !date || !note
+            !email || !safraId || !glebaId || !name || !category || !unit || !quantity || !price || !totalValue 
         ) {
             return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
         }
@@ -823,9 +1064,10 @@ app.post('/custos', async (req, res) => {
             quantity: quantity,
             price: price,
             totalValue: totalValue,
-            date: date,
-            note: note,
-            safraId: safraId       
+            expirationDate: date ? date : null,
+            note: note ? note : null,
+            safraId: safraId,
+            glebaId: glebaId       
         });
 
 
@@ -962,9 +1204,11 @@ app.get('/storage/:id', async (req, res) => {
     }
 });
 
+/*  Rota para --> CADASTRAR ITEM ESTOQUE */
 app.post('/storage', async (req,res) => {
     try{
-        const { email, propertyId, 
+        const { email, 
+            propertyId, 
             storedLocation,
             name,
             category,
@@ -975,14 +1219,12 @@ app.post('/storage', async (req,res) => {
             date,
             note
         } = req.body;
-        const user = await User.findOne({ where: { email: email } });
     
         if (
             !email || !propertyId || !name || !category || !unit || !quantity || !price || !totalValue
         ) {
             return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
         }
-        const property = await Property.findByPk(propertyId)
     
         const result = await StorageItem.create({
             storedLocation: storedLocation? storedLocation : null,
@@ -1011,7 +1253,9 @@ app.post('/storage', async (req,res) => {
 /*------------------------
         ROTAS DASHBOARD 
 --------------------------*/
-app.get('/custoProjetado', async (req, res) => {
+
+/*  Rota para --> GRÁFICO DE PIZZA DE CUSTOS */
+app.get('/custos-pie-chart', async (req, res) => {
     const { safraId } = req.query;
 
     const safra = await Safra.findByPk(safraId);
@@ -1052,6 +1296,142 @@ app.get('/custoProjetado', async (req, res) => {
             };
         });
         return res.json(result);
+      } catch (error) {
+        console.error('Erro ao executar a consulta:', error);
+        res.status(500).json({ error: 'Erro ao acessar o banco de dados' });
+      }
+});
+
+/*  Rota para --> GRÁFICO DE LINHA DE CUSTOS POR GLEBA */
+app.get('/custos-glebas-line-chart', async (req, res) => {
+    const { safraId } = req.query;
+
+    const safra = await Safra.findByPk(safraId);
+        if (!safra) {
+            return res.status(404).json({ error: 'Safra não encontrado' });
+    }
+
+    //Somando custos por categoria
+    const query = `
+        SELECT 
+            sg.glebaId, 
+            c.category, 
+            IFNULL(SUM(custos.totalValue), 0) AS value
+        FROM 
+            (SELECT DISTINCT glebaId FROM safra_glebas WHERE safraId = :safraId) AS sg
+        CROSS JOIN 
+            (SELECT DISTINCT category FROM Custos) AS c
+        LEFT JOIN 
+            Custos AS custos
+        ON 
+            custos.glebaId = sg.glebaId 
+            AND custos.category = c.category 
+            AND custos.safraId = :safraId
+        GROUP BY 
+            sg.glebaId, c.category;
+    `;
+  
+    try {
+        const sumCustos = await connection.query(query, {
+          replacements: { safraId },  
+          type: QueryTypes.SELECT  
+        });
+
+        const categories = [
+            'Defensivos',
+            'Operações',
+            'Semente',
+            'Arrendamento',
+            'Administrativo',
+            'Corretivos e Fertilizantes'
+        ];
+         
+        const result = categories.map(category => {
+            // Encontrar todas as glebas que têm custos para a categoria específica
+            const categoryFound = sumCustos.filter(item => item.category === category);
+            
+            // Criar o objeto para cada categoria, contendo o nome da categoria e os valores somados por gleba
+            const data = categoryFound.map(item => ({
+                x: `Gleba ${item.glebaId}`, // Nome da gleba
+                y: item.value // Valor somado da gleba
+            }));
+    
+            return {
+                id: category,
+                data: data // Dados formatados por gleba
+            };
+        });
+
+        return res.json(result);
+      } catch (error) {
+        console.error('Erro ao executar a consulta:', error);
+        res.status(500).json({ error: 'Erro ao acessar o banco de dados' });
+      }
+});
+
+/*  Rota para --> GRÁFICO DE BARRA DE CUSTOS POR GLEBA */
+app.get('/custos-glebas-bar-chart', async (req, res) => {
+    const { safraId } = req.query;
+
+    const safra = await Safra.findByPk(safraId);
+        if (!safra) {
+            return res.status(404).json({ error: 'Safra não encontrado' });
+    }
+
+    //Somando custos por categoria
+    const query = `
+        SELECT 
+            sg.glebaId, 
+            c.category, 
+            IFNULL(SUM(custos.totalValue), 0) AS value
+        FROM 
+            (SELECT DISTINCT glebaId FROM safra_glebas WHERE safraId = :safraId) AS sg
+        CROSS JOIN 
+            (SELECT DISTINCT category FROM Custos) AS c
+        LEFT JOIN 
+            Custos AS custos
+        ON 
+            custos.glebaId = sg.glebaId 
+            AND custos.category = c.category 
+            AND custos.safraId = :safraId
+        GROUP BY 
+            sg.glebaId, c.category;
+    `;
+  
+    try {
+        const sumCustos = await connection.query(query, {
+          replacements: { safraId },  
+          type: QueryTypes.SELECT  
+        });
+
+        const categories = [
+            'Defensivos',
+            'Operações',
+            'Semente',
+            'Arrendamento',
+            'Administrativo',
+            'Corretivos e Fertilizantes'
+        ];
+         
+        const glebas = [...new Set(sumCustos.map(item => item.glebaId))];
+
+        // Criar o resultado no formato desejado
+        const result = glebas.map(glebaId => {
+            // Iniciar o objeto para a gleba
+            const glebaData = {
+                gleba: `Gleba ${glebaId}` // Nome da gleba
+            };
+    
+            // Para cada categoria, buscar o valor correspondente
+            categories.forEach(category => {
+                const categoryFound = sumCustos.find(item => item.glebaId === glebaId && item.category === category);
+                glebaData[category.toLowerCase()] = categoryFound ? categoryFound.value : 0; // Adicionar o valor ou 0 se não encontrado
+            });
+    
+            return glebaData; // Retorna o objeto da gleba com todas as categorias
+        });
+
+        return res.json(sumCustos);
       } catch (error) {
         console.error('Erro ao executar a consulta:', error);
         res.status(500).json({ error: 'Erro ao acessar o banco de dados' });
