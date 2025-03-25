@@ -62,6 +62,7 @@ VALUES
 INSERT INTO safra_glebas (statusSafra, safraId, glebaId, createdAt, updatedAt) VALUES
 (false,1, 1, NOW(), NOW()),  -- Safra 1 associada à Gleba 1
 (false,1, 2, NOW(), NOW()),  -- Safra 1 associada à Gleba 2
+(false,1, 7, NOW(), NOW()),  -- Safra 1 associada à Gleba 7
 (false,2, 3, NOW(), NOW()),  -- Safra 2 associada à Gleba 1
 (false,2, 4, NOW(), NOW()),  -- Safra 2 associada à Gleba 3
 (false,3, 5, NOW(), NOW()),  -- Safra 3 associada à Gleba 2

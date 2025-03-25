@@ -1,18 +1,22 @@
 import React, { useState } from 'react';
-import { Grid, Paper, Avatar, Typography } from '@mui/material';
+import { Grid, Paper, Avatar, Typography, useTheme, useMediaQuery} from '@mui/material';
 import AgricultureIcon from '@mui/icons-material/Agriculture';
 import { GoogleLogin } from '@react-oauth/google';
 import axios from 'axios'; 
 axios.defaults.baseURL = 'http://localhost:3000'; // URL do seu backend
 import secureLocalStorage from 'react-secure-storage';
-
-
+import { tokens } from "../../theme";
 
 const Login = ({ onLogin }) => { 
+    const theme = useTheme();
+    const colors = tokens(theme.palette.mode);
+
+    const isMobile = useMediaQuery("(max-width: 800px)");
+    
     const paperStyle = {
         padding: 20,
         height: '55vh',
-        width: 450,
+        width: isMobile ? 300 : 450,
         margin: '20px auto',
         display: 'flex',
         flexDirection: 'column',
@@ -23,7 +27,7 @@ const Login = ({ onLogin }) => {
     };
 
     const avatarStyle = {
-        backgroundColor: '#4caf50',
+        backgroundColor: colors.mygreen[600],
         marginBottom: '30px',
         width: 100,
         height: 100,
@@ -95,7 +99,6 @@ const Login = ({ onLogin }) => {
                     <GoogleLogin
                         onSuccess={handleLoginSuccess} // Atualizado para a nova função
                         onError={handleLoginError}
-
                     />
                 </Paper>
             </Grid>

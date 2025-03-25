@@ -243,17 +243,16 @@ const SafrasForm = () => {
               <Autocomplete
                 disablePortal
                 id="glebas"
-                multiple // Permite a seleção de múltiplas opções
+                multiple 
                 options={glebaOptions}
                 getOptionLabel={(option) => option.name || ""}
                 name="gleba"
                 value={
                   values.gleba && values.gleba.length > 0
-                    ? glebaOptions.filter((option) => values.gleba.includes(option.id)) // Filtra as opções selecionadas com base nos IDs
+                    ? glebaOptions.filter((option) => values.gleba.includes(option.id)) 
                     : []
                 }
                 onChange={(event, newValue) => {
-                  // Atualiza os valores selecionados, salvando os IDs das opções selecionadas
                   setFieldValue('gleba', newValue.map((option) => option.id));
                 }}
                 onBlur={handleBlur}

@@ -339,6 +339,61 @@ app.get('/properties/:id', async (req, res) => {
 
 });
 
+/* Rota para --> BUSCAR PROPRIEDADES POR SAFRA */
+app.get('/properties-by-safra', async (req, res) => {
+    const { id }  = req.query;
+
+    try {
+        const safra = await Safra.findByPk(id);
+        if (!safra) {
+            return res.status(404).json({ error: 'Safra não encontrada' });
+        }
+        const result = await Safra.findOne({
+            where: { id: id },
+            include: [{
+              model: Gleba,
+              through: { model: SafraGleba },
+              include: [{
+                model: Property,
+                as: 'property',
+                required: true
+              }]
+            }]
+        });
+        console.log(result.glebas.length);
+
+        if (result && result.glebas && result.glebas.length > 0) {
+            // Extrai o id e name das propriedades associadas
+            const properties = result.glebas.map(gleba => {
+              const property = gleba.property;
+              return {
+                id: property.id,       // id da propriedade
+                name: property.name    // nome da propriedade
+              };
+            });
+          
+            // Verifica se os ids são diferentes, removendo os duplicados
+            const uniqueProperties = [];
+            const seenIds = new Set();
+          
+            properties.forEach(property => {
+              if (!seenIds.has(property.id)) {
+                seenIds.add(property.id); // Adiciona o id ao Set para garantir unicidade
+                uniqueProperties.push(property); // Adiciona a propriedade ao array de resultados
+              }
+            });
+          
+            // Retorna as propriedades com ids únicos
+            return res.status(200).json(uniqueProperties);
+        } else {
+            return res.status(404).json({ message: 'Nenhuma gleba associada encontrada.' });
+        }
+    } catch (error) {
+        console.error('Erro ao buscar propriedades:', error);
+        return res.status(500).json({ error: 'Erro ao buscar propriedades' });
+    }
+});
+
 /* Rota para --> CADASTRAR PROPRIEDADE */
 app.post('/propriedades', async (req, res) => {
     try {
@@ -431,6 +486,8 @@ app.delete('/propriedades/:id', async(req,res) =>{
         res.status(500).json({ error: 'Erro no servidor.' });
     }
 });
+
+
 
 /*------------------------
         ROTAS GLEBAS
@@ -1431,7 +1488,61 @@ app.get('/custos-glebas-bar-chart', async (req, res) => {
             return glebaData; // Retorna o objeto da gleba com todas as categorias
         });
 
-        return res.json(sumCustos);
+        return res.json(result);
+      } catch (error) {
+        console.error('Erro ao executar a consulta:', error);
+        res.status(500).json({ error: 'Erro ao acessar o banco de dados' });
+      }
+});
+
+/* Rota para --> GRÁFICO DE BARRA DE CUSTO MÉDIO POR HECTARE POR GLEBA */
+app.get('/custos-hectares-glebas-bar-chart', async (req, res) => {
+    const { safraId } = req.query;
+
+    const safra = await Safra.findByPk(safraId);
+        if (!safra) {
+            return res.status(404).json({ error: 'Safra não encontrado' });
+    }
+
+    //Somando custos por categoria
+    const query = `
+        SELECT 
+            sg.glebaId,  
+            IFNULL(SUM(custos.totalValue), 0) AS value
+        FROM 
+            (SELECT DISTINCT glebaId FROM safra_glebas WHERE safraId = 1) AS sg
+        LEFT JOIN 
+            Custos AS custos
+        ON 
+            custos.glebaId = sg.glebaId 
+            AND custos.safraId = 1
+        GROUP BY 
+            sg.glebaId;
+    `;
+  
+    try {
+        const sumCustos = await connection.query(query, {
+          replacements: { safraId },  
+          type: QueryTypes.SELECT  
+        });
+         
+        const glebas = [...new Set(sumCustos.map(item => item.glebaId))];
+
+        const result = glebas.map(glebaId => {
+            const glebaData = {
+                gleba: `Gleba ${glebaId}` 
+            };
+
+            sumCustos.forEach(item => {
+                if (item.glebaId === glebaId) {
+                    glebaData["custo"] = item.value; 
+                }
+            });
+    
+            return glebaData; 
+        });
+
+        return res.json(result);
       } catch (error) {
         console.error('Erro ao executar a consulta:', error);
         res.status(500).json({ error: 'Erro ao acessar o banco de dados' });

@@ -5,7 +5,7 @@ import PieChart from "../../components/PieChart";
 const Pie = () => {
   return (
     <Box m="20px">
-      <Header title="Gráfico de Pizza de Custos" subtitle="Este gráfico apresenta a composição dos principais custos envolvidos nas operações da fazenda. Ele ajuda a visualizar como cada categoria de custo contribui para o total das despesas." />
+      <Header title="Gráfico de Pizza de Custos" subtitle="" />
       <Box height="75vh">
         <PieChart isDashboard={false}/>
       </Box>

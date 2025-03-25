@@ -9,7 +9,8 @@ import Team from "./scenes/team";
 import Contacts from "./scenes/contacts";
 import Form from "./scenes/form";
 import FAQ from "./scenes/faq";
-import Bar from "./scenes/bar";
+import BarHectares from "./scenes/bar/indexHectares";
+import BarCategory from "./scenes/bar/indexCategory";
 import Pie from "./scenes/pie";
 import Line from "./scenes/line";
 import Login from './scenes/login';
@@ -67,8 +68,9 @@ function App() {
                   <Route path="/team" element={<Team />} />
                   <Route path="/contacts" element={<Contacts />} />
                   <Route path="/form" element={<Form />} />
-                  <Route path="/bar" element={<Bar />} />
-                  <Route path="/pie" element={<Pie />} />
+                  <Route path="/grafico-barra-category/:id" element={<BarCategory />} />
+                  <Route path="/grafico-barra-hectares/:id" element={<BarHectares />} />
+                  <Route path="/grafico-pizza" element={<Pie />} />
                   <Route path="/line" element={<Line />} />
                   <Route path="/faq" element={<FAQ />} />
                   <Route path="/propriedades" element={<Properties />} />
@@ -89,9 +91,9 @@ function App() {
                   <Route path="/custos/:id" element={<CustosPage />} />
                   <Route path="/custos/add" element={<CustosForm />} />
                   <Route path="/custos/edit/:id" element={<CustosEditPage />} />
-                  <Route path="/history" element={<SafrasHistory />} />
-                  <Route path="/invites" element={<Invite />} />
-                  <Route path="/invites/add" element={<InvitesForm />} />
+                  <Route path="/historico-safras" element={<SafrasHistory />} />
+                  <Route path="/convites" element={<Invite />} />
+                  <Route path="/convites/add" element={<InvitesForm />} />
                   <Route path="/projetado" element={<DashboardProjetado />} />
                   <Route path="/estoque" element={<Storage />} />
                   <Route path="/estoque/:id" element={<StoragePage />} />

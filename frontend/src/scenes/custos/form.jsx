@@ -143,7 +143,6 @@ const CustosForm = () => {
 
   const navigate = useNavigate(); 
   const handleFormSubmit = async (values) => {
-    console.log(values);
     try {
       const response = await axios.post("http://localhost:3000/custos", {
         email: userData.email,
@@ -226,14 +225,13 @@ const CustosForm = () => {
                             : null
                       } 
                       onChange={(event, value) => {
-                        // Atualiza o valor no Formik
                         setFieldValue('safra', value?.id || null);
                 
-                        // Chama a função para buscar dados no backend
                         if (value) {
-                          fetchGlebaData(value.id); // Passa o id da safra selecionada
+                          fetchGlebaData(value.id); 
                         }
-                      }}                      onBlur={handleBlur} 
+                      }}                      
+                      onBlur={handleBlur} 
                       sx={{ gridColumn: "span 2" }}
                       renderInput={(params) => (
                           <TextField 

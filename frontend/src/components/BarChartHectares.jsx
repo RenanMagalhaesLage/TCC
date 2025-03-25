@@ -29,7 +29,7 @@ const BarChart = ({ isDashboard = false }) => {
     if (userData && userData.email) { 
       const fetchBarData = async () => {
         try {
-          const response = await axios.get(`http://localhost:3000/custos-glebas-bar-chart`, {
+          const response = await axios.get(`http://localhost:3000/custos-hectares-glebas-bar-chart`, {
             params: { safraId: 1 }
           });
                       
@@ -48,7 +48,7 @@ const BarChart = ({ isDashboard = false }) => {
 
   return (
     <ResponsiveBar
-      data={data}
+      data={barData}
       theme={{
         // added
         axis: {
@@ -83,7 +83,7 @@ const BarChart = ({ isDashboard = false }) => {
             },
         }
       }}
-      keys={["custoMedioPorHectare"]}
+      keys={["custo"]}
       indexBy="gleba"
       margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
       padding={0.3}

@@ -153,7 +153,7 @@ const Sidebar = ({ onLogout }) => {
             />
             <Item
               title="Convites"
-              to="/invites"
+              to="/convites"
               icon={<EmailOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -188,7 +188,7 @@ const Sidebar = ({ onLogout }) => {
             />
             <Item
               title="Histórico Safras"
-              to="/history"
+              to="/historico-safras"
               icon={<PendingActionsIcon/>}
               selected={selected}
               setSelected={setSelected}
@@ -262,14 +262,14 @@ const Sidebar = ({ onLogout }) => {
             />
             <Item
               title="Bar Chart"
-              to="/bar"
+              to="/grafico-barra"
               icon={<BarChartOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="Pie Chart"
-              to="/pie"
+              to="/grafico-pizza"
               icon={<PieChartOutlineOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}

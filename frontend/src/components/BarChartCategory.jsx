@@ -30,7 +30,7 @@ const BarChart = ({isDashboard, safraId}) => {
       const fetchBarData = async () => {
         try {
           const response = await axios.get(`http://localhost:3000/custos-glebas-bar-chart`, {
-            params: { safraId: 1 }
+            params: { safraId: safraId }
           });
           console.log(response.data)            
           setBarData(response.data); 
@@ -56,46 +56,12 @@ const BarChart = ({isDashboard, safraId}) => {
             'corretivos e fertilizantes'
         ]}
         indexBy="gleba"
-        margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
+        margin={isMobile ? { top: 20, right: 20, bottom: 50, left: 60 } : { top: 50, right: 130, bottom: 50, left: 60 }}
         padding={0.5}
         innerPadding={3}
         valueScale={{ type: 'linear' }}
         indexScale={{ type: 'band', round: true }}
         colors={{ scheme: 'nivo' }}
-        defs={[
-            {
-                id: 'dots',
-                type: 'patternDots',
-                background: 'inherit',
-                color: '#38bcb2',
-                size: 4,
-                padding: 1,
-                stagger: true
-            },
-            {
-                id: 'lines',
-                type: 'patternLines',
-                background: 'inherit',
-                color: '#eed312',
-                rotation: -45,
-                lineWidth: 6,
-                spacing: 10
-            }
-        ]}
-        fill={[
-            {
-                match: {
-                    id: 'fries'
-                },
-                id: 'dots'
-            },
-            {
-                match: {
-                    id: 'sandwich'
-                },
-                id: 'lines'
-            }
-        ]}
         borderColor={{
             from: 'color',
             modifiers: [
@@ -111,10 +77,11 @@ const BarChart = ({isDashboard, safraId}) => {
             tickSize: 5,
             tickPadding: 5,
             tickRotation: 0,
-            legend: isDashboard && isMobile ? '' : 'glebas',
+            legend: 'glebas',
             legendPosition: 'middle',
             legendOffset: 32,
-            truncateTickAt: 0
+            truncateTickAt: 0,
+            tickValues: isMobile ? [] : undefined
         }}
         axisLeft={{
             tickSize: 5,
