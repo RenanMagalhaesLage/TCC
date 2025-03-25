@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, TextField, Typography, useTheme, Autocomplete, useMediaQuery, MenuItem } from "@mui/material";
+import { Box, Button, TextField, Typography, useTheme, Autocomplete, useMediaQuery, MenuItem, IconButton, Modal, Backdrop, Fade, Chip,Tooltip,FormControlLabel,Checkbox } from "@mui/material";
 import { useNavigate,useParams } from 'react-router-dom';
 import { Formik } from "formik";
 import { tokens } from "../../theme";
@@ -7,20 +7,26 @@ import * as yup from "yup";
 import Header from "../../components/Header";
 import axios from 'axios';
 import secureLocalStorage from 'react-secure-storage'; 
+import InfoIcon from '@mui/icons-material/Info';
 
 
 const SafrasEditPage = () => {
+  const { id } = useParams(); 
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const isNonMobile = useMediaQuery("(min-width:600px)");
-  const [property, setProperty] = useState("");
-  const [gleba, setGleba] = useState("");
+  const isSmallDevice = useMediaQuery("(max-width: 800px)");
+  const isMobile = useMediaQuery("(max-width: 1000px)");
+  const [glebas, setGlebas] = useState([]);
+  const [glebaOptions,setGlebaOptions] = useState([]);
   const [safra, setSafra] = useState([]);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { id } = useParams(); 
   const [isPlanejado, setIsPlanejado] = useState(true);
-
+  const [openModalGleba, setOpenModalGleba] = useState(false);
+  const [openModalSafra, setOpenModalSafra] = useState(false);
+  const [isChecked, setIsChecked] = useState(false);
+  
 
   const fields = [
     //{ name: "type", label: "Tipo", type: "text" },
@@ -57,17 +63,28 @@ const SafrasEditPage = () => {
     if (userData && userData.email) {
       const fetchSafras = async () => {
         try {
-            const response = await axios.get(`http://localhost:3000/safras/${id}`);
-            const { safra, gleba, property, owner } = response.data;
-            setSafra(safra);
-            setGleba(gleba);
-            setProperty(property);
-            setIsPlanejado(safra.type === "Planejado" ? true : false);
-            console.log(isPlanejado);
-            setLoading(false); 
+          const response = await axios.get(`http://localhost:3000/safras/${id}`);
+          const safra = response.data;
+          const glebas = response.data.glebas;
+          setSafra(safra);
+          setGlebas(glebas);
+          setIsPlanejado(safra.type === "Planejado" ? true : false);
+          //console.log(isPlanejado);
+          setLoading(false); 
 
-        } catch (err) {
-            console.error('Erro ao buscar SAFRAS:', err);  
+
+          const responseGlebas = await axios.get(`http://localhost:3000/glebas-available`, {
+            params: { email: userData.email }
+          });
+          
+          const glebaData = responseGlebas.data.map(gleba => ({
+            id: gleba.id,
+            name: `${gleba.name} - ${gleba.property.name}`
+          }));
+          setGlebaOptions(glebaData);
+
+        } catch (error) {
+            console.error('Erro ao buscar safras:', error);  
         }finally {
           setLoading(false);
         }
@@ -76,8 +93,7 @@ const SafrasEditPage = () => {
     }
   }, [userData]);
 
-
-const initialValues = safra ? {
+  const initialValues = safra ? {
     type: safra.type || "",
     cultivo: safra.cultivo || "",
     semente: safra.semente || "",
@@ -98,9 +114,8 @@ const initialValues = safra ? {
     prodPrevista: safra.prodPrevista || "",
     prodRealizada: safra.prodRealizada || "",
     porcentHect: safra.porcentHect || "",
-    gleba: gleba.name || "",
-    property: property.name || "",
-} : {};
+    glebas: "",
+  } : {};
 
   const navigate = useNavigate(); 
   const handleFormSubmit = async (values) => {
@@ -124,7 +139,8 @@ const initialValues = safra ? {
         graosAvariados:values.type === "Planejado" ? 0 : values.graosAvariados,
         graosEsverdeados:values.type === "Planejado" ? 0 : values.graosEsverdeados,
         graosQuebrados:values.type === "Planejado" ? 0 : values.graosQuebrados,
-        prodRealizada:values.type === "Planejado" ? 0 : values.prodRealizada,         
+        prodRealizada:values.type === "Planejado" ? 0 : values.prodRealizada,  
+        glebas: values.glebas,       
         
       });
   
@@ -136,13 +152,35 @@ const initialValues = safra ? {
     }
   };
 
-  if (loading || !safra || !gleba || !property) {
+  const handleCheckboxChange = (event) => {
+    setIsChecked(event.target.checked);
+  };
+
+  const handleOpenModalGleba = () => setOpenModalGleba(true);
+  const handleOpenModalSafra = () => setOpenModalSafra(true);
+  const handleFinalizar = async () =>{
+    setIsChecked(false);
+    setOpenModalSafra(false);
+  };
+  const handleAdicionarGleba = () =>{
+    setOpenModalGleba(false);
+    console.log("adicionado");
+  
+  };
+
+  if (loading || !safra ) {
     return <Typography variant="h4" fontWeight="bold" sx={{ml: "50px"}}>Carregando...</Typography>;
   }
   
   return (
     <Box m="20px">
       <Header title="Editar Safra" subtitle="Edite as informações da Safra" />
+      <Typography variant="body1" sx={{ mb: "20px", color: theme.palette.mode === 'dark' ? colors.primary[100] : colors.grey[600] }}>
+        <IconButton sx={{ p: 0, mr: 1 }}>
+          <InfoIcon fontSize="small" />
+        </IconButton>
+          
+      </Typography>
 
       <Formik
         onSubmit={handleFormSubmit}
@@ -167,23 +205,6 @@ const initialValues = safra ? {
                 "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
               }}
             >
-              <TextField
-                    fullWidth
-                    variant="filled"
-                    label="Propriedade"
-                    value={property.name}
-                    disabled 
-                    sx={{ gridColumn: "span 2" }}
-              />
-              <TextField
-                    fullWidth
-                    variant="filled"
-                    label="Gleba"
-                    value={gleba.name}
-                    disabled 
-                    sx={{ gridColumn: "span 2" }}
-              />
-
               {fields.map(({ name, label, type, disabled }) => (
                   <TextField
                     key={name}
@@ -232,7 +253,7 @@ const initialValues = safra ? {
                   setFieldValue("type", value); 
                   setIsPlanejado(value === "Planejado"); 
               }}
-                helperText="Selecione o tipo de safra"
+                helperText="Troque aqui o tipo da Safra!"
                 InputLabelProps={{ shrink: true }}
                 sx={{ gridColumn: "span 1",
                   "& .MuiFilledInput-root": {
@@ -263,7 +284,6 @@ const initialValues = safra ? {
                 "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
               }}
             >
-              
               {values.type !== "Planejado" && fieldsRealizada.map(({ name, label, type, disabled }) => (
                   <TextField
                     key={name}
@@ -288,17 +308,242 @@ const initialValues = safra ? {
               <Button 
                     type="submit"
                     sx={{ 
-                            backgroundColor: colors.mygreen[400],
-                            color: colors.grey[100],
-                            fontSize: "12px",
-                            fontWeight: "bold",
-                            "&:hover": {
-                                    backgroundColor: colors.grey[700], 
-                                },
+                        backgroundColor: colors.mygreen[400],
+                        color: colors.grey[100],
+                        fontSize: "12px",
+                        fontWeight: "bold",
+                        "&:hover": {
+                          backgroundColor: colors.grey[700], 
+                        },
                     }} 
                     variant="contained">
                 Salvar
               </Button>
+              <Button 
+                onClick={handleOpenModalGleba}
+                sx={{ 
+                  backgroundColor: colors.mygreen[400],
+                  color: colors.grey[100],
+                  fontSize: "12px",
+                  fontWeight: "bold",
+                  marginLeft: "10px",
+                  "&:hover": {
+                    backgroundColor: colors.grey[700], 
+                  },
+                }} 
+                variant="contained"
+              >
+                Adicionar Gleba
+              </Button>
+              <Modal
+                open={openModalGleba}
+                onClose={null} 
+                aria-labelledby="transition-modal-title"
+                aria-describedby="transition-modal-description"
+                closeAfterTransition
+                slots={{ backdrop: Backdrop }}
+                slotProps={{
+                  backdrop: {
+                    timeout: 500,
+                  },
+                }}
+              >
+                <Fade in={openModalGleba}>
+                  <Box 
+                    color={colors.grey[100]}
+                    backgroundColor={colors.primary[400]}
+                    sx={{ 
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      width: 450,
+                      borderRadius: 3, 
+                      boxShadow: '0px 10px 30px rgba(0, 0, 0, 0.1)',
+                      p: 4,
+                    }}
+                  >
+                    <Typography id="modal-modal-title" variant="h4" component="h2" >
+                      Adicionar uma Gleba
+                    </Typography>
+                    <Box
+                      gridColumn="span 12"
+                      display="grid"
+                      gridTemplateColumns={isMobile ? "1fr" : "repeat(1, 1fr)"}
+                      padding="25px 0px"
+                    >
+                      <Box display="flex" flexWrap="wrap" gap="10px">
+                        {glebas && glebas.map((gleba, index) => (
+                          <Chip
+                            key={index}
+                            label={gleba.name} 
+                            sx={{ padding: "10px", fontWeight: "bold", flexShrink: 0 }}
+                          />
+                        ))}
+                      </Box>
+                    </Box>    
+                    <Typography variant="body1" sx={{ mb: "20px", color: theme.palette.mode === 'dark' ? colors.primary[100] : colors.grey[600] }}>
+                      <IconButton sx={{ p: 0, mr: 1 }}>
+                        <InfoIcon fontSize="small" />
+                      </IconButton>
+                        Uma vez que uma Gleba é adicionada a uma Safra, essa ação não pode ser desfeita!
+                    </Typography>
+                    <Autocomplete
+                      disablePortal
+                      id="glebas"
+                      multiple 
+                      options={glebaOptions}
+                      getOptionLabel={(option) => option.name || ""}
+                      name="glebas"
+                      value={
+                        values.glebas && values.glebas.length > 0
+                        ? glebaOptions.filter((option) => values.glebas.includes(option.id)) 
+                        : []
+                      }
+                      onChange={(event, newValue) => {
+                        setFieldValue('glebas', newValue.map((option) => option.id));
+                        console.log("mudou " + newValue[0].id);
+                      }}
+                      onBlur={handleBlur}
+                      sx={{ gridColumn: isSmallDevice ? "span 4" : "span 2" }}
+                    
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Gleba"
+                          variant="filled"
+                          name="glebas"
+                          error={!!touched.glebas && !!errors.glebas}
+                          helperText={touched.glebas && errors.glebas}
+                          onBlur={handleBlur}
+                        />
+                      )}
+                      noOptionsText="Nenhuma Gleba Disponível"
+                      />                                         
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
+                        <Button 
+                          onClick={() => {
+                            setFieldValue('glebas', '');
+                            setOpenModalGleba(false);
+                          }} 
+                            sx={{
+                            color: colors.redAccent[500]
+                          }}
+                        >
+                          Sair
+                        </Button>
+                        <Button 
+                          onClick={handleAdicionarGleba} 
+                          variant="contained" 
+                          sx={{ 
+                            color: colors.grey[100],
+                            fontWeight: "bold",
+                            backgroundColor:  colors.mygreen[400],
+                            "&:hover": {
+                              backgroundColor: colors.grey[700], 
+                            },
+                          }}
+                        >
+                        Salvar
+                      </Button>
+                    </Box>
+                  </Box>
+                </Fade>
+              </Modal>              
+              <Button 
+                onClick={handleOpenModalSafra}
+                sx={{ 
+                  backgroundColor: colors.blueAccent[500],
+                  color: colors.grey[100],
+                  fontSize: "12px",
+                  fontWeight: "bold",
+                  marginLeft: "10px",
+                  "&:hover": {
+                    backgroundColor: colors.grey[700], 
+                  },
+                }} 
+                variant="contained">
+                Finalizar Safra
+              </Button>
+              <Modal
+                open={openModalSafra}
+                onClose={null} 
+                aria-labelledby="transition-modal-title"
+                aria-describedby="transition-modal-description"
+                closeAfterTransition
+                slots={{ backdrop: Backdrop }}
+                slotProps={{
+                  backdrop: {
+                    timeout: 500,
+                  },
+                }}
+              >
+                <Fade in={openModalSafra}>
+                  <Box 
+                    color={colors.grey[100]}
+                    backgroundColor={colors.primary[400]}
+                    sx={{ 
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      width: 450,
+                      borderRadius: 3, 
+                      boxShadow: '0px 10px 30px rgba(0, 0, 0, 0.1)',
+                      p: 4,
+                    }}
+                  >
+                    <Typography id="modal-modal-title" variant="h4" component="h2" >
+                      Deseja realmente finalizar esta Safra ?
+                    </Typography>
+                     <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                        Ao fazer isso, esteja ciente que:
+                        <ul>
+                          <li>Essa ação não pode ser revertida;</li>
+                          <li>Você não poderá mais editar os dados desta Safra.</li>
+                        </ul>
+                    </Typography> 
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={isChecked}
+                          onChange={handleCheckboxChange} 
+                        />
+                      }
+                      label="Estou ciente e quero continuar."
+                      sx={{ mt: 2 }}
+                    />                                        
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
+                        <Button 
+                          onClick={() => {
+                            setOpenModalSafra(false);
+                            setIsChecked(false);
+                          }}
+                            sx={{
+                            color: colors.redAccent[500]
+                          }}
+                        >
+                          Sair
+                        </Button>
+                        <Button 
+                          //onClick={handleDelete} 
+                          variant="contained" 
+                          sx={{ 
+                            color: colors.grey[100],
+                            fontWeight: "bold",
+                            backgroundColor: colors.blueAccent[500],
+                            "&:hover": {
+                              backgroundColor: colors.grey[700], 
+                            },
+                          }}
+                          disabled={!isChecked}
+                        >
+                        Finalizar
+                      </Button>
+                    </Box>
+                  </Box>
+                </Fade>
+              </Modal>              
             </Box>
           </form>
         )}
@@ -307,27 +552,26 @@ const initialValues = safra ? {
   );
 };
 
-
 const checkoutSchema = yup.object().shape({
-    type: yup.string().required("Campo de preenchimento obrigatório"),
-    cultivo: yup.string().required("Campo de preenchimento obrigatório"),
-    semente: yup.string().required("Campo de preenchimento obrigatório"),
-    metroLinear: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
-    dosagem: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
-    toneladas: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
-    adubo: yup.string().required("Campo de preenchimento obrigatório"),
-    dataFimPlantio: yup.date().required("Campo de preenchimento obrigatório").typeError("Deve ser uma data válida"),
-    dataFimColheita: yup.date().required("Campo de preenchimento obrigatório").typeError("Deve ser uma data válida"),
-    tempoLavoura: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
-    precMilimetrica: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
-    umidade: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
-    impureza: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
-    graosAvariados: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
-    graosEsverdeados: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
-    graosQuebrados: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
-    prodTotal: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
-    prodPrevista: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
-    prodRealizada: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+  type: yup.string().required("Campo de preenchimento obrigatório"),
+  cultivo: yup.string().required("Campo de preenchimento obrigatório"),
+  semente: yup.string().required("Campo de preenchimento obrigatório"),
+  metroLinear: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+  dosagem: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+  toneladas: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+  adubo: yup.string().required("Campo de preenchimento obrigatório"),
+  dataFimPlantio: yup.date().required("Campo de preenchimento obrigatório").typeError("Deve ser uma data válida"),
+  dataFimColheita: yup.date().required("Campo de preenchimento obrigatório").typeError("Deve ser uma data válida"),
+  tempoLavoura: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+  precMilimetrica: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+  umidade: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+  impureza: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+  graosAvariados: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+  graosEsverdeados: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+  graosQuebrados: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+  prodTotal: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+  prodPrevista: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+  prodRealizada: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
     //porcentHect: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
 });
 
@@ -353,4 +597,5 @@ const calculateTempoLavoura = (dataFimPlantio, dataFimColheita) => {
   }
   return "";
 };
+
 export default SafrasEditPage;

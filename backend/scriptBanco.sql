@@ -12,7 +12,10 @@ INSERT INTO glebas (name, area, propertyId, createdAt, updatedAt) VALUES
 ('Gleba 5', 250.75, 3, NOW(), NOW()),
 ('Gleba 6', 300.00, 3, NOW(), NOW()),
 ('Gleba 7', 120.00, 4, NOW(), NOW()),
-('Gleba 8', 330.50, 4, NOW(), NOW());
+('Gleba 8', 100.50, 4, NOW(), NOW()),
+('Gleba 9', 23.90, 1, NOW(), NOW()),
+('Gleba 10', 501.56, 1, NOW(), NOW()),
+('Gleba 11', 49.51, 1, NOW(), NOW());
 
 INSERT INTO safras (type, status, cultivo, semente, metroLinear, dosagem, toneladas, adubo, dataFimPlantio, dataFimColheita, tempoLavoura, precMilimetrica, umidade, impureza, graosAvariados, graosEsverdeados, graosQuebrados, prodTotal, prodPrevista, prodRealizada, porcentHect, createdAt, updatedAt, areaTotal, name) 
 VALUES

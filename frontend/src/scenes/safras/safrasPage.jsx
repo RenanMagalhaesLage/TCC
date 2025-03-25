@@ -325,11 +325,6 @@ const SafrasPage = () => {
         //console.info('You clicked the Chip.');
     };  
 
-    const handleFinalize = () => {
-        
-    }
-
-
     return (
         <Box m="20px">
             <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -606,7 +601,7 @@ const SafrasPage = () => {
                                                     }}
                                                 >
                                                     <Typography id="modal-modal-title" variant="h4" component="h2">
-                                                        Deseja realmente deletar esta safra?
+                                                        Deseja realmente deletar esta Safra?
                                                     </Typography>
                                                     <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                                                         Ao fazer isso, esteja ciente que:
