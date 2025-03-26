@@ -350,7 +350,7 @@ const Safras = () => {
 
     const columnsRealizadas = [
         { field: "name", headerName: "Nome", flex: 1, minWidth: 100, cellClassName: "name-column--cell", resizable: false },
-        { field: "area", headerName: "Área da Gleba", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },    
+        { field: "areaTotal", headerName: "Área", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },    
         { field: "cultivo", headerName: "Cultivo", flex: 1, minWidth: 70, cellClassName: "city-column--cell", resizable: false },
         { field: "precMilimetrica", headerName: "Precipitação Milimetrica", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
         { 

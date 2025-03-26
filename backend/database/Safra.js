@@ -24,60 +24,78 @@ const Safra = connection.define('safra',{
     cultivo:{
         type: Sequelize.STRING,
         allowNull: false
-    },semente:{
+    },
+    semente:{
         type: Sequelize.STRING,
         allowNull:false
-    },metroLinear:{
+    },
+    metroLinear:{
         type: Sequelize.STRING,
         allowNull:false
-    },dosagem:{ //kg/ha
+    },
+    dosagem:{ //kg/ha
         type: Sequelize.INTEGER,
         allowNull:false
-    },toneladas:{
+    },
+    toneladas:{
         type: Sequelize.DOUBLE,
         allowNull:false
-    },adubo:{
+    },
+    adubo:{
         type: Sequelize.STRING,
         allowNull:false
-    },dataFimPlantio:{
+    },
+    dataFimPlantio:{
         type: Sequelize.DATEONLY,
         allowNull:false,
         defaultValue: Sequelize.NOW
-    },dataFimColheita:{
+    },
+    dataFimColheita:{
         type: Sequelize.DATEONLY,
         allowNull:false,
         defaultValue: Sequelize.NOW
-    },tempoLavoura:{ //dias
+    },
+    tempoLavoura:{ //dias
         type: Sequelize.INTEGER,
         allowNull:false
-    },precMilimetrica:{
+    },
+    precMilimetrica:{
         type: Sequelize.INTEGER,
         allowNull:false
-    },umidade:{
+    },
+    umidade:{
         type: Sequelize.DOUBLE,
         allowNull:false
-    },impureza:{
+    },
+    impureza:{
         type: Sequelize.DOUBLE,
         allowNull:false
-    },graosAvariados:{
+    },
+    graosAvariados:{
         type: Sequelize.DOUBLE,
         allowNull:false
-    },graosEsverdeados:{
+    },
+    graosEsverdeados:{
         type: Sequelize.DOUBLE,
         allowNull:false
-    },graosQuebrados:{
+    },
+    graosQuebrados:{
         type: Sequelize.DOUBLE,
         allowNull:false
-    },prodTotal:{
+    },
+    prodTotal:{
         type: Sequelize.INTEGER,
         allowNull:false
-    },prodPrevista:{
+    },
+    prodPrevista:{
         type: Sequelize.DOUBLE,
         allowNull:false
-    },prodRealizada:{
+    },
+    prodRealizada:{
         type: Sequelize.DOUBLE,
         allowNull:false
-    },porcentHect:{ //% Produto /hectare
+    },
+    porcentHect:{ //% Produto /hectare
         type: Sequelize.DOUBLE,
         allowNull:false
     },

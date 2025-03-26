@@ -5,12 +5,12 @@ INSERT INTO properties (name, city, area, createdAt, updatedAt) VALUES
 ('Fazenda Boa Vista', 'Bahia', 450.30, NOW(), NOW());
 
 INSERT INTO glebas (name, area, propertyId, createdAt, updatedAt) VALUES 
-('Gleba 1', 100.25, 1, NOW(), NOW()),
-('Gleba 2', 200.50, 1, NOW(), NOW()),
-('Gleba 3', 50.30, 2, NOW(), NOW()),
+('Gleba 1', 100, 1, NOW(), NOW()),
+('Gleba 2', 200, 1, NOW(), NOW()),
+('Gleba 3', 50, 2, NOW(), NOW()),
 ('Gleba 4', 150.00, 2, NOW(), NOW()),
-('Gleba 5', 250.75, 3, NOW(), NOW()),
-('Gleba 6', 300.00, 3, NOW(), NOW()),
+('Gleba 5', 250, 3, NOW(), NOW()),
+('Gleba 6', 250, 3, NOW(), NOW()),
 ('Gleba 7', 120.00, 4, NOW(), NOW()),
 ('Gleba 8', 100.50, 4, NOW(), NOW()),
 ('Gleba 9', 23.90, 1, NOW(), NOW()),
@@ -19,12 +19,12 @@ INSERT INTO glebas (name, area, propertyId, createdAt, updatedAt) VALUES
 
 INSERT INTO safras (type, status, cultivo, semente, metroLinear, dosagem, toneladas, adubo, dataFimPlantio, dataFimColheita, tempoLavoura, precMilimetrica, umidade, impureza, graosAvariados, graosEsverdeados, graosQuebrados, prodTotal, prodPrevista, prodRealizada, porcentHect, createdAt, updatedAt, areaTotal, name) 
 VALUES
-  ('Planejado', false, 'Milho', 'Semente A', 500, 50, 20.5, 'Adubo X', '2024-03-01', '2024-09-01', 180, 0, 0, 0, 0, 0, 0, 150, 200.5, 0, 0, NOW(), NOW(), 100, 'Safra 1'),
-  ('Planejado', false, 'Soja', 'Semente B', 700, 60, 30.0, 'Adubo Y', '2024-04-01', '2024-10-01', 160, 0, 0, 0, 0, 0, 0, 200, 250.0, 0, 0, NOW(), NOW(), 120, 'Safra 2'),
-  ('Planejado', false, 'Trigo', 'Semente C', 550, 45, 25.0, 'Adubo Z', '2024-05-01', '2024-11-01', 190, 0, 0, 0, 0, 0, 0, 175, 220.0, 0, 0, NOW(), NOW(), 110, 'Safra 3'),
-  ('Planejado', false, 'Algodão', 'Semente D', 650, 70, 40.0, 'Adubo W', '2024-06-01', '2024-12-01', 180, 0, 0, 0, 0, 0, 0, 220, 270.0, 0, 0, NOW(), NOW(), 140, 'Safra 4'),
-  ('Planejado', false, 'Feijão', 'Semente E', 500, 55, 22.5, 'Adubo Q', '2024-07-01', '2024-01-01', 150, 0, 0, 0, 0, 0, 0, 160, 210.5, 0, 0, NOW(), NOW(), 95, 'Safra 5'),
-  ('Planejado', false, 'Arroz', 'Semente F', 600, 65, 35.0, 'Adubo T', '2024-08-01', '2024-02-01', 170, 0, 0, 0, 0, 0, 0, 210, 260.0, 0, 0, NOW(), NOW(), 130, 'Safra 6');
+  ('Planejado', false, 'Milho', 'Semente A', 500, 50, 20.5, 'Adubo X', '2024-03-01', '2024-09-01', 180, 0, 0, 0, 0, 0, 0, 150, 200.5, 0, 0, NOW(), NOW(), 300, 'Safra 1'),
+  ('Planejado', false, 'Soja', 'Semente B', 700, 60, 30.0, 'Adubo Y', '2024-04-01', '2024-10-01', 160, 0, 0, 0, 0, 0, 0, 200, 250.0, 0, 0, NOW(), NOW(), 200, 'Safra 2'),
+  ('Planejado', false, 'Trigo', 'Semente C', 550, 45, 25.0, 'Adubo Z', '2024-05-01', '2024-11-01', 190, 0, 0, 0, 0, 0, 0, 175, 220.0, 0, 0, NOW(), NOW(), 500, 'Safra 3'),
+  ('Planejado', false, 'Algodão', 'Semente D', 650, 70, 40.0, 'Adubo W', '2024-06-01', '2024-12-01', 180, 0, 0, 0, 0, 0, 0, 220, 270.0, 0, 0, NOW(), NOW(), 0, 'Safra 4'),
+  ('Planejado', false, 'Feijão', 'Semente E', 500, 55, 22.5, 'Adubo Q', '2024-07-01', '2024-01-01', 150, 0, 0, 0, 0, 0, 0, 160, 210.5, 0, 0, NOW(), NOW(), 0, 'Safra 5'),
+  ('Planejado', false, 'Arroz', 'Semente F', 600, 65, 35.0, 'Adubo T', '2024-08-01', '2024-02-01', 170, 0, 0, 0, 0, 0, 0, 210, 260.0, 0, 0, NOW(), NOW(), 0, 'Safra 6');
 
 INSERT INTO custos (name, unit, quantity, price, category, totalValue, expirationDate, note, safraId, status, type, createdAt, updatedAt, glebaId) VALUES
 ('Calcário', 'tonelada', 10, 120.00, 'Corretivos e Fertilizantes', 1200.00, NOW(), 'Aplicação de calcário no solo', 1, false, 'Planejado', NOW(), NOW(), 1),
@@ -65,7 +65,6 @@ VALUES
 INSERT INTO safra_glebas (statusSafra, safraId, glebaId, createdAt, updatedAt) VALUES
 (false,1, 1, NOW(), NOW()),  -- Safra 1 associada à Gleba 1
 (false,1, 2, NOW(), NOW()),  -- Safra 1 associada à Gleba 2
-(false,1, 7, NOW(), NOW()),  -- Safra 1 associada à Gleba 7
 (false,2, 3, NOW(), NOW()),  -- Safra 2 associada à Gleba 1
 (false,2, 4, NOW(), NOW()),  -- Safra 2 associada à Gleba 3
 (false,3, 5, NOW(), NOW()),  -- Safra 3 associada à Gleba 2

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Button, TextField, Typography, useTheme, Autocomplete, useMediaQuery, MenuItem, IconButton, Modal, Backdrop, Fade, Chip,Tooltip,FormControlLabel,Checkbox } from "@mui/material";
 import { useNavigate,useParams } from 'react-router-dom';
-import { Formik } from "formik";
+import { Formik,useFormikContext } from "formik";
 import { tokens } from "../../theme";
 import * as yup from "yup";
 import Header from "../../components/Header";
@@ -26,10 +26,12 @@ const SafrasEditPage = () => {
   const [openModalGleba, setOpenModalGleba] = useState(false);
   const [openModalSafra, setOpenModalSafra] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
-  
+  const [safraStatus, setSafraStatus] = useState("");
+  let formikRef = null;  
 
   const fields = [
     //{ name: "type", label: "Tipo", type: "text" },
+    { name: "name", label: "Nome da Safra", type: "text" },
     { name: "cultivo", label: "Cultivo", type: "text" },
     { name: "semente", label: "Semente", type: "text" },
     { name: "metroLinear", label: "Metro Linear", type: "number" },
@@ -67,11 +69,10 @@ const SafrasEditPage = () => {
           const safra = response.data;
           const glebas = response.data.glebas;
           setSafra(safra);
+          setSafraStatus(safra.status);
           setGlebas(glebas);
           setIsPlanejado(safra.type === "Planejado" ? true : false);
-          //console.log(isPlanejado);
           setLoading(false); 
-
 
           const responseGlebas = await axios.get(`http://localhost:3000/glebas-available`, {
             params: { email: userData.email }
@@ -114,13 +115,20 @@ const SafrasEditPage = () => {
     prodPrevista: safra.prodPrevista || "",
     prodRealizada: safra.prodRealizada || "",
     porcentHect: safra.porcentHect || "",
-    glebas: "",
+    glebas: null,
+    status: safra.status === false ? false : true,
+    name: safra.name || "",
   } : {};
 
   const navigate = useNavigate(); 
   const handleFormSubmit = async (values) => {
+    console.log(values);
     try {
-      const response = await axios.put(`http://localhost:3000/safras/${id}`, {
+      const response = await axios.put(`http://localhost:3000/safras`, {
+        id: id,
+        glebas: values.glebas ? values.glebas : null, 
+        name: values.name,  
+        status: safraStatus,
         cultivo: values.cultivo,
         semente: values.semente,
         metroLinear: values.metroLinear,
@@ -139,9 +147,7 @@ const SafrasEditPage = () => {
         graosAvariados:values.type === "Planejado" ? 0 : values.graosAvariados,
         graosEsverdeados:values.type === "Planejado" ? 0 : values.graosEsverdeados,
         graosQuebrados:values.type === "Planejado" ? 0 : values.graosQuebrados,
-        prodRealizada:values.type === "Planejado" ? 0 : values.prodRealizada,  
-        glebas: values.glebas,       
-        
+        prodRealizada:values.type === "Planejado" ? 0 : values.prodRealizada,          
       });
   
       if (response.status === 200) {  
@@ -161,6 +167,11 @@ const SafrasEditPage = () => {
   const handleFinalizar = async () =>{
     setIsChecked(false);
     setOpenModalSafra(false);
+    setSafraStatus(true);
+
+    if (formikRef) {
+      await formikRef.submitForm(); 
+    }
   };
   const handleAdicionarGleba = () =>{
     setOpenModalGleba(false);
@@ -179,10 +190,11 @@ const SafrasEditPage = () => {
         <IconButton sx={{ p: 0, mr: 1 }}>
           <InfoIcon fontSize="small" />
         </IconButton>
-          
+        Para finalizar a safra, ela precisa, primeiro, ser do tipo realizada.
       </Typography>
 
       <Formik
+        innerRef={(ref) => (formikRef = ref)} 
         onSubmit={handleFormSubmit}
         initialValues={initialValues}
         validationSchema={!isPlanejado ? checkoutSchema : checkoutSchema2}
@@ -402,7 +414,6 @@ const SafrasEditPage = () => {
                       }
                       onChange={(event, newValue) => {
                         setFieldValue('glebas', newValue.map((option) => option.id));
-                        console.log("mudou " + newValue[0].id);
                       }}
                       onBlur={handleBlur}
                       sx={{ gridColumn: isSmallDevice ? "span 4" : "span 2" }}
@@ -462,7 +473,9 @@ const SafrasEditPage = () => {
                     backgroundColor: colors.grey[700], 
                   },
                 }} 
-                variant="contained">
+                variant="contained"
+                disabled={values.type === "Planejado"}
+              >
                 Finalizar Safra
               </Button>
               <Modal
@@ -526,7 +539,7 @@ const SafrasEditPage = () => {
                           Sair
                         </Button>
                         <Button 
-                          //onClick={handleDelete} 
+                          onClick={handleFinalizar} 
                           variant="contained" 
                           sx={{ 
                             color: colors.grey[100],
@@ -553,6 +566,7 @@ const SafrasEditPage = () => {
 };
 
 const checkoutSchema = yup.object().shape({
+  name: yup.string().required("Campo de preenchimento obrigatório"),
   type: yup.string().required("Campo de preenchimento obrigatório"),
   cultivo: yup.string().required("Campo de preenchimento obrigatório"),
   semente: yup.string().required("Campo de preenchimento obrigatório"),
@@ -576,6 +590,7 @@ const checkoutSchema = yup.object().shape({
 });
 
 const checkoutSchema2 = yup.object().shape({
+  name: yup.string().required("Campo de preenchimento obrigatório"),
   type: yup.string().required("Campo de preenchimento obrigatório"),
   cultivo: yup.string().required("Campo de preenchimento obrigatório"),
   semente: yup.string().required("Campo de preenchimento obrigatório"),

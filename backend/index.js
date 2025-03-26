@@ -886,11 +886,13 @@ app.post('/safras', async (req, res) => {
 });
 
 /*  Rota para --> EDITAR SAFRAS */
-app.put('/safras/:id', async (req, res) => {
+app.put('/safras', async (req, res) => {
     try {
         const { 
-            email, 
-            glebaId, 
+            id, 
+            glebas,
+            name,
+            status, 
             cultivo, 
             semente,
             metroLinear,
@@ -912,8 +914,45 @@ app.put('/safras/:id', async (req, res) => {
             prodRealizada,  
             //porcentHect,
         } = req.body;
+
+        let areaGleba = 0;
+        //Adicionando primeiro a(s) gleba(s)
+        if (glebas && glebas.length > 0) {
+            for (let glebaId of glebas) {
+                await SafraGleba.create({
+                    safraId: id,   
+                    glebaId: glebaId, 
+                    statusSafra: status    
+                });
+            }
+            const glebasIds = glebas.map(id => Number(id));
+
+            areaGleba = await Gleba.sum('area', {
+                where: {
+                  id: glebasIds
+                }
+            });
+        }
+
+        if(status){
+            //Caso for finalizar a safra atualizar status das glebas
+            const [glebasUpdated] = await SafraGleba.update(
+                { statusSafra: status},
+                { where: { safraId: id } }
+            )
+        }
+
+ 
+
+        const safra = await Safra.findByPk(id);
+        const areaTotal = safra.areaTotal + areaGleba;
+
         const [updated] = await Safra.update(
             { 
+                name,
+                areaTotal,
+                type,
+                status,
                 cultivo, 
                 semente,
                 metroLinear,
@@ -925,7 +964,6 @@ app.put('/safras/:id', async (req, res) => {
                 tempoLavoura,
                 prodTotal,
                 prodPrevista,
-                type,
                 precMilimetrica,  
                 umidade,          
                 impureza,         
@@ -934,12 +972,11 @@ app.put('/safras/:id', async (req, res) => {
                 graosQuebrados,   
                 prodRealizada, 
             },
-            { where: { id: req.params.id } }
+            { where: { id: id } }
         );
 
-
         if (updated) {
-            const updatedSafra = await Safra.findByPk(req.params.id);
+            const updatedSafra = await Safra.findByPk(id);
             return res.json(updatedSafra);
         }
 

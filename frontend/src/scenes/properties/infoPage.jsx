@@ -615,7 +615,7 @@ const Propertie = () => {
                             mt={isMobile ? "370px": 60}
                         >                       
                             <Typography variant="h4" fontWeight="bold" color={colors.grey[100]}>
-                                Itens em Estoque na Propriedade
+                                Itens em Estoque
                             </Typography>
                         </Box> 
                         <Box

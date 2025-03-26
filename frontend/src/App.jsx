@@ -15,17 +15,17 @@ import Pie from "./scenes/pie";
 import Line from "./scenes/line";
 import Login from './scenes/login';
 import Properties from './scenes/properties';
-import PropertyPage from './scenes/properties/propertyPage';
-import PropertiesForm from './scenes/properties/form';
-import PropertiesEditForm from './scenes/properties/editForm';
+import PropertyPage from './scenes/properties/infoPage';
+import PropertyForm from './scenes/properties/form';
+import PropertyEditForm from './scenes/properties/editForm';
 import Glebas from './scenes/glebas';
-import Gleba from './scenes/glebas/glebaPage';
-import GlebasForm from './scenes/glebas/form';
-import GlebasEditForm from './scenes/glebas/editForm';
+import GlebaPage from './scenes/glebas/infoPage';
+import GlebaForm from './scenes/glebas/form';
+import GlebaEditForm from './scenes/glebas/editForm';
 import Safras from './scenes/safras'
-import SafrasPage from './scenes/safras/safrasPage';
-import SafrasForm from './scenes/safras/form';
-import SafrasHistory from './scenes/safras/history';
+import SafraPage from './scenes/safras/infoPage';
+import SafraForm from './scenes/safras/form';
+import SafrasHistory from './scenes/safras/historyPage';
 import Custos from './scenes/custos';
 import Invite from './scenes/invites';
 import InvitesForm from './scenes/invites/form';
@@ -75,18 +75,18 @@ function App() {
                   <Route path="/faq" element={<FAQ />} />
                   <Route path="/propriedades" element={<Properties />} />
                   <Route path="/propriedades/:id" element={<PropertyPage />} />
-                  <Route path="/propriedades/add" element={<PropertiesForm />} />
-                  <Route path="/propriedades/edit/:id" element={<PropertiesEditForm />} />
+                  <Route path="/propriedades/add" element={<PropertyForm />} />
+                  <Route path="/propriedades/edit/:id" element={<PropertyEditForm />} />
                   <Route path="/glebas" element={<Glebas />} />
-                  <Route path="/glebas/:id" element={<Gleba />} />
-                  <Route path="/glebas/add" element={<GlebasForm />} />
-                  <Route path="/glebas/add/:id?" element={<GlebasForm />} />
-                  <Route path="/glebas/edit/:id" element={<GlebasEditForm />} />
+                  <Route path="/glebas/:id" element={<GlebaPage />} />
+                  <Route path="/glebas/add" element={<GlebaForm />} />
+                  <Route path="/glebas/add/:id?" element={<GlebaForm />} />
+                  <Route path="/glebas/edit/:id" element={<GlebaEditForm />} />
                   <Route path="/safras" element={<Safras />} />
-                  <Route path="/safras/:id" element={<SafrasPage />} />
-                  <Route path="/safras/add" element={<SafrasForm />} />
-                  <Route path="/safras/add/:id?" element={<SafrasForm />} />
-                  <Route path="/safras/edit/:id" element={<SafrasEditPage />} />
+                  <Route path="/safras/:id" element={<SafraPage />} />
+                  <Route path="/safras/add" element={<SafraForm />} />
+                  <Route path="/safras/add/:id?" element={<SafraForm />} />
+                  <Route path="/safras/edit/:id" element={<SafraEditPage />} />
                   <Route path="/custos" element={<Custos />} />
                   <Route path="/custos/:id" element={<CustosPage />} />
                   <Route path="/custos/add" element={<CustosForm />} />
