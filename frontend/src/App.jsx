@@ -64,7 +64,7 @@ function App() {
               <main className='content' style={{ flexGrow: 1, overflow: 'auto' }}>
                 <Topbar />
                 <Routes>
-                  <Route path="/" element={<Dashboard />} />
+                  <Route path="/" />
                   <Route path="/team" element={<Team />} />
                   <Route path="/contacts" element={<Contacts />} />
                   <Route path="/form" element={<Form />} />

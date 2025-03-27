@@ -99,6 +99,14 @@ const Safra = connection.define('safra',{
         type: Sequelize.DOUBLE,
         allowNull:false
     },
+    precoVendaEstimado:{ 
+        type: Sequelize.DOUBLE,
+        allowNull:false
+    },
+    precoVendaRealizado:{ 
+        type: Sequelize.DOUBLE,
+        allowNull:false
+    },
 });
 
 

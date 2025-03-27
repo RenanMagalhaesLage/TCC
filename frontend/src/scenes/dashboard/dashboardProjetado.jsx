@@ -24,6 +24,7 @@ const DashboardProjetado = () => {
   const colors = tokens(theme.palette.mode);
   const [userData, setUserData] = useState(null);
   const [safraOptions, setSafraOptions] = useState([]);
+  const [safraData, setSafraData] = useState(null)
   const [safraId, setSafraId] = useState("");
   const [propertyId, setPropertyId] = useState("");
   const [propertyOptions,setPropertyOptions] = useState([]);
@@ -49,14 +50,14 @@ const DashboardProjetado = () => {
             params: { email: userData.email }
           });
                       
-          const safraData = response.data
+          const safras = response.data
             .filter(safra => safra.status === false)
             .map(safra => ({
               id: safra.id,
               name: `${safra.name} - ${safra.cultivo}`
           }));
-          setSafraOptions(safraData);
-                        
+          setSafraOptions(safras);
+
         } catch (error) {
           console.log("ERRO - ao buscar no banco de dados.");
         }
@@ -71,8 +72,9 @@ const DashboardProjetado = () => {
         params: { id: id }
       });
       setPropertyOptions(response.data);
+      
     } catch (error) {
-      console.error('Erro ao buscar dados da safra:', error);
+      console.error('Erro ao buscar dados da propriedades da safra:', error);
     }
   }, []);
 
@@ -92,9 +94,23 @@ const DashboardProjetado = () => {
     setShowPanel(false);
     setSafraId(values.safra);
     setPropertyId(values.property);  
+
+  
+    try {
+      const response = await axios.get(`http://localhost:3000/report-safra`, {
+        params: { id: values.safra }  
+      });
+
+      setSafraData(response.data);
+  
+      setShowPanel(true); 
+    } catch (error) {
+      console.error('Erro ao buscar dados da safra:', error);
+    }
+  
     setTimeout(() => {
-      setShowPanel(true); // Exibe o painel após um breve atraso
-    }, 300);     
+      setShowPanel(true);
+    }, 300); 
   };
 
   return (
@@ -152,7 +168,7 @@ const DashboardProjetado = () => {
                   onBlur={handleBlur} 
                 />
               )}
-              noOptionsText="Não Encontrado"
+              noOptionsText="Nenhuma Safra disponível"
             />     
             <Autocomplete
               disablePortal
@@ -179,6 +195,7 @@ const DashboardProjetado = () => {
                   onBlur={handleBlur} 
                 />
               )}
+              noOptionsText="Nenhuma propriedade disponível"
             />  
           </Box>
           <Box
@@ -220,7 +237,6 @@ const DashboardProjetado = () => {
               gridTemplateColumns="repeat(12, 1fr)"
               gridAutoRows="140px"
               gap="20px"
-              
             >
               {/* ROW 1 */}
               <Box
@@ -234,7 +250,7 @@ const DashboardProjetado = () => {
                 }}
               >
                 <InfoBox
-                  title="1.242"
+                  title={safraData ? safraData.areaTotal : ""}
                   subtitle="Hectares"
                 />
               </Box>
@@ -249,8 +265,8 @@ const DashboardProjetado = () => {
                 }}
               >
                 <InfoBox
-                  title="R$ 165,00"
-                  subtitle="Preço venda R$ / HA "
+                  title={safraData ? "R$ " + safraData.precoVenda : ""}
+                  subtitle="Preço venda R$ / ha "
       
                 />
               </Box>
@@ -265,8 +281,38 @@ const DashboardProjetado = () => {
                 }}
               >
                 <InfoBox
-                  title="R$ 7.547"
-                  subtitle="Custo médio / HA "
+                  title={safraData ? "R$ " + safraData.custoTotal : ""}
+                  subtitle="Custo Total"
+                />
+              </Box>
+              <Box
+                gridColumn={isSmallDevice ? "span 12": "span 2"}
+                backgroundColor={colors.primary[400]}
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                sx={{
+                  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.09)", 
+                }}
+              >
+                <InfoBox
+                  title={safraData ? "R$ " + safraData.custoMedio : ""}
+                  subtitle="Custo médio / ha "
+                />
+              </Box>
+              <Box
+                gridColumn={isSmallDevice ? "span 6": "span 2"}
+                backgroundColor={colors.primary[400]}
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                sx={{
+                  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.09)", 
+                }}
+              >
+                <InfoBox
+                  title={safraData ? safraData.prodEstimada : ""}
+                  subtitle="Prod. Estimada (SCS)"
                 />
               </Box>
               <Box
@@ -284,24 +330,10 @@ const DashboardProjetado = () => {
                   subtitle="Ponto Equilibrio (SCS)"
                 />
               </Box>
-              <Box
-                gridColumn={isSmallDevice ? "span 6": "span 2"}
-                backgroundColor={colors.primary[400]}
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                sx={{
-                  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.09)", 
-                }}
-              >
-                <InfoBox
-                  title="74,48"
-                  subtitle="Prod. Estimada (SCS)"
-                />
-              </Box>
+
               {/* ROW 2 */}
               <Box
-                gridColumn={isSmallDevice ? "span 6": "span 2"}
+                gridColumn={isSmallDevice ? "span 12": "span 2"}
                 backgroundColor={colors.primary[400]}
                 display="flex"
                 alignItems="center"
@@ -311,27 +343,12 @@ const DashboardProjetado = () => {
                 }}
               >
                 <InfoBox
-                  title="R$ 9.181.446"
-                  subtitle="Custo Total"
-                />
-              </Box>
-              <Box
-                gridColumn={isSmallDevice ? "span 6": "span 2"}
-                backgroundColor={colors.primary[400]}
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                sx={{
-                  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.09)", 
-                }}
-              >
-                <InfoBox
-                  title="R$ 15.250.069"
+                  title={safraData ? "R$ " + safraData.receitaBruta : ""}
                   subtitle="Receita Bruta"
                 />
               </Box>
               <Box
-                gridColumn={isSmallDevice ? "span 6": "span 2"}
+                gridColumn={isSmallDevice ? "span 12": "span 2"}
                 backgroundColor={colors.primary[400]}
                 display="flex"
                 alignItems="center"
@@ -341,26 +358,27 @@ const DashboardProjetado = () => {
                 }}
               >
                 <InfoBox
-                  title="R$ 4.742"
-                  subtitle="Lucro / Hectare"
-                />
-              </Box>
-              <Box
-                gridColumn={isSmallDevice ? "span 6": "span 2"}
-                backgroundColor={colors.primary[400]}
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                sx={{
-                  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.09)", 
-                }}
-              >
-                <InfoBox
-                  title="R$ 6.068.624"
+                  title={safraData ? "R$ " + safraData.lucroTotal : ""}
                   subtitle="Lucro Total"
                 />
               </Box>
               <Box
+                gridColumn={isSmallDevice ? "span 12": "span 2"}
+                backgroundColor={colors.primary[400]}
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                sx={{
+                  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.09)", 
+                }}
+              >
+                <InfoBox
+                  title={safraData ? "R$ " + safraData.lucroHect: ""}
+                  subtitle="Lucro / ha"
+                />
+              </Box>
+
+              <Box
                 gridColumn={isSmallDevice ? "span 6": "span 2"}
                 backgroundColor={colors.primary[400]}
                 display="flex"
@@ -371,7 +389,7 @@ const DashboardProjetado = () => {
                 }}
               >
                 <InfoBox
-                  title="38,4%"
+                  title={safraData ? safraData.rentabilidadeLair + "%": ""}
                   subtitle="Rentabilidade (LAIR %)"
                 />
               </Box>
@@ -386,7 +404,7 @@ const DashboardProjetado = () => {
                 }}
               >
                 <InfoBox
-                  title="34,5%"
+                  title={safraData ? safraData.rentabilidadeFinal + "%": ""}
                   subtitle="Rentabilidade Final"
                 />
               </Box>

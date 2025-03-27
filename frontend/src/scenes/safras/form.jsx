@@ -34,7 +34,7 @@ const SafrasForm = () => {
     { name: "dataFimColheita", label: "Data Fim Colheita", type: "date" },
     { name: "tempoLavoura", label: "Tempo de Lavoura (dias)", type: "number", disabled: true },
     { name: "prodTotal", label: "Prod. Total", type: "number" },
-    { name: "prodPrevista", label: "Prod. Prevista", type: "number" },
+    { name: "prodPrevista", label: "Prod. Prevista (sacos / ha)", type: "number" },
     
     
   ];

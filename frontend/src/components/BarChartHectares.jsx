@@ -8,7 +8,6 @@ import secureLocalStorage from 'react-secure-storage';
 import axios from "axios";
 
 const BarChart = ({isDashboard, safraId}) => {
-  console.log("teste " + safraId);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const isMobile = useMediaQuery("(max-width: 800px)");
@@ -35,8 +34,6 @@ const BarChart = ({isDashboard, safraId}) => {
           });
                       
           setBarData(response.data); 
-          console.log("teste " + safraId);
-          console.log(response.data);
                         
         } catch (error) {
           console.log("ERRO - ao buscar no banco de dados.");

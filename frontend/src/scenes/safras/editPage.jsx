@@ -39,7 +39,7 @@ const SafrasEditPage = () => {
     { name: "toneladas", label: "Toneladas", type: "number" },
     { name: "adubo", label: "Adubo", type: "text" },
     { name: "prodTotal", label: "Prod. Total", type: "number" },
-    { name: "prodPrevista", label: "Prod. Prevista", type: "number" },
+    { name: "prodPrevista", label: "Prod. Prevista (sacos / ha)", type: "number" },
     { name: "dataFimPlantio", label: "Data Fim Plantio", type: "date" },
     { name: "dataFimColheita", label: "Data Fim Colheita", type: "date" },
     { name: "tempoLavoura", label: "Tempo Lavoura (dias)", type: "number", disabled: true },
@@ -51,7 +51,7 @@ const SafrasEditPage = () => {
     { name: "graosAvariados", label: "Grãos Avariados", type: "number" },
     { name: "graosEsverdeados", label: "Grãos Esverdeados", type: "number" },
     { name: "graosQuebrados", label: "Grãos Quebrados", type: "number" },
-    { name: "prodRealizada", label: "Prod. Realizada", type: "number" },
+    { name: "prodRealizada", label: "Prod. Realizada (sacos / ha)", type: "number" },
   ];
   
   useEffect(() => {

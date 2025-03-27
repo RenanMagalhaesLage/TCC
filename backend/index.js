@@ -1586,6 +1586,67 @@ app.get('/custos-hectares-glebas-bar-chart', async (req, res) => {
       }
 });
 
+app.get('/report-safra', async (req, res) => {
+    const { id } = req.query;
+
+    const safra = await Safra.findByPk(id);
+        if (!safra) {
+            return res.status(404).json({ error: 'Safra não encontrado' });
+    }
+
+    //Somando custos por categoria
+    const query = `
+        SELECT SUM(totalValue) AS totalCustos
+        FROM custos
+        WHERE safraId = :id;
+    `;
+  
+    try {
+        const [sumCustos] = await connection.query(query, {
+          replacements: { id },  
+          type: QueryTypes.SELECT  
+        });
+
+        const custoMedio = (sumCustos.totalCustos / safra.areaTotal);
+        const receitaBruta = safra.precoVendaEstimado * safra.areaTotal * safra.prodPrevista;
+        const lucroTotal = receitaBruta - sumCustos.totalCustos;
+        const lucroHect = lucroTotal / safra.areaTotal;
+        /* PONTO EQUILÍBRIO = CUSTO MÉDIO / PREÇO VENDA */
+        const pontoEquilibrio = custoMedio / safra.precoVendaEstimado;
+        /* LAIR --> LUCRO ANTES DO IMPOSTO DE RENDA */
+        const receitaHect = safra.precoVendaEstimado * safra.prodPrevista;
+        const rentabilidadeLair = (receitaHect / custoMedio) - 1;
+        const funrural = receitaBruta*0.2;
+        /* IMPOSTO DE RENDA --> (LUCRO TOTAL - FUNRURAL) * 20% */
+        const importoRenda =  (lucroTotal - funrural) * 0.2;
+        const lucroLiquido = lucroTotal - funrural - importoRenda;
+        const lucroLiquidoHect = lucroLiquido / safra.areaTotal;
+        const rentabilidadeTotal = lucroLiquidoHect / custoMedio;
+
+        const result = {
+            areaTotal: formatarNumero(safra.areaTotal),
+            precoVenda: formatarNumero(safra.precoVendaEstimado),
+            custoTotal: formatarNumero(sumCustos.totalCustos) || 0,
+            custoMedio:  formatarNumero(custoMedio),
+            prodEstimada: formatarNumero(safra.prodPrevista), 
+            pontoEquilibrio: formatarNumero(pontoEquilibrio),
+            receitaBruta: formatarNumero(receitaBruta),
+            lucroTotal: formatarNumero(lucroTotal),
+            lucroHect: formatarNumero(lucroHect),
+            rentabilidadeLair: formatarNumero(rentabilidadeLair),
+            rentabilidadeFinal: formatarNumero(rentabilidadeTotal),
+
+        };
+      
+        return res.json(result);
+        
+
+    } catch (error) {
+        console.error('Erro ao executar a consulta:', error);
+        res.status(500).json({ error: 'Erro ao acessar o banco de dados' });
+    }
+});
+
 /*------------------------
         ROTAS INVITE
 --------------------------*/
@@ -1757,3 +1818,18 @@ app.get("/",(req,res) =>{
 app.listen(8080,()=>{
     console.log("App rodando na porta 8080");
 })*/
+
+function formatarNumero(valor) {
+    const numeroFormatado = new Intl.NumberFormat('pt-BR', { 
+        style: 'decimal', 
+        minimumFractionDigits: 0, 
+        maximumFractionDigits: 2 
+    }).format(valor);
+    
+    // Verificar se as casas decimais são "00" e removê-las se for o caso
+    if (valor % 1 === 0) {
+        return numeroFormatado; 
+    } else {
+        return numeroFormatado.replace(/(\,00)$/, ''); // Remove a vírgula com "00" no final
+    }
+}

@@ -32,7 +32,6 @@ const BarChart = ({isDashboard, safraId}) => {
           const response = await axios.get(`http://localhost:3000/custos-glebas-bar-chart`, {
             params: { safraId: safraId }
           });
-          console.log(response.data)            
           setBarData(response.data); 
                         
         } catch (error) {
