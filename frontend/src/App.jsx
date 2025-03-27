@@ -25,14 +25,14 @@ import GlebaEditForm from './scenes/glebas/editForm';
 import Safras from './scenes/safras'
 import SafraPage from './scenes/safras/infoPage';
 import SafraForm from './scenes/safras/form';
-import SafrasHistory from './scenes/safras/historyPage';
+import SafraHistory from './scenes/safras/historyPage';
+import SafraEditPage from './scenes/safras/editPage';
 import Custos from './scenes/custos';
 import Invite from './scenes/invites';
 import InvitesForm from './scenes/invites/form';
 import CustosPage from './scenes/custos/custosPage';
 import CustosForm from './scenes/custos/form';
 import CustosEditPage from './scenes/custos/editPage';
-import SafrasEditPage from './scenes/safras/editPage';
 import DashboardProjetado from './scenes/dashboard/dashboardProjetado';
 import Storage from './scenes/storage/index';
 import StoragePage from './scenes/storage/storagePage';
@@ -70,7 +70,7 @@ function App() {
                   <Route path="/form" element={<Form />} />
                   <Route path="/grafico-barra-category/:id" element={<BarCategory />} />
                   <Route path="/grafico-barra-hectares/:id" element={<BarHectares />} />
-                  <Route path="/grafico-pizza" element={<Pie />} />
+                  <Route path="/grafico-pizza/:id" element={<Pie />} />
                   <Route path="/line" element={<Line />} />
                   <Route path="/faq" element={<FAQ />} />
                   <Route path="/propriedades" element={<Properties />} />
@@ -91,7 +91,7 @@ function App() {
                   <Route path="/custos/:id" element={<CustosPage />} />
                   <Route path="/custos/add" element={<CustosForm />} />
                   <Route path="/custos/edit/:id" element={<CustosEditPage />} />
-                  <Route path="/historico-safras" element={<SafrasHistory />} />
+                  <Route path="/historico-safras" element={<SafraHistory />} />
                   <Route path="/convites" element={<Invite />} />
                   <Route path="/convites/add" element={<InvitesForm />} />
                   <Route path="/projetado" element={<DashboardProjetado />} />

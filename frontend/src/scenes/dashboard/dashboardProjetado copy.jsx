@@ -441,7 +441,7 @@ const DashboardProjetado = () => {
             </Box>
           </Box>
           <Box height="400px" m={isSmallDevice ? "-20px -100px 0 0" : "-20px -50px 0 0"}>
-            <BarChart isDashboard={true} />
+            <BarChart isDashboard={true} safraId={safraId}/>
           </Box>
         </Box>
         {/* ROW 5 */}

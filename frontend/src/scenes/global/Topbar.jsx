@@ -113,12 +113,12 @@ const Topbar = () =>{
                         <Typography variant="body2" sx={{ marginTop: "5px" }}>• Notificação 3</Typography>
                         </Box>
                   </Paper>
-                )}*/}
+                )}
                 <Tooltip title="Dúvidas Frequentes" >
                     <IconButton>
                         <HelpOutlineOutlinedIcon />
                     </IconButton>
-                </Tooltip>
+                </Tooltip>*/}
             </Box>
         </Box>
     )

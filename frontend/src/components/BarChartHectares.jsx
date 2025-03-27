@@ -7,7 +7,8 @@ import { colorSchemes } from "@nivo/colors";
 import secureLocalStorage from 'react-secure-storage';
 import axios from "axios";
 
-const BarChart = ({ isDashboard = false }) => {
+const BarChart = ({isDashboard, safraId}) => {
+  console.log("teste " + safraId);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const isMobile = useMediaQuery("(max-width: 800px)");
@@ -30,12 +31,12 @@ const BarChart = ({ isDashboard = false }) => {
       const fetchBarData = async () => {
         try {
           const response = await axios.get(`http://localhost:3000/custos-hectares-glebas-bar-chart`, {
-            params: { safraId: 1 }
+            params: { safraId: safraId }
           });
                       
-
           setBarData(response.data); 
-
+          console.log("teste " + safraId);
+          console.log(response.data);
                         
         } catch (error) {
           console.log("ERRO - ao buscar no banco de dados.");
@@ -133,7 +134,7 @@ const BarChart = ({ isDashboard = false }) => {
         legendPosition: "middle",
         legendOffset: -40,
       }}
-      enableLabel={false}
+      enableLabel={true}
       labelSkipWidth={12}
       labelSkipHeight={12}
       labelTextColor={{

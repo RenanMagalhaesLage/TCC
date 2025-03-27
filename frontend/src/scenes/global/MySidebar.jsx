@@ -245,7 +245,7 @@ const Sidebar = ({ onLogout }) => {
               setSelected={setSelected}
             />
             
-
+          {/* 
             <Typography
               variant="h6"
               color={colors.grey[300]}
@@ -281,6 +281,7 @@ const Sidebar = ({ onLogout }) => {
               selected={selected}
               setSelected={setSelected}
             />
+            */}
             <Divider variant="middle" component="li" sx={{marginRight: isCollapsed ?  0 : 2, marginLeft: -1 }}/>
 
 
@@ -310,13 +311,14 @@ const Sidebar = ({ onLogout }) => {
             )}
 
             <Box mt={isCollapsed ? "30px" : "0px"}>
+            {/*
             <Item
               title="Dúvidas Frequentes"
               to="/faq"
               icon={<HelpOutlineOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-            />
+            />*/}
             <Item
               title="Sair"
               to="#"

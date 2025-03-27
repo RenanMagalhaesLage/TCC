@@ -1547,12 +1547,12 @@ app.get('/custos-hectares-glebas-bar-chart', async (req, res) => {
             sg.glebaId,  
             IFNULL(SUM(custos.totalValue), 0) AS value
         FROM 
-            (SELECT DISTINCT glebaId FROM safra_glebas WHERE safraId = 1) AS sg
+            (SELECT DISTINCT glebaId FROM safra_glebas WHERE safraId = :safraId) AS sg
         LEFT JOIN 
             Custos AS custos
         ON 
             custos.glebaId = sg.glebaId 
-            AND custos.safraId = 1
+            AND custos.safraId = :safraId
         GROUP BY 
             sg.glebaId;
     `;

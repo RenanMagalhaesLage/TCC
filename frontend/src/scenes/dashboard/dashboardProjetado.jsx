@@ -75,13 +75,17 @@ const DashboardProjetado = () => {
       console.error('Erro ao buscar dados da safra:', error);
     }
   }, []);
+
+  const handleClickPie = (id) => {
+    navigate(`/grafico-pizza/${id}`); 
+  };
   
   const handleClickBarraCategory = (id) => {
-    navigate(`/grafico-barra-category/${id}`); // Realize a navegação para a rota desejada
+    navigate(`/grafico-barra-category/${id}`); 
   };
 
   const   handleClickBarraHectares = (id) => {
-    navigate(`/grafico-barra-hectares/${id}`); // Realize a navegação para a rota desejada
+    navigate(`/grafico-barra-hectares/${id}`); 
   };
 
   const handleFormSubmit = async (values) => {
@@ -414,13 +418,12 @@ const DashboardProjetado = () => {
                   </Box>
                   <Box>
                     <Tooltip title="Visualizar">
-                      <IconButton>
+                      <IconButton onClick={() => handleClickPie(safraId)}>
                         <VisibilityIcon
                           sx={{ fontSize: "26px", color: colors.mygreen[500] }}
                         />
                       </IconButton>
                     </Tooltip>
-                    
                   </Box>
                 </Box>
                 <Box height="400px" m="-20px 0 0 0">
@@ -502,7 +505,7 @@ const DashboardProjetado = () => {
                   </Box>
                 </Box>
                 <Box height="400px" m={isSmallDevice ? "-20px -0 0 0" : "-20px 0 0 0"}>
-                  <BarChartHectares isDashboard={true} />
+                  <BarChartHectares isDashboard={true} safraId={safraId}/>
                 </Box>
               </Box>
               {/* ROW 5 */}

@@ -27,7 +27,7 @@ const PieChart = ({isDashboard, safraId }) => {
       const fetchPieData = async () => {
         try {
           const response = await axios.get(`http://localhost:3000/custos-pie-chart`, {
-            params: { safraId: 1 }
+            params: { safraId: safraId }
           });
                       
   
