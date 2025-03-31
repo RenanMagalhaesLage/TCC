@@ -86,7 +86,7 @@ const BarChart = ({isDashboard, safraId}) => {
             'semente',
             'arrendamento',
             'administrativo',
-            'corretivos e fertilizantes'
+            'corr. e fert.'
         ]}
         indexBy="gleba"
         margin={isMobile ? { top: 20, right: 20, bottom: 50, left: 60 } : { top: 50, right: 130, bottom: 50, left: 60 }}

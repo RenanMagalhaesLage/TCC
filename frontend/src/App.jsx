@@ -9,8 +9,9 @@ import Team from "./scenes/team";
 import Contacts from "./scenes/contacts";
 import Form from "./scenes/form";
 import FAQ from "./scenes/faq";
-import BarHectares from "./scenes/bar/indexHectares";
-import BarCategory from "./scenes/bar/indexCategory";
+import BarHectares from "./scenes/bar/barCharHectares";
+import BarCategory from "./scenes/bar/barCharCategory";
+import BarCustos from "./scenes/bar/barChartCustos";
 import Pie from "./scenes/pie";
 import Line from "./scenes/line";
 import Login from './scenes/login';
@@ -34,6 +35,7 @@ import CustosPage from './scenes/custos/custosPage';
 import CustosForm from './scenes/custos/form';
 import CustosEditPage from './scenes/custos/editPage';
 import DashboardProjetado from './scenes/dashboard/dashboardProjetado';
+import DashboardRealizado from './scenes/dashboard/dashboardRealizado';
 import Storage from './scenes/storage/index';
 import StoragePage from './scenes/storage/storagePage';
 import StorageForm from './scenes/storage/form';
@@ -70,6 +72,7 @@ function App() {
                   <Route path="/form" element={<Form />} />
                   <Route path="/grafico-barra-category/:id" element={<BarCategory />} />
                   <Route path="/grafico-barra-hectares/:id" element={<BarHectares />} />
+                  <Route path="/grafico-barra-custos/:id" element={<BarCustos />} />
                   <Route path="/grafico-pizza/:id" element={<Pie />} />
                   <Route path="/line" element={<Line />} />
                   <Route path="/faq" element={<FAQ />} />
@@ -95,6 +98,7 @@ function App() {
                   <Route path="/convites" element={<Invite />} />
                   <Route path="/convites/add" element={<InvitesForm />} />
                   <Route path="/projetado" element={<DashboardProjetado />} />
+                  <Route path="/realizado" element={<DashboardRealizado />} />
                   <Route path="/estoque" element={<Storage />} />
                   <Route path="/estoque/:id" element={<StoragePage />} />
                   <Route path="/estoque/add" element={<StorageForm />} />

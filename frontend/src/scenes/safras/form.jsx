@@ -34,9 +34,8 @@ const SafrasForm = () => {
     { name: "dataFimColheita", label: "Data Fim Colheita", type: "date" },
     { name: "tempoLavoura", label: "Tempo de Lavoura (dias)", type: "number", disabled: true },
     { name: "prodTotal", label: "Prod. Total", type: "number" },
-    { name: "prodPrevista", label: "Prod. Prevista (sacos / ha)", type: "number" },
-    
-    
+    { name: "prodPrevista", label: "Prod. Estimada (sacos / ha)", type: "number" },
+    { name: "precoVendaEstimado", label: "Preço de venda Estimado (R$ / saco)", type: "number" },
   ];
   
   useEffect(() => {
@@ -115,6 +114,7 @@ const SafrasForm = () => {
     prodTotal: "",
     prodPrevista: "",
     gleba: "",
+    precoVendaEstimado: "",
   };  
 
   const handleSwitchChange = (event, setFieldValue) => {
@@ -129,6 +129,7 @@ const SafrasForm = () => {
 
   const navigate = useNavigate(); 
   const handleFormSubmit = async (values) => {
+    console.log(values);
     try {
       const response = await axios.post("http://localhost:3000/safras", {
         email: userData.email,
@@ -145,6 +146,7 @@ const SafrasForm = () => {
         tempoLavoura: values.tempoLavoura,
         prodTotal: values.prodTotal,
         prodPrevista: values.prodPrevista,
+        precoVendaEstimado: values.precoVendaEstimado,
       });
       if (response.status === 201) {  
         navigate(`/safras?message=${encodeURIComponent("1")}`);
@@ -331,18 +333,19 @@ const SafrasForm = () => {
 
 
 const checkoutSchema = yup.object().shape({
-    cultivo: yup.string().required("Campo de preenchimento obrigatório"),
-    semente: yup.string().required("Campo de preenchimento obrigatório"),
-    metroLinear: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
-    dosagem: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
-    toneladas: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
-    adubo: yup.string().required("Campo de preenchimento obrigatório"),
-    dataFimPlantio: yup.date().required("Campo de preenchimento obrigatório").typeError("Deve ser uma data válida"),
-    dataFimColheita: yup.date().required("Campo de preenchimento obrigatório").typeError("Deve ser uma data válida"),
-    //tempoLavoura: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
-    prodTotal: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
-    prodPrevista: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
-    gleba: yup.array().min(1, "Selecione ao menos uma gleba").required("Campo de preenchimento obrigatório"),  
-    safraName:yup.string().required("Campo de preenchimento obrigatório"),
+  cultivo: yup.string().required("Campo de preenchimento obrigatório"),
+  semente: yup.string().required("Campo de preenchimento obrigatório"),
+  metroLinear: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+  dosagem: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+  toneladas: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+  adubo: yup.string().required("Campo de preenchimento obrigatório"),
+  dataFimPlantio: yup.date().required("Campo de preenchimento obrigatório").typeError("Deve ser uma data válida"),
+  dataFimColheita: yup.date().required("Campo de preenchimento obrigatório").typeError("Deve ser uma data válida"),
+  //tempoLavoura: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+  prodTotal: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+  prodPrevista: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+  gleba: yup.array().min(1, "Selecione ao menos uma gleba").required("Campo de preenchimento obrigatório"),  
+  safraName: yup.string().required("Campo de preenchimento obrigatório"),
+  precoVendaEstimado: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
 });
 export default SafrasForm;

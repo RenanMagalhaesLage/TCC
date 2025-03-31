@@ -7,7 +7,7 @@ import Header from "../../components/Header";
 import LineChart from "../../components/LineChart";
 import BarChartHectares from "../../components/BarChartHectares";
 import BarChartCategory from "../../components/BarChartCategory";
-import PieChart from "../../components/PieChart";
+import BarChartCustos from "../../components/BarChartCustos";
 import InfoBox from "../../components/InfoBox";
 import { Formik, Form, Field } from "formik";
 import secureLocalStorage from 'react-secure-storage';
@@ -15,7 +15,7 @@ import axios from "axios";
 import { useNavigate } from 'react-router-dom';
 import * as yup from "yup";
 
-const DashboardProjetado = () => {
+const DashboardRealizado = () => {
   const navigate = useNavigate(); 
   const isMobile = useMediaQuery("(max-width: 800px)");
   const isSmallDevice = useMediaQuery("(max-width: 1300px)");
@@ -52,7 +52,7 @@ const DashboardProjetado = () => {
                       
           const safras = response.data
             .filter(safra => safra.status === false)
-            .filter(safra => safra.type === "Planejado")
+            .filter(safra => safra.type === "Realizado")
             .map(safra => ({
               id: safra.id,
               name: `${safra.name} - ${safra.cultivo}`
@@ -79,8 +79,8 @@ const DashboardProjetado = () => {
     }
   }, []);
 
-  const handleClickPie = (id) => {
-    navigate(`/grafico-pizza/${id}`); 
+  const handleClickBarraCustos = (id) => {
+    navigate(`/grafico-barra-custos/${id}`); 
   };
   
   const handleClickBarraCategory = (id) => {
@@ -95,7 +95,6 @@ const DashboardProjetado = () => {
     setShowPanel(false);
     setSafraId(values.safra);
     setPropertyId(values.property);  
-
   
     try {
       const response = await axios.get(`http://localhost:3000/report-safra`, {
@@ -118,7 +117,7 @@ const DashboardProjetado = () => {
     <Box m="20px">
       {/* HEADER */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="Painel Custo Agrícola Projetado" subtitle="Visualize o painel do custo agricula projetado" />
+        <Header title="Painel Custo Agrícola Realizado" subtitle="Visualize o painel do custo agricula realizado" />
       </Box>
 
       <Formik
@@ -302,6 +301,21 @@ const DashboardProjetado = () => {
                 />
               </Box>
               <Box
+                gridColumn={isSmallDevice ? "span 12": "span 2"}
+                backgroundColor={colors.primary[400]}
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                sx={{
+                  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.09)", 
+                }}
+              >
+                <InfoBox
+                  //title={safraData ? "R$ " + safraData.custoMedio : ""}
+                  subtitle="Disp Prev vs. Real "
+                />
+              </Box>
+              <Box
                 gridColumn={isSmallDevice ? "span 6": "span 2"}
                 backgroundColor={colors.primary[400]}
                 display="flex"
@@ -437,7 +451,7 @@ const DashboardProjetado = () => {
                   </Box>
                   <Box>
                     <Tooltip title="Visualizar">
-                      <IconButton onClick={() => handleClickPie(safraId)}>
+                      <IconButton onClick={() => handleClickBarraCustos(safraId)}>
                         <VisibilityIcon
                           sx={{ fontSize: "26px", color: colors.mygreen[500] }}
                         />
@@ -446,7 +460,7 @@ const DashboardProjetado = () => {
                   </Box>
                 </Box>
                 <Box height="400px" m="-20px 0 0 0">
-                  <PieChart isDashboard={true} safraId={safraId}/>
+                  <BarChartCustos isDashboard={true} safraId={safraId}/>
                 </Box>
               </Box>
               <Box
@@ -542,4 +556,4 @@ const checkoutSchema = yup.object().shape({
   note: yup.number(),
 });
 
-export default DashboardProjetado;
+export default DashboardRealizado;

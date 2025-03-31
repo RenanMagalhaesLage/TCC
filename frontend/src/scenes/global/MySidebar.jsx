@@ -239,7 +239,7 @@ const Sidebar = ({ onLogout }) => {
             />
             <Item
               title="Realizado"
-              to="/"
+              to="/realizado"
               icon={<TimelineOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}

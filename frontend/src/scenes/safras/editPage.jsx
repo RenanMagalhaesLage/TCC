@@ -40,6 +40,7 @@ const SafrasEditPage = () => {
     { name: "adubo", label: "Adubo", type: "text" },
     { name: "prodTotal", label: "Prod. Total", type: "number" },
     { name: "prodPrevista", label: "Prod. Prevista (sacos / ha)", type: "number" },
+    { name: "precoVendaEstimado", label: "Preço de venda Estimado (R$ / saco)", type: "number" },
     { name: "dataFimPlantio", label: "Data Fim Plantio", type: "date" },
     { name: "dataFimColheita", label: "Data Fim Colheita", type: "date" },
     { name: "tempoLavoura", label: "Tempo Lavoura (dias)", type: "number", disabled: true },
@@ -52,6 +53,7 @@ const SafrasEditPage = () => {
     { name: "graosEsverdeados", label: "Grãos Esverdeados", type: "number" },
     { name: "graosQuebrados", label: "Grãos Quebrados", type: "number" },
     { name: "prodRealizada", label: "Prod. Realizada (sacos / ha)", type: "number" },
+    { name: "precoVendaRealizado", label: "Preço de venda Realizado (R$ / saco)", type: "number" },
   ];
   
   useEffect(() => {
@@ -118,6 +120,8 @@ const SafrasEditPage = () => {
     glebas: null,
     status: safra.status === false ? false : true,
     name: safra.name || "",
+    precoVendaEstimado: safra.precoVendaEstimado || "",
+    precoVendaRealizado: safra.precoVendaRealizado || "",
   } : {};
 
   const navigate = useNavigate(); 
@@ -586,6 +590,7 @@ const checkoutSchema = yup.object().shape({
   prodTotal: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
   prodPrevista: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
   prodRealizada: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+  precoVendaEstimado: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
     //porcentHect: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
 });
 
@@ -603,6 +608,7 @@ const checkoutSchema2 = yup.object().shape({
   tempoLavoura: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
   prodTotal: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
   prodPrevista: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+  precoVendaEstimado: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
 });
 
 const calculateTempoLavoura = (dataFimPlantio, dataFimColheita) => {

@@ -822,7 +822,9 @@ app.post('/safras', async (req, res) => {
             tempoLavoura,
             prodTotal,
             prodPrevista, 
+            precoVendaEstimado,
         } = req.body;
+        console.log("TESTEEEE " + precoVendaEstimado);
         const user = await User.findOne({ where: { email: email } });
 
         const ids = glebaIds.map(id => Number(id));
@@ -835,10 +837,11 @@ app.post('/safras', async (req, res) => {
 
         if (
             !email || !glebaIds || !safraName || !cultivo || !semente || !metroLinear || !dosagem || !toneladas || 
-            !adubo || !dataFimPlantio || !dataFimColheita || !tempoLavoura || !prodTotal || !prodPrevista
+            !adubo || !dataFimPlantio || !dataFimColheita || !tempoLavoura || !prodTotal || !prodPrevista || !precoVendaEstimado
         ) {
             return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
         }
+        console.log("PASSOUUU");
 
         const newSafra = await Safra.create({
             type: "Planejado",
@@ -856,6 +859,7 @@ app.post('/safras', async (req, res) => {
             tempoLavoura: tempoLavoura,
             prodTotal: prodTotal,
             prodPrevista: prodPrevista, 
+            precoVendaEstimado: precoVendaEstimado,
             precMilimetrica: 0,  
             umidade: 0,          
             impureza: 0,         
@@ -864,6 +868,7 @@ app.post('/safras', async (req, res) => {
             graosQuebrados: 0,   
             prodRealizada: 0,  
             porcentHect: 0,
+            precoVendaRealizado: 0,
         });
 
         if (glebaIds && glebaIds.length > 0) {
@@ -1362,6 +1367,7 @@ app.get('/custos-pie-chart', async (req, res) => {
       SELECT category, SUM(totalValue) AS value
       FROM Custos
       WHERE safraId = :safraId
+      AND type = 'Planejado'
       GROUP BY category;
     `;
   
@@ -1379,7 +1385,7 @@ app.get('/custos-pie-chart', async (req, res) => {
             'Administrativo',
             'Corretivos e Fertilizantes'
             
-          ];
+        ];
           
         const result = categories.map(category => {
             const categoryFound = Array.isArray(sumCustos) ? sumCustos.find(result => result.category === category) : null;
@@ -1463,7 +1469,7 @@ app.get('/custos-glebas-line-chart', async (req, res) => {
       }
 });
 
-/*  Rota para --> GRÁFICO DE BARRA DE CUSTOS POR GLEBA */
+/*  Rota para --> GRÁFICO DE BARRA DE CUSTOS POR CATEGORIA POR GLEBA */
 app.get('/custos-glebas-bar-chart', async (req, res) => {
     const { safraId } = req.query;
 
@@ -1471,6 +1477,7 @@ app.get('/custos-glebas-bar-chart', async (req, res) => {
         if (!safra) {
             return res.status(404).json({ error: 'Safra não encontrado' });
     }
+    console.log("safra type = " + safra.type);
 
     //Somando custos por categoria
     const query = `
@@ -1488,14 +1495,21 @@ app.get('/custos-glebas-bar-chart', async (req, res) => {
             custos.glebaId = sg.glebaId 
             AND custos.category = c.category 
             AND custos.safraId = :safraId
+            AND custos.type = :type
         GROUP BY 
             sg.glebaId, c.category;
     `;
   
     try {
         const sumCustos = await connection.query(query, {
-          replacements: { safraId },  
-          type: QueryTypes.SELECT  
+            replacements: { safraId, type: safra.type },  
+            type: QueryTypes.SELECT  
+        });
+
+        sumCustos.forEach(item => {
+            if (item.category === 'Corretivos e Fertilizantes') {
+                item.category = 'Corr. e Fert.';
+            }
         });
 
         const categories = [
@@ -1504,7 +1518,7 @@ app.get('/custos-glebas-bar-chart', async (req, res) => {
             'Semente',
             'Arrendamento',
             'Administrativo',
-            'Corretivos e Fertilizantes'
+            'Corr. e Fert.'
         ];
          
         const glebas = [...new Set(sumCustos.map(item => item.glebaId))];
@@ -1553,14 +1567,15 @@ app.get('/custos-hectares-glebas-bar-chart', async (req, res) => {
         ON 
             custos.glebaId = sg.glebaId 
             AND custos.safraId = :safraId
+            AND custos.type = :type
         GROUP BY 
             sg.glebaId;
     `;
   
     try {
         const sumCustos = await connection.query(query, {
-          replacements: { safraId },  
-          type: QueryTypes.SELECT  
+            replacements: { safraId, type: safra.type },  
+            type: QueryTypes.SELECT  
         });
          
         const glebas = [...new Set(sumCustos.map(item => item.glebaId))];
@@ -1580,6 +1595,43 @@ app.get('/custos-hectares-glebas-bar-chart', async (req, res) => {
         });
 
         return res.json(result);
+      } catch (error) {
+        console.error('Erro ao executar a consulta:', error);
+        res.status(500).json({ error: 'Erro ao acessar o banco de dados' });
+      }
+});
+
+/* Rota para --> GRÁFICO DE BARRA DE CUSTO MÉDIO POR HECTARE POR GLEBA */
+app.get('/custos-categoria-bar-chart', async (req, res) => {
+    const { safraId } = req.query;
+
+    const safra = await Safra.findByPk(safraId);
+        if (!safra) {
+            return res.status(404).json({ error: 'Safra não encontrado' });
+    }
+
+    //Somando custos por categoria
+    const query = `
+       SELECT category, SUM(totalValue) AS value
+        FROM Custos
+        WHERE safraId = 2
+        AND type = 'Realizado'
+        GROUP BY category;
+    `;
+  
+    try {
+        const sumCustos = await connection.query(query, {
+          replacements: { safraId },  
+          type: QueryTypes.SELECT  
+        });
+
+        sumCustos.forEach(item => {
+            if (item.category === 'Corretivos e Fertilizantes') {
+                item.category = 'Corr. e Fert.';
+            }
+        });
+
+        return res.json(sumCustos);
       } catch (error) {
         console.error('Erro ao executar a consulta:', error);
         res.status(500).json({ error: 'Erro ao acessar o banco de dados' });
