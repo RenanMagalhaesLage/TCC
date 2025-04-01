@@ -85,19 +85,19 @@ const PropertiesForm = () => {
                 helperText={touched.namePropertie && errors.namePropertie}
                 sx={{ gridColumn: "span 4" }}
               />
-                <TextField
+              <TextField
                 fullWidth
                 variant="filled"
-                    type="number"
-                    label="Área"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values.area}
-                    name="area"
-                    error={!!touched.area && !!errors.area}
-                    helperText={touched.area && errors.area}
-                    sx={{ gridColumn: "span 2" }}
-                />
+                type="number"
+                label="Área"
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.area}
+                name="area"
+                error={!!touched.area && !!errors.area}
+                helperText={touched.area && errors.area}
+                sx={{ gridColumn: "span 2" }}
+              />
               <TextField
                 fullWidth
                 variant="filled"

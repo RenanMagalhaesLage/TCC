@@ -13,6 +13,7 @@ const StorageForm = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const isNonMobile = useMediaQuery("(min-width:600px)");
+  const isSmallDevice = useMediaQuery("(max-width: 800px)"); 
   const [properties, setProperties] = useState([]);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -155,10 +156,8 @@ const StorageForm = () => {
             <Box
               display="grid"
               gap="30px"
-              gridTemplateColumns="repeat(4, minmax(0, 1fr))"
-              sx={{
-                "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
-              }}
+              gridTemplateColumns="repeat(4, 1fr)"
+
             >
               <TextField
                 fullWidth
@@ -171,121 +170,72 @@ const StorageForm = () => {
                 name="name"
                 error={!!touched.name && !!errors.name}
                 helperText={touched.name && errors.name}
-                sx={{ gridColumn: "span 1" }}
+                sx={{ gridColumn: isSmallDevice ? "span 4" : "span 2" }}
               />
-                
-                <Autocomplete
-                  disablePortal
-                  id="properties"
-                  options={properties}
-                  getOptionLabel={(option) => option.name || ""}
-                  name="property"
-                  
-                  value={
-                    values.property
-                    ? properties.find((option) => option.id === values.property) 
-                    : null
-                  } 
-                  onChange={(event, value) => setFieldValue('property', value?.id || null)} 
-                  onBlur={handleBlur} 
-                  sx={{ gridColumn: "span 2" }}
-                  renderInput={(params) => (
-                    <TextField 
-                        {...params} 
-                        label="Propriedade"
-                        variant="filled"
-                        name="property"
-                        error={!!touched.property && !!errors.property }
-                        helperText={touched.property &&  errors.property }
-                        onBlur={handleBlur} 
-                    />
-                  )}
-                  noOptionsText="Não Encontrado"
-                />
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  type="text"
-                  label="Localização Referência"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.storedLocation || ""}
-                  name="storedLocation"
-                  error={!!touched.storedLocation && !!errors.storedLocation}
-                  helperText={touched.storedLocation && errors.storedLocation}
-                  sx={{ gridColumn: "span 1" }}
-                />
+              <Autocomplete
+                disablePortal
+                id="properties"
+                options={properties}
+                getOptionLabel={(option) => option.name || ""}
+                name="property"
+                value={
+                  values.property
+                  ? properties.find((option) => option.id === values.property) 
+                  : null
+                } 
+                onChange={(event, value) => setFieldValue('property', value?.id || null)} 
+                onBlur={handleBlur} 
+                renderInput={(params) => (
+                  <TextField 
+                    {...params} 
+                    label="Propriedade"
+                    variant="filled"
+                    name="property"
+                    error={!!touched.property && !!errors.property }
+                    helperText={touched.property &&  errors.property }
+                    onBlur={handleBlur} 
+                  />
+                )}
+                sx={{ gridColumn: isSmallDevice ? "span 4" : "span 2" }}
+                noOptionsText="Não Encontrado"
+              />
+              <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label="Localização Referência"
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.storedLocation || ""}
+                name="storedLocation"
+                error={!!touched.storedLocation && !!errors.storedLocation}
+                helperText={touched.storedLocation && errors.storedLocation}
+                sx={{ gridColumn: isSmallDevice ? "span 4" : "span 1" }}
+              />
 
-                <TextField
-                  label="Preço"
-                  variant="filled"
-                  value={values.price || ""}
-                  onBlur={handleBlur} 
-                  onChange={(e) => {
-                    handleChange(e);
-                    setFieldValue("totalValue", calculateTotalValue(e.target.value, values.quantity));
-                  }} 
-                  name="price"
-                  error={!!touched.price && !!errors.price}
-                  helperText={touched.price && errors.price}
-                  id="formatted-numberformat-input"
-                  InputProps={{
-                    inputComponent: NumericFormatCustom,
-                  }}
-                  sx={{
-                    gridRow: "2", 
-                    gridColumn: "3"
-                  }}
-                />
-
-                <TextField
-                  label="Valor Total"
-                  variant="filled"
-                  value={values.totalValue || ""}
-                  onBlur={handleBlur} 
-                  onChange={(e) => {
-                    setFieldValue("totalValue", calculateTotalValue(values.quantity, values.price));
-                    handleChange(e);
-                      
-                  }}                    
-                  name="totalValue"
-                  error={!!touched.totalValue && !!errors.totalValue}
-                  helperText={touched.totalValue && errors.totalValue}
-                    
-                  InputProps={{
-                    inputComponent: NumericFormatCustom,
-                  }}
-                  disabled
-                  sx={{
-                    gridRow: "2", 
-                    gridColumn: "4"
-                  }}
-                />
-
-                <Autocomplete
-                  disablePortal
-                  id="categories"
-                  options={categoryOptions}
-                  name="category"
-                  value={values.category || null} 
-                  onChange={(event, value) => setFieldValue('category', value)} 
-                  onBlur={handleBlur} 
-                  sx={{ gridColumn: "span 1" }}
-                  renderInput={(params) => (
-                    <TextField 
-                      {...params} 
-                      label="Categoria"
-                      variant="filled"
-                      name="category"
-                      error={!!touched.category && !!errors.category}
-                      helperText={touched.category && errors.category}
-                      onBlur={handleBlur} 
-                    />
-                  )}
-                  noOptionsText="Não Encontrado"
-                />
-
-                {fields.map(({ name, label, type, disabled, }) => (
+              <Autocomplete
+                disablePortal
+                id="categories"
+                options={categoryOptions}
+                name="category"
+                value={values.category || null} 
+                onChange={(event, value) => setFieldValue('category', value)} 
+                onBlur={handleBlur} 
+                renderInput={(params) => (
+                  <TextField 
+                    {...params} 
+                    label="Categoria"
+                    variant="filled"
+                    name="category"
+                    error={!!touched.category && !!errors.category}
+                    helperText={touched.category && errors.category}
+                    onBlur={handleBlur} 
+                  />
+                )}
+                sx={{ gridColumn: isSmallDevice ? "span 4" : "span 1" }}
+                noOptionsText="Não Encontrado"
+              />
+              {fields.map(({ name, label, type, disabled, }) => (
                   <TextField
                     key={name}
                     fullWidth
@@ -311,40 +261,75 @@ const StorageForm = () => {
                     disabled={disabled}
                     error={touched[name] && Boolean(errors[name])}
                     helperText={touched[name] && errors[name]}
-                    sx={{ gridColumn: "span 1" }}
                     InputLabelProps={type === "date" ? { shrink: true } : {}}
+                    sx={{ gridColumn: isSmallDevice ? "span 4" : "span 1" }}
                   />
-                ))}   
-                <TextField
-                    fullWidth
-                    variant="filled"
-                    type="text"
-                    label="Observação"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values.note || ""}
-                    multiline
-                    rows={5}
-                    name="note"
-                    error={!!touched.note && !!errors.note}
-                    helperText={touched.note && errors.note}
-                    sx={{
-                      gridColumn: "span 2", 
-                      gridRow: "4", 
-                    }}
-                  />       
+                ))}
+              <TextField
+                label="Preço"
+                variant="filled"
+                value={values.price || ""}
+                onBlur={handleBlur} 
+                onChange={(e) => {
+                  handleChange(e);
+                  setFieldValue("totalValue", calculateTotalValue(e.target.value, values.quantity));
+                }} 
+                name="price"
+                error={!!touched.price && !!errors.price}
+                helperText={touched.price && errors.price}
+                id="formatted-numberformat-input"
+                InputProps={{
+                  inputComponent: NumericFormatCustom,
+                }}
+                sx={{ gridColumn: isSmallDevice ? "span 4" : "span 1" }}
+              />       
+              <TextField
+                  label="Valor Total"
+                  variant="filled"
+                  value={values.totalValue || ""}
+                  onBlur={handleBlur} 
+                  onChange={(e) => {
+                    setFieldValue("totalValue", calculateTotalValue(values.quantity, values.price));
+                    handleChange(e);
+                      
+                  }}                    
+                  name="totalValue"
+                  error={!!touched.totalValue && !!errors.totalValue}
+                  helperText={touched.totalValue && errors.totalValue}
+                    
+                  InputProps={{
+                    inputComponent: NumericFormatCustom,
+                  }}
+                  sx={{ gridColumn: isSmallDevice ? "span 4" : "span 1" }}
+                  disabled
+              />
+              <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label="Observação"
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.note || ""}
+                multiline
+                rows={5}
+                name="note"
+                error={!!touched.note && !!errors.note}
+                helperText={touched.note && errors.note}
+                sx={{ gridColumn: isSmallDevice ? "span 4" : "span 2" }}
+              />  
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
               <Button 
                     type="submit"
                     sx={{ 
-                            backgroundColor: colors.mygreen[400],
-                            color: colors.grey[100],
-                            fontSize: "12px",
-                            fontWeight: "bold",
-                            "&:hover": {
-                                    backgroundColor: colors.grey[700], 
-                                },
+                      backgroundColor: colors.mygreen[400],
+                      color: colors.grey[100],
+                      fontSize: "12px",
+                      fontWeight: "bold",
+                      "&:hover": {
+                        backgroundColor: colors.grey[700], 
+                      },
                     }} 
                     variant="contained">
                 Adicionar
