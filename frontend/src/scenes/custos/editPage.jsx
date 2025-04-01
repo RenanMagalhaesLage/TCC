@@ -35,7 +35,7 @@ const CustosEditPage = () => {
     "Administrativo",
     "Arrendamento",
     "Semente",
-     "Corretivos e Fertilizantes",
+    "Corretivos e Fertilizantes",
     "Defensivos",
     "Operações",
   ]

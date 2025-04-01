@@ -14,7 +14,9 @@ const StorageForm = () => {
   const colors = tokens(theme.palette.mode);
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const isSmallDevice = useMediaQuery("(max-width: 800px)"); 
+  const [storageProperty, setStorageProperty] = useState("");
   const [properties, setProperties] = useState([]);
+  const [storageItem, setStorageItem] = useState("");
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const { id } = useParams(); 
@@ -48,14 +50,18 @@ const StorageForm = () => {
     if (userData && userData.email) {
       const fetchStorageData = async () => {
         try {
-          const response = await axios.get(`http://localhost:3000/user`, {
+          const responseStorage = await axios.get(`http://localhost:3000/storage/${id}`);
+          setStorageItem(responseStorage.data);
+
+          const responseProperties = await axios.get(`http://localhost:3000/user`, {
             params: { email: userData.email }
           });
-          const propertyData = response.data.map(property => ({
-            id: property.id,           // Pega o ID da propriedade
-            name: property.name        // Pega o nome da propriedade
+          const propertyData = responseProperties.data.map(property => ({
+            id: property.id,           
+            name: property.name      
           }));
           setProperties(propertyData);
+
         } catch (err) {
           console.error('Erro ao buscar estoque:', err);  
         }finally {
@@ -71,16 +77,16 @@ const StorageForm = () => {
   }
 
   const initialValues = {
-    name: "",
-    unit: "",
-    quantity: "",
-    price: "",
-    category: "",
-    totalValue: "",
-    date: "",
-    note: "",
-    property: "",
-    storedLocation:""
+    name: storageItem.name || "",
+    unit: storageItem.unit || "",
+    quantity: storageItem.quantity || "",
+    price: storageItem.price || "",
+    category: storageItem.category || "",
+    totalValue: storageItem.totalValue || "",
+    date: storageItem.expirationDate || "",
+    note: storageItem.note || "",
+    property: storageItem.propertyId || "",
+    storedLocation: storageItem.storedLocation || "",
   };  
 
   const NumericFormatCustom = React.forwardRef(function NumericFormatCustom(props, ref) {
@@ -108,8 +114,10 @@ const StorageForm = () => {
 
   const navigate = useNavigate(); 
   const handleFormSubmit = async (values) => {
+    console.log(values);
     try {
-      const response = await axios.post("http://localhost:3000/storage", {
+      const response = await axios.put("http://localhost:3000/storage", {
+        id: id,
         email: userData.email,
         propertyId: values.property,
         storedLocation: values.storedLocation || null,
@@ -122,12 +130,12 @@ const StorageForm = () => {
         date: values.date || null,
         note: values.note || null
       });
-      if (response.status === 201) {  
-        navigate(`/estoque?message=${encodeURIComponent("1")}`);
+      if (response.status === 200) {  
+        navigate(`/estoque?message=${encodeURIComponent("2")}`);
       }
       
     } catch (error) {
-      console.error("Erro ao criar item no estoque: " , error);
+      console.error("Erro ao editar item no estoque: " , error);
     }
   };
 
@@ -137,7 +145,7 @@ const StorageForm = () => {
   
   return (
     <Box m="20px">
-      <Header title="Adicionar Item ao Estoque" subtitle="Preencha os campos para que seja cadastrado um item ao seu estoque" />
+      <Header title="Editar Item em Estoque" subtitle="Edite as informações do item em estoque" />
       <Formik
         onSubmit={handleFormSubmit}
         initialValues={initialValues}
@@ -332,7 +340,7 @@ const StorageForm = () => {
                       },
                     }} 
                     variant="contained">
-                Adicionar
+                Salvar
               </Button>
             </Box>
             {/*Object.keys(errors).length > 0 && (
@@ -346,7 +354,6 @@ const StorageForm = () => {
     </Box>
   );
 };
-
 
 const checkoutSchema = yup.object().shape({
   name: yup.string().required("Campo de preenchimento obrigatório"),

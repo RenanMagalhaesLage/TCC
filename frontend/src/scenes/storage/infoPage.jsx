@@ -86,24 +86,27 @@ const StoragePage = () => {
 
     useEffect(() => {
         if (userData && userData.email) { 
-            const fetchCustosData = async () => {
+            const fetchStorageData = async () => {
                 try {
                     const response = await axios.get(`http://localhost:3000/storage/${id}`);
                     setCusto(response.data);
                     setPropertyName(response.data.property.name);
+                    const users = response.data.property.users;
+                    const owner = users.find(custo => custo.user_properties.access === 'owner');
+                    setOwner(owner);
                 } catch (error) {
                     console.log(`ERROR - ao buscar dados do estoque de id = ${id}.`);
                     console.log(error);
                 }
             };
-            fetchCustosData();
+            fetchStorageData();
         }
     }, [userData]);  
 
     const navigate = useNavigate(); 
 
     const handleEdit = () => {
-        navigate(`/custos/edit/${id}`);
+        navigate(`/estoque/edit/${id}`);
     }
 
     const handleOpen = () => setOpen(true);
@@ -183,7 +186,7 @@ const StoragePage = () => {
                             gridTemplateColumns={isMobile ? "1fr" : "repeat(2, 1fr)"} 
                             padding="25px 35px 30px 35px"
                             height={isMobile ? "auto" : "initial"} 
-                            minHeight={isMobile ? "400px" : "240px"} 
+                            minHeight={isMobile ? "600px" : "240px"} 
                             marginBottom={isMobile ? "0" :"118px"}
                             marginTop={isMobile ? "10px":"-50px"}
                             sx={{boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.07)",}}
@@ -195,7 +198,7 @@ const StoragePage = () => {
                                     Localização:
                                     </Typography>
                                     <Typography variant="body1" color={colors.grey[300]}>
-                                        {propertyName + " - " + custo.stored_location}
+                                        {propertyName + " - " + custo.storedLocation}
                                     </Typography>
                                 </Box>
                                 <Box display="flex" alignItems="center" marginBottom="15px">

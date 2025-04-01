@@ -37,9 +37,9 @@ import CustosEditPage from './scenes/custos/editPage';
 import DashboardProjetado from './scenes/dashboard/dashboardProjetado';
 import DashboardRealizado from './scenes/dashboard/dashboardRealizado';
 import Storage from './scenes/storage/index';
-import StoragePage from './scenes/storage/storagePage';
-import StorageForm from './scenes/storage/form';
-
+import StoragePage from './scenes/storage/infoPage';
+import StorageForm from './scenes/storage/formPage';
+import StorageEditPage from './scenes/storage/editPage';
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -102,8 +102,7 @@ function App() {
                   <Route path="/estoque" element={<Storage />} />
                   <Route path="/estoque/:id" element={<StoragePage />} />
                   <Route path="/estoque/add" element={<StorageForm />} />
-
-
+                  <Route path="/estoque/edit/:id" element={<StorageEditPage />} />
                 </Routes>
               </main>
             </>

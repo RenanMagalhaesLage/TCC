@@ -1036,18 +1036,33 @@ app.get('/custos/:id', async (req, res) => {
                 include: {
                   model: Property,  
                   include: [{
-                    model: User,  // Incluir os usuários relacionados à Property
+                    model: User,  
                     through: { model: UserProperty },  
-                    attributes: ['id', 'name'],  
+                    attributes: ['id', 'name', 'email'],  
                   }],
                   as: 'property',  
                 },
                 }],
                 as: 'safra'
             }]
-        })
+        });
         
-        return res.status(200).json(result);
+        const allUsers = [];
+
+        if (result && result.safra) {
+            // Verifique se result.safra é um array ou um único objeto
+            const safraArray = Array.isArray(result.safra) ? result.safra : [result.safra];
+          
+            safraArray.forEach(safra => {
+              safra.glebas.forEach(gleba => {
+                gleba.property.users.forEach(user => {
+                  allUsers.push(user); // Adicionando cada usuário na lista
+                });
+              });
+            });
+          }
+        return res.status(200).json(allUsers);
+        //return res.status(200).json({ custos: result, users: allUsers });
         /*  
 
         const property = await Property.findByPk(gleba.propertyId);
@@ -1187,7 +1202,7 @@ app.put('/custos/:id', async (req, res) => {
             safraId, 
             name,
             category,
-            unity,
+            unit,
             quantity,
             price,
             totalValue,
@@ -1199,7 +1214,7 @@ app.put('/custos/:id', async (req, res) => {
             { 
                 name,
                 category,
-                unity,
+                unit,
                 quantity,
                 price,
                 totalValue,
@@ -1288,7 +1303,11 @@ app.get('/storage/:id', async (req, res) => {
             where: { id: id },
             include: [{
                 model: Property,  
-                as: 'property'     
+                    include: [{
+                        model: User,  
+                        through: { model: UserProperty },
+                    }],
+                    as: 'property',       
             }]
         });
         if (!result) {
@@ -1345,6 +1364,59 @@ app.post('/storage', async (req,res) => {
     }catch (error) {
         console.error('Erro ao salvar item no estoque:', error);
         return res.status(500).json({ error: 'Erro ao salvar o item no estoque.' });
+    }
+    
+});
+
+/*  Rota para --> EDITAR ITEM ESTOQUE */
+app.put('/storage', async (req,res) => {
+    try{
+        const { 
+            id,
+            email, 
+            propertyId, 
+            storedLocation,
+            name,
+            category,
+            unit,
+            quantity,
+            price,
+            totalValue,
+            date,
+            note
+        } = req.body;
+    
+        if (
+            !email || !propertyId || !name || !category || !unit || !quantity || !price || !totalValue
+        ) {
+            return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
+        }
+
+        const [updated] = await StorageItem.update(
+            { 
+                name,
+                category,
+                unit,
+                quantity,
+                price,
+                totalValue,
+                date,
+                note,
+                propertyId,
+                storedLocation,
+            },
+            { where: { id: id } }
+        );
+    
+        if (updated) {
+            const updatedStorageItem = await StorageItem.findByPk(id);
+            return res.json(updatedStorageItem);
+        }
+
+        res.status(404).json({ message: 'Storage Item não encontrado' });
+    }catch (error) {
+        console.error('Erro ao editar item no estoque:', error);
+        return res.status(500).json({ error: 'Erro ao editar o item no estoque.' });
     }
     
 });
