@@ -39,6 +39,10 @@ const Storage = () => {
           case 3:
             setSnackbarMessage("Item do Estoque excluído!");
             break;
+
+          case 4:
+            setSnackbarMessage("Item do Estoque transferido!");
+            break;
     
           default:
             //console.log("Mensagem não reconhecida.");

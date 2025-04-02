@@ -252,9 +252,9 @@ const CustosForm = () => {
                   getOptionLabel={(option) => option.name || ""} 
                   name="gleba"
                   value={
-                          values.gleba 
-                            ? glebaOptions.find((option) => option.id === values.gleba) 
-                            : null
+                    values.gleba 
+                    ? glebaOptions.find((option) => option.id === values.gleba) 
+                    : null
                   } 
                   onChange={(event, value) => setFieldValue('gleba', value?.id || null)} 
                   onBlur={handleBlur} 
@@ -270,6 +270,7 @@ const CustosForm = () => {
                       onBlur={handleBlur} 
                       />
                   )}
+                  noOptionsText="Nenhuma Gleba Disponível"
                   />
                 <TextField
                   fullWidth
@@ -341,7 +342,7 @@ const CustosForm = () => {
                     InputLabelProps={type === "date" ? { shrink: true } : {}}
                   />
                 ))}   
-                                  <TextField
+                <TextField
                     label="Preço"
                     variant="filled"
                     value={values.price || ""}
@@ -423,7 +424,6 @@ const CustosForm = () => {
     </Box>
   );
 };
-
 
 const checkoutSchema = yup.object().shape({
   name: yup.string().required("Campo de preenchimento obrigatório"),

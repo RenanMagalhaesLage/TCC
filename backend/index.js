@@ -1150,7 +1150,7 @@ app.get('/custos-by-user', async (req, res) => {
 app.post('/custos', async (req, res) => {
     try {
         const { email, 
-            safraId, 
+            idSafra, 
             glebaId,
             name,
             category,
@@ -1163,11 +1163,11 @@ app.post('/custos', async (req, res) => {
         } = req.body;
 
         if (
-            !email || !safraId || !glebaId || !name || !category || !unit || !quantity || !price || !totalValue 
+            !email || !idSafra || !glebaId || !name || !category || !unit || !quantity || !price || !totalValue 
         ) {
             return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
         }
-        const safra = await Safra.findByPk(safraId)
+        const safra = await Safra.findByPk(idSafra);
 
         const newCusto = await Custo.create({
             type: safra.type,
@@ -1438,6 +1438,70 @@ app.delete('/storage', async(req,res) =>{
         console.error(error);
         res.status(500).json({ error: 'Erro no servidor.' });
     }
+});
+
+/*  Rota para --> TRANSFERIR UM ITEM ESTOQUE */
+app.post('/storage-custo', async (req,res) => {
+    try{
+        const { 
+            idStorageItem, 
+            idSafra, 
+            idGleba,
+            quantity,
+        } = req.body;
+    
+        if (
+            !quantity || !idStorageItem || !idSafra
+        ) {
+            return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
+        }
+
+        const storageItem = await StorageItem.findByPk(idStorageItem);
+        storageItem.quantity = storageItem.quantity - quantity;
+        storageItem.totalValue = storageItem.quantity * storageItem.price;
+
+        const safra = await Safra.findByPk(idSafra);
+
+        const newCusto = await Custo.create({
+            type: safra.type,
+            status: safra.status,
+            name: storageItem.name,
+            category: storageItem.category,
+            unit: storageItem.unit,
+            quantity: quantity,
+            price: storageItem.price,
+            totalValue: storageItem.price * quantity,
+            expirationDate: storageItem.date ? storageItem.date : null,
+            note: storageItem.note ? storageItem.note : null,
+            safraId: idSafra,
+            glebaId: idGleba,       
+        });
+
+        let updatedStorageItem = null;
+        if(storageItem.quantity === 0){
+            await StorageItem.destroy({ where: { id: idStorageItem } });
+        }else{
+            const [updated] = await StorageItem.update(
+                { 
+                    quantity: storageItem.quantity,
+                    totalValue: storageItem.totalValue
+                },
+                { where: { id: idStorageItem} }
+            );
+            if (updated) {
+                updatedStorageItem = await StorageItem.findByPk(idStorageItem);
+            }
+        }
+    
+        return res.status(201).json({ 
+            storageItem: updatedStorageItem ? updatedStorageItem : null,
+            custo: newCusto
+        });
+    }catch (error) {
+        console.error('Erro ao salvar item no estoque:', error);
+        return res.status(500).json({ error: 'Erro ao salvar o item no estoque.' });
+    }
+    
 });
 
 /*------------------------

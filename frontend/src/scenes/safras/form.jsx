@@ -129,7 +129,7 @@ const SafrasForm = () => {
 
   const navigate = useNavigate(); 
   const handleFormSubmit = async (values) => {
-    console.log(values);
+    //console.log(values);
     try {
       const response = await axios.post("http://localhost:3000/safras", {
         email: userData.email,
