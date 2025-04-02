@@ -15,17 +15,18 @@ import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ImportExportIcon from '@mui/icons-material/ImportExport';
 
 const StoragePage = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const isMobile = useMediaQuery("(max-width: 1000px)");
+    const isMobile = useMediaQuery("(max-width: 1025px)");
     const [owner, setOwner] = useState("");
     const { id } = useParams();
     const [userData, setUserData] = useState(null);
     const [propertyName, setPropertyName] = useState("");
     const [custo,setCusto] = useState("");
-    const [open, setOpen] = useState(false);
+    const [openDelete, setOpenDelete] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
 
     const headerNames = [
@@ -109,21 +110,21 @@ const StoragePage = () => {
         navigate(`/estoque/edit/${id}`);
     }
 
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => {
-        setOpen(false);
+    const handleOpenDelete = () => setOpenDelete(true);
+    const handleCloseDelete = () => {
+        setOpenDelete(false);
         setIsChecked(false);
     };
 
     const handleDelete = async () =>{
-        handleClose();
+        handleCloseDelete();
         try {
-            const response = await axios.delete(`http://localhost:3000/custos/${id}`, {
-                answer: false, 
+            const response = await axios.delete(`http://localhost:3000/storage`, {
+                params: { id: id }
             });
-            navigate(`/custos?message=${encodeURIComponent("3")}`);
+            navigate(`/estoque?message=${encodeURIComponent("3")}`);
         } catch (error) {
-            console.error("Erro ao deletar custo:", error);
+            console.error("Erro ao deletar item de estoque:", error);
         }
     }
 
@@ -134,11 +135,6 @@ const StoragePage = () => {
     const handleChip = () => {
         //console.info('You clicked the Chip.');
     };  
-
-    const handleFinalize = () => {
-        
-    }
-
 
     return (
         <Box m="20px">
@@ -188,7 +184,7 @@ const StoragePage = () => {
                             height={isMobile ? "auto" : "initial"} 
                             minHeight={isMobile ? "600px" : "240px"} 
                             marginBottom={isMobile ? "0" :"118px"}
-                            marginTop={isMobile ? "10px":"-50px"}
+                            marginTop={"-50px"}
                             sx={{boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.07)",}}
                         >
                             {/* Primeira Coluna */}
@@ -203,7 +199,7 @@ const StoragePage = () => {
                                 </Box>
                                 <Box display="flex" alignItems="center" marginBottom="15px">
                                     <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
-                                    Categoria do Custo:
+                                    Categoria do item:
                                     </Typography>
                                     <Typography variant="body1" color={colors.grey[300]}>
                                         {custo.category}
@@ -211,7 +207,7 @@ const StoragePage = () => {
                                 </Box>
                                 <Box display="flex" alignItems="center" marginBottom="15px">
                                     <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
-                                    Nome do Custo:
+                                    Nome do item:
                                     </Typography>
                                     <Typography variant="body1" color={colors.grey[300]}>
                                     {custo.name}
@@ -291,7 +287,7 @@ const StoragePage = () => {
                                             <Tooltip title='Deletar'>
                                                 <Button 
                                                     variant="contained" 
-                                                    onClick={handleOpen} 
+                                                    onClick={handleOpenDelete} 
                                                     sx={{ backgroundColor:  colors.redAccent[500],
                                                         "&:hover": {
                                                             backgroundColor: colors.grey[700], 
@@ -330,7 +326,7 @@ const StoragePage = () => {
                                                         }}
                                                     >
                                                         <Typography id="modal-modal-title" variant="h4" component="h2">
-                                                            Deseja realmente deletar este custo?
+                                                            Deseja realmente deletar este item do estoque?
                                                         </Typography>
                                                         <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                                                             Ao fazer isso, esteja ciente que:
@@ -352,7 +348,7 @@ const StoragePage = () => {
                                                         
                                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
                                                             <Button 
-                                                                onClick={handleClose} 
+                                                                onClick={handleCloseDelete} 
                                                                 sx={{
                                                                     color: colors.redAccent[500]
                                                                 }}
@@ -387,6 +383,20 @@ const StoragePage = () => {
                                                     }}
                                                 >
                                                     <EditIcon />
+                                                </Button>
+                                            </Tooltip>
+                                            <Tooltip title='Transferir'>
+                                                <Button 
+                                                    variant="contained" 
+                                                    onClick={handleOpenTransfer} 
+                                                    sx={{ ml:2,
+                                                        backgroundColor:colors.blueAccent[500],
+                                                        "&:hover": {
+                                                            backgroundColor: colors.grey[700], 
+                                                        },
+                                                    }} 
+                                                >
+                                                    <ImportExportIcon />
                                                 </Button>
                                             </Tooltip>
                                         </Box>

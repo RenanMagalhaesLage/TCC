@@ -114,7 +114,6 @@ const StorageForm = () => {
 
   const navigate = useNavigate(); 
   const handleFormSubmit = async (values) => {
-    console.log(values);
     try {
       const response = await axios.put("http://localhost:3000/storage", {
         id: id,

@@ -1421,6 +1421,25 @@ app.put('/storage', async (req,res) => {
     
 });
 
+/*  Rota para --> DELETAR ITEM ESTOQUE */
+app.delete('/storage', async(req,res) =>{
+    const { id } = req.query;
+
+    try {
+
+        const storageItem = await StorageItem.findByPk(id);
+        if (!storageItem) {
+            return res.status(404).json({ error: 'Item de Estoque não encontrado.' });
+        }
+
+        await storageItem.destroy();
+        res.status(200).json({ message: 'Item de Estoque deletado com sucesso.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erro no servidor.' });
+    }
+});
+
 /*------------------------
         ROTAS DASHBOARD 
 --------------------------*/
