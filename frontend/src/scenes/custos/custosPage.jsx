@@ -91,7 +91,9 @@ const CustosPage = () => {
         if (userData && userData.email) { 
             const fetchCustosData = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:3000/custos/${id}`);
+                    const response = await axios.get(`http://localhost:3000/custos`,{
+                        params: { id: id}
+                    });
                     const custo = response.data;
                     const safra = response.data.safra;
                     const glebas = response.data.safra.glebas;
@@ -214,9 +216,9 @@ const CustosPage = () => {
                             gridTemplateColumns={isMobile ? "1fr" : "repeat(2, 1fr)"} 
                             padding="25px 35px 30px 35px"
                             height={isMobile ? "auto" : "initial"} 
-                            minHeight={isMobile ? "400px" : "240px"} 
+                            minHeight={isMobile ? "600px" : "240px"} 
                             marginBottom={isMobile ? "0" :"118px"}
-                            marginTop={isMobile ? "10px":"-130px"}
+                            marginTop={"-130px"}
                             sx={{boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.07)",}}
                         >
                             {/* Primeira Coluna */}
@@ -308,7 +310,6 @@ const CustosPage = () => {
                                 justifyContent="flex-end"
                                 //sx={{border: "1px solid red"}} 
                             >
-                                {userData && owner && userData.email === owner.email &&  (
                                         <Box 
                                             display="flex" 
                                             justifyContent= {isMobile ? "flex-start" : "flex-end"} 
@@ -418,7 +419,6 @@ const CustosPage = () => {
                                                 </Button>
                                             </Tooltip>
                                         </Box>
-                                    )}
                             </Box>
                         </Box>
                     </Box>

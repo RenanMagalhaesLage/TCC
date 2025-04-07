@@ -1017,8 +1017,8 @@ app.delete('/safras/:id', async(req,res) =>{
 --------------------------*/
 
 /* Rota para --> BUSCAR CUSTO POR ID*/
-app.get('/custos/:id', async (req, res) => {
-    const { id } = req.params;
+app.get('/custos', async (req, res) => {
+    const { id }  = req.query;
 
     try {
         const custo = await Custo.findByPk(id);
@@ -1046,48 +1046,8 @@ app.get('/custos/:id', async (req, res) => {
                 as: 'safra'
             }]
         });
-        
-        const allUsers = [];
 
-        if (result && result.safra) {
-            // Verifique se result.safra é um array ou um único objeto
-            const safraArray = Array.isArray(result.safra) ? result.safra : [result.safra];
-          
-            safraArray.forEach(safra => {
-              safra.glebas.forEach(gleba => {
-                gleba.property.users.forEach(user => {
-                  allUsers.push(user); // Adicionando cada usuário na lista
-                });
-              });
-            });
-          }
-        return res.status(200).json(allUsers);
-        //return res.status(200).json({ custos: result, users: allUsers });
-        /*  
-
-        const property = await Property.findByPk(gleba.propertyId);
-
-        const ownerProperty = await UserProperty.findOne({
-            where: { propertyId: gleba.propertyId },
-            attributes: ['userId', 'access']
-        }); 
-        
-        const userId = ownerProperty?.userId
-
-        const owner = await User.findByPk(userId);
-        if (!owner) {
-            return res.status(404).json({ error: 'Dono do custo não encontrado' });
-        }
-        
-        const result = {
-            custo: custo,
-            safra: safra,
-            gleba: gleba,
-            property: property,
-            owner: owner
-        };
-
-        return res.status(200).json(result);*/
+        return res.status(200).json(result);
     } catch (error) {
         console.error('Erro ao buscar custo:', error);
         return res.status(500).json({ error: 'Erro ao buscar custo' });
@@ -1195,11 +1155,13 @@ app.post('/custos', async (req, res) => {
 });
 
 /* Rota para --> EDITAR CUSTOS */
-app.put('/custos/:id', async (req, res) => {
+app.put('/custos', async (req, res) => {
     try {
         const { 
+            id,
             email, 
             safraId, 
+            glebaId,
             name,
             category,
             unit,
@@ -1219,14 +1181,16 @@ app.put('/custos/:id', async (req, res) => {
                 price,
                 totalValue,
                 date,
-                note
+                note,
+                safraId, 
+                glebaId
             },
-            { where: { id: req.params.id } }
+            { where: { id: id } }
         );
 
 
         if (updated) {
-            const updatedCusto = await Custo.findByPk(req.params.id);
+            const updatedCusto = await Custo.findByPk(id);
             return res.json(updatedCusto);
         }
 

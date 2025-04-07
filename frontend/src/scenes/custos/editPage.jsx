@@ -13,11 +13,13 @@ const CustosEditPage = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const isNonMobile = useMediaQuery("(min-width:600px)");
+  const isSmallDevice = useMediaQuery("(max-width: 800px)"); 
   const [property, setProperty] = useState("");
   const [gleba, setGleba] = useState("");
   const [safra, setSafra] = useState("");
   const [custo, setCusto] =useState("");
   const [safraOptions, setSafraOptions] = useState([]);
+  const [glebaOptions, setGlebaOptions] = useState([]);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const { id } = useParams(); 
@@ -39,7 +41,7 @@ const CustosEditPage = () => {
     "Defensivos",
     "Operações",
   ]
-  
+
   useEffect(() => {
     const storedUser = secureLocalStorage.getItem('userData'); 
     if (storedUser) {
@@ -51,16 +53,24 @@ const CustosEditPage = () => {
     if (userData && userData.email) {
       const fetchCustosData = async () => {
         try {
-          const response = await axios.get(`http://localhost:3000/custos/${id}`);
-          const {custo, safra, gleba, property, owner } = response.data;
-            setCusto(custo);
-            setSafra(safra);
-            setGleba(gleba);
-            setProperty(property);
-            setLoading(false);
+          const response = await axios.get(`http://localhost:3000/custos`,{
+            params: { id: id}
+          });
+          const custo = response.data;
+          const safra = response.data.safra;
+          setCusto(custo);
+          setSafra(safra);
+          setProperty(property);
+          setLoading(false);
 
-        } catch (err) {
-            console.error('Erro ao buscar custos:', err);  
+          const glebaData = safra.glebas.map((gleba) => ({
+            id: gleba.id,
+            name: `${gleba.name} - ${gleba.property.name}`,
+          }));
+          setGlebaOptions(glebaData);
+
+        } catch (erro) {
+            console.error('Erro ao buscar dados do custo:', erro);  
         }finally {
           setLoading(false);
         }
@@ -80,9 +90,10 @@ const CustosEditPage = () => {
     price: custo.price || "",
     category: custo.category || "",
     totalValue: custo.totalValue|| "",
-    date: custo.date || "",
+    date: custo.expirationDate || "",
     note: custo.note || "",
     safra: custo.safraId || "",
+    gleba: custo.glebaId || ""
   } : {};  
 
   const NumericFormatCustom = React.forwardRef(function NumericFormatCustom(props, ref) {
@@ -110,9 +121,11 @@ const CustosEditPage = () => {
 
   const handleFormSubmit = async (values) => {
     try {
-      const response = await axios.put(`http://localhost:3000/custos/${id}`, {
+      const response = await axios.put(`http://localhost:3000/custos`, {
+        id: id,
         email: userData.email,
         safraId: values.safra,
+        glebaId: values.gleba,
         name: values.name,
         category: values.category,
         unit: values.unit,
@@ -166,7 +179,7 @@ const CustosEditPage = () => {
                     fullWidth
                     variant="filled"
                     label="Safra"
-                    value={safra.cultivo + " - " + safra.dataFimPlantio + " - " + gleba.name + " - " + property.name}
+                    value={safra.name + " - " + safra.cultivo}
                     disabled 
                     sx={{ gridColumn: "span 2" }}
                     
@@ -199,6 +212,33 @@ const CustosEditPage = () => {
                       )}
                   />
                 )}
+                <Autocomplete
+                  disablePortal
+                  id="glebas"
+                  options={glebaOptions} 
+                  getOptionLabel={(option) => option.name || ""} 
+                  name="gleba"
+                  value={
+                    values.gleba 
+                    ? glebaOptions.find((option) => option.id === values.gleba) 
+                    : null
+                  }                  
+                  onChange={(event, value) => setFieldValue('gleba', value?.id || null)} 
+                  onBlur={handleBlur} 
+                  renderInput={(params) => (
+                    <TextField 
+                      {...params} 
+                      label="Gleba"
+                      variant="filled"
+                      name="gleba"
+                      error={!!touched.gleba && !!errors.gleba}
+                      helperText={touched.gleba && errors.gleba}
+                      onBlur={handleBlur} 
+                    />
+                  )}
+                  sx={{ gridColumn: isSmallDevice ? "span 4" : "span 2" }}
+                  noOptionsText="Nenhuma Gleba Disponível"
+                />
                 <TextField
                     fullWidth
                     variant="filled"
@@ -345,7 +385,7 @@ const CustosEditPage = () => {
                                 },
                     }} 
                     variant="contained">
-                Adicionar
+                Salvar
               </Button>
             </Box>
             {/*Object.keys(errors).length > 0 && (
@@ -362,14 +402,15 @@ const CustosEditPage = () => {
 
 
 const checkoutSchema = yup.object().shape({
-    name: yup.string().required("Campo de preenchimento obrigatório"),
-    category: yup.string().required("Campo de preenchimento obrigatório"),
-    unit: yup.string().required("Campo de preenchimento obrigatório"),
-    quantity: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
-    price: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
-    totalValue: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
-    date: yup.date().required("Campo de preenchimento obrigatório").typeError("Deve ser uma data válida"),
-    note: yup.string().required("Campo de preenchimento obrigatório"),
-    safra: yup.string().required("Campo de preenchimento obrigatório"),
+  name: yup.string().required("Campo de preenchimento obrigatório"),
+  category: yup.string().required("Campo de preenchimento obrigatório"),
+  unit: yup.string().required("Campo de preenchimento obrigatório"),
+  quantity: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+  price: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+  totalValue: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
+  date: yup.date(),  
+  note: yup.string(),
+  safra: yup.string().required("Campo de preenchimento obrigatório"),
+  gleba: yup.string().required("Campo de preenchimento obrigatório"),
 });
 export default CustosEditPage;
