@@ -32,7 +32,7 @@ import Custos from './scenes/custos';
 import Invite from './scenes/invites';
 import InvitesForm from './scenes/invites/form';
 import CustosPage from './scenes/custos/custosPage';
-import CustosForm from './scenes/custos/form';
+import CustosForm from './scenes/custos/formPage';
 import CustosEditPage from './scenes/custos/editPage';
 import DashboardProjetado from './scenes/dashboard/dashboardProjetado';
 import DashboardRealizado from './scenes/dashboard/dashboardRealizado';

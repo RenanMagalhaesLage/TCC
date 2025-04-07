@@ -27,10 +27,11 @@ const CustosEditPage = () => {
 
   const fields = [
     { name: "unit", label: "Unidade", type: "text" },
+    { name: "date", label: "Data", type: "date" },
     { name: "quantity", label: "Quantidade", type: "number" },
     //{ name: "price", label: "Preço", type: "number" },
     //{ name: "totalValue", label: "Valor total", type: "number", disabled: true },
-    { name: "date", label: "Data", type: "date" },
+
   ];
 
   const categoryOptions = [
@@ -169,10 +170,7 @@ const CustosEditPage = () => {
             <Box
               display="grid"
               gap="30px"
-              gridTemplateColumns="repeat(4, minmax(0, 1fr))"
-              sx={{
-                "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
-              }}
+              gridTemplateColumns="repeat(4, 1fr)"
             >
                 {safra ? (
                   <TextField
@@ -181,7 +179,7 @@ const CustosEditPage = () => {
                     label="Safra"
                     value={safra.name + " - " + safra.cultivo}
                     disabled 
-                    sx={{ gridColumn: "span 2" }}
+                    sx={{ gridColumn: isSmallDevice ? "span 4" : "span 2" }}
                     
                   />
                 ) : (
@@ -198,7 +196,7 @@ const CustosEditPage = () => {
                       } 
                       onChange={(event, value) => setFieldValue('safra', value?.id || null)} 
                       onBlur={handleBlur} 
-                      sx={{ gridColumn: "span 2" }}
+                      sx={{ gridColumn: isSmallDevice ? "span 4" : "span 2" }}
                       renderInput={(params) => (
                           <TextField 
                               {...params} 
@@ -240,66 +238,20 @@ const CustosEditPage = () => {
                   noOptionsText="Nenhuma Gleba Disponível"
                 />
                 <TextField
-                    fullWidth
-                    variant="filled"
-                    type="text"
-                    label="Nome do Custo"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values.name || ""}
-                    name="name"
-                    error={!!touched.name && !!errors.name}
-                    helperText={touched.name && errors.name}
-                    sx={{ gridColumn: "span 1" }}
-                  />
+                  fullWidth
+                  variant="filled"
+                  type="text"
+                  label="Nome do Custo"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.name || ""}
+                  name="name"
+                  error={!!touched.name && !!errors.name}
+                  helperText={touched.name && errors.name}
+                  sx={{ gridColumn: isSmallDevice ? "span 4" : "span 2" }}
+                />
 
-                  <TextField
-                    label="Preço"
-                    variant="filled"
-                    value={values.price || ""}
-                    onBlur={handleBlur} 
-                    onChange={(e) => {
-                      handleChange(e);
-                      setFieldValue("totalValue", calculateTotalValue(e.target.value, values.quantity));
-                    }} 
-                    name="price"
-                    error={!!touched.price && !!errors.price}
-                    helperText={touched.price && errors.price}
-                    id="formatted-numberformat-input"
-                    InputProps={{
-                      inputComponent: NumericFormatCustom,
-                    }}
-                    sx={{
-                      gridRow: "2", 
-                      gridColumn: "3"
-                    }}
-                  />
-
-                  <TextField
-                    label="Valor Total"
-                    variant="filled"
-                    value={values.totalValue || ""}
-                    onBlur={handleBlur} 
-                    onChange={(e) => {
-                      setFieldValue("totalValue", calculateTotalValue(values.quantity, values.price));
-                      handleChange(e);
-                      
-                    }}                    
-                    name="totalValue"
-                    error={!!touched.totalValue && !!errors.totalValue}
-                    helperText={touched.totalValue && errors.totalValue}
-                    
-                    InputProps={{
-                      inputComponent: NumericFormatCustom,
-                    }}
-                    disabled
-                    sx={{
-                      gridRow: "2", 
-                      gridColumn: "4"
-                    }}
-                  />
-
-                  <Autocomplete
+                <Autocomplete
                     disablePortal
                     id="categories"
                     options={categoryOptions}
@@ -307,7 +259,7 @@ const CustosEditPage = () => {
                     value={values.category || null} 
                     onChange={(event, value) => setFieldValue('category', value)} 
                     onBlur={handleBlur} 
-                    sx={{ gridColumn: "span 1" }}
+                    sx={{ gridColumn: isSmallDevice ? "span 4" : "span 1" }}
                     renderInput={(params) => (
                       <TextField 
                         {...params} 
@@ -349,40 +301,76 @@ const CustosEditPage = () => {
                     disabled={disabled}
                     error={touched[name] && Boolean(errors[name])}
                     helperText={touched[name] && errors[name]}
-                    sx={{ gridColumn: "span 1" }}
+                    sx={{ gridColumn: isSmallDevice ? "span 4" : "span 1" }}
                     InputLabelProps={type === "date" ? { shrink: true } : {}}
                   />
                 ))}   
                 <TextField
-                    fullWidth
-                    variant="filled"
-                    type="text"
-                    label="Observação"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values.note || ""}
-                    multiline
-                    rows={5}
-                    name="note"
-                    error={!!touched.note && !!errors.note}
-                    helperText={touched.note && errors.note}
-                    sx={{
-                      gridColumn: "span 2", 
-                      gridRow: "4", 
-                    }}
-                  />       
+                  label="Preço"
+                  variant="filled"
+                  value={values.price || ""}
+                  onBlur={handleBlur} 
+                  onChange={(e) => {
+                    handleChange(e);
+                    setFieldValue("totalValue", calculateTotalValue(e.target.value, values.quantity));
+                  }} 
+                  name="price"
+                  error={!!touched.price && !!errors.price}
+                  helperText={touched.price && errors.price}
+                  id="formatted-numberformat-input"
+                  InputProps={{
+                    inputComponent: NumericFormatCustom,
+                  }}
+                  sx={{ gridColumn: isSmallDevice ? "span 4" : "span 1" }}
+                />
+
+                <TextField
+                  label="Valor Total"
+                  variant="filled"
+                  value={values.totalValue || ""}
+                  onBlur={handleBlur} 
+                  onChange={(e) => {
+                      setFieldValue("totalValue", calculateTotalValue(values.quantity, values.price));
+                      handleChange(e);
+                      
+                  }}                    
+                  name="totalValue"
+                  error={!!touched.totalValue && !!errors.totalValue}
+                  helperText={touched.totalValue && errors.totalValue}
+                    
+                  InputProps={{
+                    inputComponent: NumericFormatCustom,
+                  }}
+                  disabled
+                  sx={{ gridColumn: isSmallDevice ? "span 4" : "span 1" }}
+                />
+                <TextField
+                  fullWidth
+                  variant="filled"
+                  type="text"
+                  label="Observação"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.note || ""}
+                  multiline
+                  rows={5}
+                  name="note"
+                  error={!!touched.note && !!errors.note}
+                  helperText={touched.note && errors.note}
+                  sx={{ gridColumn: isSmallDevice ? "span 4" : "span 2" }}
+                />       
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
               <Button 
                     type="submit"
                     sx={{ 
-                            backgroundColor: colors.mygreen[400],
-                            color: colors.grey[100],
-                            fontSize: "12px",
-                            fontWeight: "bold",
-                            "&:hover": {
-                                    backgroundColor: colors.grey[700], 
-                                },
+                      backgroundColor: colors.mygreen[400],
+                      color: colors.grey[100],
+                      fontSize: "12px",
+                      fontWeight: "bold",
+                      "&:hover": {
+                        backgroundColor: colors.grey[700], 
+                      },
                     }} 
                     variant="contained">
                 Salvar

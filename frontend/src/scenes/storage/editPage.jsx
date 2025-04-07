@@ -24,10 +24,11 @@ const StorageForm = () => {
 
   const fields = [
     { name: "unit", label: "Unidade", type: "text" },
+    { name: "date", label: "Data de Validade", type: "date" },
     { name: "quantity", label: "Quantidade", type: "number" },
     //{ name: "price", label: "Preço", type: "number" },
     //{ name: "totalValue", label: "Valor total", type: "number", disabled: true },
-    { name: "date", label: "Data de Validade", type: "date" },
+    
   ];
 
   const categoryOptions = [
