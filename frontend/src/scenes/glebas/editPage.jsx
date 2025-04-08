@@ -130,14 +130,14 @@ const GlebasEditForm = () => {
                   helperText={touched.area && errors.area}
                   sx={{ gridColumn: "span 2" }}
                 />
-                  <TextField
-                    fullWidth
-                    variant="filled"
-                    label="Propriedade"
-                    value={property.name}
-                    disabled 
-                    sx={{ gridColumn: "span 2" }}
-                  />
+                <TextField
+                  fullWidth
+                  variant="filled"
+                  label="Propriedade"
+                  value={property.name}
+                  disabled 
+                  sx={{ gridColumn: "span 2" }}
+                />
             
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">

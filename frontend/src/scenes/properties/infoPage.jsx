@@ -271,6 +271,10 @@ const Propertie = () => {
         navigate(`/glebas/add/${id}`);
     }
 
+    const handleInvite = () =>{
+        navigate(`/convites/add/${id}`);
+    }
+
     const handleOpen = () => setOpen(true);
     const handleClose = () => {
         setOpen(false);
@@ -506,7 +510,7 @@ const Propertie = () => {
                                         <Tooltip title='Convidar Usuário'>
                                             <Button 
                                                 variant="contained" 
-                                                onClick={() => handleEdit(params.row)} 
+                                                onClick={() => handleInvite()} 
                                                 sx={{ml:2,
                                                     backgroundColor:colors.blueAccent[500],
                                                     "&:hover": {

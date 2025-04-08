@@ -118,13 +118,13 @@ const PropertiesForm = () => {
               <Button 
                     type="submit"
                     sx={{ 
-                            backgroundColor: colors.mygreen[400],
-                            color: colors.grey[100],
-                            fontSize: "12px",
-                            fontWeight: "bold",
-                            "&:hover": {
-                                    backgroundColor: colors.grey[700], 
-                                },
+                      backgroundColor: colors.mygreen[400],
+                      color: colors.grey[100],
+                      fontSize: "12px",
+                      fontWeight: "bold",
+                      "&:hover": {
+                        backgroundColor: colors.grey[700], 
+                      },
                     }} 
                     variant="contained">
                 Adicionar

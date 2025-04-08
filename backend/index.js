@@ -524,8 +524,6 @@ app.delete('/propriedades/:id', async(req,res) =>{
     }
 });
 
-
-
 /*------------------------
         ROTAS GLEBAS
 --------------------------*/

@@ -30,34 +30,16 @@ const InvitesForm = () => {
     if (userData && userData.email) {
       const fetchPropriedades = async () => {
         try {
-          /*
-            const response = await axios.get(`http://localhost:3000/user`, {
-              params: { email: userData.email }
-            });
-            const propertyData = response.data.map(property =>({
-                id: property.id,
-                name: property.name
-            }));
-            setPropertyOptions(propertyData);
-          */
-            const response = await axios.get(`http://localhost:3000/properties-invites`, {
-              params: { email: userData.email }
-            });
-            setPropertyOptions(response.data);
+          const response = await axios.get(`http://localhost:3000/properties-invites`, {
+            params: { email: userData.email }
+          });
+          const properties = response.data;
+          setPropertyOptions(properties);
 
-            if (id) {
-              const fetchPropertyData = async () => {
-                try {
-                    const response = await axios.get(`http://localhost:3000/propriedades/${id}`);
-                    setProperty(response.data.property);
-                    setLoading(false); 
-                } catch (error) {
-                    console.error("Erro ao buscar dados da gleba:", error);
-                    setLoading(false); 
-                }
-              };
-              fetchPropertyData();
-            }
+          if(id){
+            const property = properties.filter(property => property.id === Number(id));
+            setProperty(property[0]);
+          }
 
         } catch (err) {
             console.error('Erro ao buscar propriedades:', err);  
@@ -71,7 +53,7 @@ const InvitesForm = () => {
 
   const initialValues = {
     email: "",
-    property: property ? property.id : ""   
+    property:  property ? property.id : ""  
   };
 
   const navigate = useNavigate(); 
@@ -149,11 +131,9 @@ const InvitesForm = () => {
               />
               {property ? (
                 <TextField
-                  id="properties"
                   fullWidth
                   variant="filled"
                   label="Propriedade"
-                  name="property"
                   value={property.name}
                   disabled 
                   sx={{ gridColumn: "span 2" }}

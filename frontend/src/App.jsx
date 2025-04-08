@@ -21,8 +21,8 @@ import PropertyForm from './scenes/properties/formPage';
 import PropertyEditForm from './scenes/properties/editForm';
 import Glebas from './scenes/glebas';
 import GlebaPage from './scenes/glebas/infoPage';
-import GlebaForm from './scenes/glebas/form';
-import GlebaEditForm from './scenes/glebas/editForm';
+import GlebaForm from './scenes/glebas/formPage';
+import GlebaEditForm from './scenes/glebas/editPage';
 import Safras from './scenes/safras'
 import SafraPage from './scenes/safras/infoPage';
 import SafraForm from './scenes/safras/form';
@@ -99,6 +99,7 @@ function App() {
                   <Route path="/historico-safras" element={<SafraHistory />} />
                   <Route path="/convites" element={<Invite />} />
                   <Route path="/convites/add" element={<InvitesForm />} />
+                  <Route path="/convites/add/:id?" element={<InvitesForm />} />
                   <Route path="/projetado" element={<DashboardProjetado />} />
                   <Route path="/realizado" element={<DashboardRealizado />} />
                   <Route path="/estoque" element={<Storage />} />

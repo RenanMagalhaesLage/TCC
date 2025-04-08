@@ -72,11 +72,13 @@ const Sidebar = ({ onLogout }) => {
     if (location.pathname.startsWith('/glebas')) {
       setSelected('Glebas');
     }else if(location.pathname.startsWith('/safras')){
-      setSelected('Safras')
+      setSelected('Safras');
     }else if(location.pathname.startsWith('/custos')){
-      setSelected('Custos')
+      setSelected('Custos');
     }else if(location.pathname.startsWith('/estoque')){
-      setSelected('Estoque')
+      setSelected('Estoque');
+    }else if(location.pathname.startsWith('/convites')){
+      setSelected('Convites');
     }
   }, [location.pathname]);
 
