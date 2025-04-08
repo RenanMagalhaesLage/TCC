@@ -1521,6 +1521,95 @@ app.get('/custos-pie-chart', async (req, res) => {
       }
 });
 
+/*  Rota para --> GRÁFICO DE PIZZA DE TODOS CUSTOS DE SAFRAS */
+app.get('/all-custos-pie-chart', async (req, res) => {
+    const { email} = req.query;
+
+    const user = await User.findOne({ where: { email: email } });
+    if (!user) {
+        return res.status(404).json({ error: 'Usuário não encontrado' });
+    }
+
+    /* Busca todas as propriedades associadas ao usuário e seus níveis de acesso*/
+    const userProperties = await UserProperty.findAll({
+        where: { userId: user.id },
+        attributes: ['propertyId', 'access']
+    });
+    
+    const propertyIds = userProperties.map(up => up.propertyId);
+    const access = userProperties.map(up => up.access);
+    
+    const properties = await Property.findAll({
+        where: {
+            id: propertyIds
+        },
+        include: {
+            model: Gleba, as: 'glebas', 
+            include: {
+                model: Safra, as: 'safras',
+                where: {
+                    type: 'Realizado',  
+                    status: false         
+                }
+            }
+        }
+    });
+
+    const safraIds = new Set();  
+
+    properties.forEach(property => {
+        property.glebas.forEach(gleba => {
+            gleba.safras.forEach(safra => {
+                safraIds.add(safra.id);  
+            });
+        });
+    });
+
+    const uniqueSafraIds = [...safraIds];
+    const query = `
+        SELECT category, SUM(totalValue) AS value
+        FROM Custos
+        WHERE safraId = :safraId
+        AND type = 'Realizado' AND status = false
+        GROUP BY category;
+    `;
+    let sumCustos = 0;
+    for (let safraId of uniqueSafraIds) {
+        try {
+            sumCustos  = await connection.query(query, {
+            replacements: { safraId },  
+            type: QueryTypes.SELECT
+          });
+    
+          // Exibe os resultados da consulta para o safraId atual
+          console.log(`Custos para safraId ${safraId}:`, sumCustos);
+
+          const categories = [
+            'Defensivos',
+            'Operações',
+            'Semente',
+            'Arrendamento',
+            'Administrativo',
+            'Corretivos e Fertilizantes'
+            
+        ];
+          
+        const result = categories.map(category => {
+            const categoryFound = Array.isArray(sumCustos) ? sumCustos.find(result => result.category === category) : null;
+            return {
+              id: category,  // Adiciona o atributo 'id' com o mesmo valor de 'category'
+              label: category,
+              value: categoryFound ? categoryFound.value : 0 
+            };
+        });
+        return res.json(result);
+
+        } catch (error) {
+          console.error(`Erro ao buscar custos para safraId ${safraId}:`, error);
+        }
+    }
+});
+
 /*  Rota para --> GRÁFICO DE LINHA DE CUSTOS POR GLEBA */
 app.get('/custos-glebas-line-chart', async (req, res) => {
     const { safraId } = req.query;

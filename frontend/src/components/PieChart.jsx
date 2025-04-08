@@ -26,13 +26,20 @@ const PieChart = ({isDashboard, safraId }) => {
     if (userData && userData.email) { 
       const fetchPieData = async () => {
         try {
-          const response = await axios.get(`http://localhost:3000/custos-pie-chart`, {
-            params: { safraId: safraId }
-          });
-                      
-  
-          setPieData(response.data); 
+          console.log(safraId)
+          if(safraId === '0' || safraId === 0){
+            const response = await axios.get(`http://localhost:3000/all-custos-pie-chart`, {
+              params: { email: userData.email }
+            });
+            setPieData(response.data); 
 
+          }else{
+            const response = await axios.get(`http://localhost:3000/custos-pie-chart`, {
+              params: { safraId: safraId }
+            });
+                        
+            setPieData(response.data); 
+          }
                         
         } catch (error) {
           console.log("ERRO - ao buscar no banco de dados.");

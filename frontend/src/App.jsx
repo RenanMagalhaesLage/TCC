@@ -17,7 +17,7 @@ import Line from "./scenes/line";
 import Login from './scenes/login';
 import Properties from './scenes/properties';
 import PropertyPage from './scenes/properties/infoPage';
-import PropertyForm from './scenes/properties/form';
+import PropertyForm from './scenes/properties/formPage';
 import PropertyEditForm from './scenes/properties/editForm';
 import Glebas from './scenes/glebas';
 import GlebaPage from './scenes/glebas/infoPage';
@@ -40,6 +40,8 @@ import Storage from './scenes/storage/index';
 import StoragePage from './scenes/storage/infoPage';
 import StorageForm from './scenes/storage/formPage';
 import StorageEditPage from './scenes/storage/editPage';
+import Home from './scenes/home'
+
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -48,7 +50,7 @@ function App() {
 
   const handleLogin = () => {
     setConect(true);
-    navigate('/'); 
+    navigate('/home'); 
   };
 
   const handleLogout = () => {
@@ -66,7 +68,7 @@ function App() {
               <main className='content' style={{ flexGrow: 1, overflow: 'auto' }}>
                 <Topbar />
                 <Routes>
-                  <Route path="/" />
+                  <Route path="/home" element={<Home/>}/>
                   <Route path="/team" element={<Team />} />
                   <Route path="/contacts" element={<Contacts />} />
                   <Route path="/form" element={<Form />} />

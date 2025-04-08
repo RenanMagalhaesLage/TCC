@@ -258,7 +258,7 @@ const Custos = () => {
                 )}
             </Box>
             <div>
-                {message && (
+                {message !== 0 && (
                     <Snackbar 
                     open={openSnackbar} 
                     autoHideDuration={2500} 
