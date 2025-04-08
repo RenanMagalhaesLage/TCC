@@ -339,6 +339,43 @@ app.get('/properties/:id', async (req, res) => {
 
 });
 
+/* Rota para --> BUSCAR PROPRIEDADES DISPONÍVEIS PARA CONVITES */
+app.get('/properties-invites', async (req, res) => {
+    const { email }  = req.query;
+    try{
+        const user = await User.findOne({ where: { email: email } });
+        if (!user) {
+            return res.status(404).json({ error: 'Usuário não encontrado' });
+        }
+
+        const userProperties  = await UserProperty.findAll({
+            where: { 
+                userId: user.id,
+                access: 'owner'
+            },
+            attributes: ['propertyId']
+        });
+        const propertyIds = userProperties.map(item => item.propertyId);
+
+        const properties = await Property.findAll({
+            where: {
+                id: propertyIds,
+            },
+            attributes: ['id', 'name'],
+        });
+        
+        const result = properties.map(property => ({
+            id: property.id,
+            name: property.name,
+        }));
+
+        return res.status(200).json(result);
+    } catch (error) {
+        console.error('Erro ao buscar custos do usuário:', error);
+        return res.status(500).json({ error: 'Erro ao buscar custos do usuário' });
+    }
+});
+
 /* Rota para --> BUSCAR PROPRIEDADES POR SAFRA */
 app.get('/properties-by-safra', async (req, res) => {
     const { id }  = req.query;

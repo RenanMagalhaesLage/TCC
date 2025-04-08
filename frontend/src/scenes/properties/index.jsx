@@ -51,13 +51,14 @@ const Properties = () => {
       }, [message]);
 
     const columns = [
-        { field: "name", headerName: "Nome", flex: 1, cellClassName: "name-column--cell", resizable: false },
-        { field: "city", headerName: "Cidade", flex: 1, cellClassName: "city-column--cell", resizable: false },
-        { field: "area", headerName: "Área", type: "number", headerAlign: "left", align: "left", resizable: false },
+        { field: "name", headerName: "Nome", flex: 1, minWidth: 100, cellClassName: "name-column--cell", resizable: false },
+        { field: "city", headerName: "Cidade", flex: 1, minWidth: 100, cellClassName: "city-column--cell", resizable: false },
+        { field: "area", headerName: "Área", type: "number", minWidth: 100, headerAlign: "left", align: "left", resizable: false },
         {
             field: "access",
             headerName: "Nível de Acesso",
             flex: 1,
+            minWidth: 100,
             headerAlign: "center",
             resizable: false,
             renderCell: ({ row: { access } }) => {

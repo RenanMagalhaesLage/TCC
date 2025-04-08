@@ -30,6 +30,7 @@ const InvitesForm = () => {
     if (userData && userData.email) {
       const fetchPropriedades = async () => {
         try {
+          /*
             const response = await axios.get(`http://localhost:3000/user`, {
               params: { email: userData.email }
             });
@@ -38,12 +39,17 @@ const InvitesForm = () => {
                 name: property.name
             }));
             setPropertyOptions(propertyData);
+          */
+            const response = await axios.get(`http://localhost:3000/properties-invites`, {
+              params: { email: userData.email }
+            });
+            setPropertyOptions(response.data);
 
             if (id) {
               const fetchPropertyData = async () => {
                 try {
                     const response = await axios.get(`http://localhost:3000/propriedades/${id}`);
-                    setPropertie(response.data.property);
+                    setProperty(response.data.property);
                     setLoading(false); 
                 } catch (error) {
                     console.error("Erro ao buscar dados da gleba:", error);
@@ -70,6 +76,7 @@ const InvitesForm = () => {
 
   const navigate = useNavigate(); 
   const handleFormSubmit = async (values) => {
+    console.log("teste" + values);
     setErrorMessage(""); 
 
     if (id) {
@@ -84,9 +91,9 @@ const InvitesForm = () => {
       });
   
       if (response.status === 201) {
-        navigate(`/invites?message=${encodeURIComponent("1")}`);
+        navigate(`/convites?message=${encodeURIComponent("1")}`);
       } else if (response.status === 200) {
-        navigate(`/invites?message=${encodeURIComponent("2")}`);
+        navigate(`/convites?message=${encodeURIComponent("2")}`);
       }
     } catch (error) {
       console.error("Erro ao criar invite:", error);
@@ -218,7 +225,7 @@ const checkoutSchema = yup.object().shape({
       .string()
       .email("Formato de email inválido") 
       .required("Campo de preenchimento obrigatório"), 
-  propertie: yup.string().required("Campo de preenchimento obrigatório"),
+  property: yup.string().required("Campo de preenchimento obrigatório"),
 });
 
 const checkoutSchema2 = yup.object().shape({

@@ -49,13 +49,14 @@ const Glebas = () => {
       }, [message]);
 
     const columns = [
-        { field: "name", headerName: "Nome", flex: 1, cellClassName: "name-column--cell", resizable: false },
-        { field: "propertie", headerName: "Propriedade", flex: 1, cellClassName: "propertie-column--cell", resizable: false },
-        { field: "area", headerName: "Área", type: "number", flex: 1,headerAlign: "left", align: "left", resizable: false },
+        { field: "name", headerName: "Nome", flex: 1, minWidth: 100, cellClassName: "name-column--cell", resizable: false },
+        { field: "propertie", headerName: "Propriedade", flex: 1, minWidth: 150, cellClassName: "propertie-column--cell", resizable: false },
+        { field: "area", headerName: "Área", type: "number", flex: 1, minWidth: 100, headerAlign: "left", align: "left", resizable: false },
         {
             field: "access",
             headerName: "Nível de Acesso",
             flex: 1,
+            minWidth: 100,
             headerAlign: "center",
             resizable: false,
             renderCell: ({ row: { access } }) => {

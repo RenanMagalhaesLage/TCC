@@ -28,6 +28,7 @@ const Invite = () => {
     const [open, setOpen] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
     const [styleSnackBar, setStyleSnackBar] = useState("success");
+    const [reload, setReload] = useState(false);
 
     useEffect(() => {
         switch (message) {
@@ -47,10 +48,10 @@ const Invite = () => {
       }, [message]);
 
     const columns=[
-        { field: 'sender', headerName: 'Remetente', flex: 1,resizable: false, headerAlign: "left"},
-        { field: 'senderEmail', headerName: 'E-mail Remetente', flex: 1 , resizable: false, headerAlign: "left"},
-        { field: 'propertyName', headerName: 'Nome da Propriedade', flex: 1, resizable: false, headerAlign: "left" },
-        { field: 'city', headerName: 'Cidade', flex: 1,resizable: false, headerAlign: "left"},
+        { field: 'sender', headerName: 'Remetente', flex: 1, minWidth: 100, resizable: false, headerAlign: "left"},
+        { field: 'senderEmail', headerName: 'E-mail Remetente', flex: 1 , minWidth: 100, resizable: false, headerAlign: "left"},
+        { field: 'propertyName', headerName: 'Nome da Propriedade', flex: 1, minWidth: 100, resizable: false, headerAlign: "left" },
+        { field: 'city', headerName: 'Cidade', flex: 1, minWidth: 100, resizable: false, headerAlign: "left"},
         {
             field: 'actions',
             headerName: 'Ações',
@@ -219,7 +220,7 @@ const Invite = () => {
             };
             fetchInvites();
         }
-    }, [userData]);  
+    }, [userData, reload]);  
 
 
     const navigate = useNavigate(); 
@@ -245,11 +246,7 @@ const Invite = () => {
                 answer: true, 
             });
     
-            if (response.status === 200) {
-                //window.location.reload();
-            } else {
-                console.error("Erro ao recusar o convite:", response.status);
-            }
+            setReload(prevState => !prevState);
         } catch (error) {
             console.error("Erro ao enviar a recusa do convite:", error);
         }
@@ -265,7 +262,7 @@ const Invite = () => {
     const handleDecline = async (inviteId) => {
         handleClose();
         setSnackbarMessage("Convite recusado!");
-        setStyleSnackBar("error")
+        setStyleSnackBar("error");
         setOpenSnackbar(true);
 
         try {
@@ -273,11 +270,7 @@ const Invite = () => {
                 answer: false, 
             });
     
-            if (response.status === 200) {
-                //window.location.reload();
-            } else {
-                console.error("Erro ao recusar o convite:", response.status);
-            }
+            setReload(prevState => !prevState);
         } catch (error) {
             console.error("Erro ao enviar a recusa do convite:", error);
         }
@@ -297,7 +290,7 @@ const Invite = () => {
                                 fontWeight: "bold",
                                 padding: "10px 20px",
                             }}
-                            onClick={() => navigate(`/invites/add`)}
+                            onClick={() => navigate(`/convites/add`)}
                         >
                             <PersonAddAlt1Icon sx={{ mr: isMobile ? "0px" : "10px" }} />
                             {!isMobile && ("Enviar Convite")}
