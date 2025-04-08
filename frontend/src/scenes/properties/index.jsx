@@ -43,6 +43,10 @@ const Properties = () => {
           case 4:
             setSnackbarMessage("Usuário adicionado na propriedade!");
             break;
+
+          case 5:
+            setSnackbarMessage("Usuário removido da propriedade!");
+            break;
     
           default:
             //console.log("Mensagem não reconhecida.");

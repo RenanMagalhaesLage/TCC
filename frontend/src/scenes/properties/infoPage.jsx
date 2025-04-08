@@ -25,18 +25,21 @@ const Propertie = () => {
     const [users, setUsers] = useState([]);
     const [glebas, setGlebas] = useState([]);
     const [owner, setOwner] = useState("");
+    const [isOwner, setIsOwner] = useState(false);
     const [storageItems, setStorageItems]= useState([]);
     const { id } = useParams(); 
     const [open, setOpen] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
+    const [openRemove, setOpenRemove] = useState(false); 
 
     const columnsUsers = [
-        { field: "name", headerName: "Nome", flex: 1, cellClassName: "name-column--cell", resizable: false },
-        { field: "email", headerName: "E-mail", flex: 1, cellClassName: "email-column--cell", resizable: false },
+        { field: "name", headerName: "Nome", flex: 1, minWidth: 100, cellClassName: "name-column--cell", resizable: false },
+        { field: "email", headerName: "E-mail", flex: 1, minWidth: 100, cellClassName: "email-column--cell", resizable: false },
         {
             field: "access",
             headerName: "Nível de Acesso",
             flex: 1,
+            minWidth: 100,
             headerAlign: "center",
             resizable: false,
             renderCell: ({ row: { user_properties } }) => {        
@@ -70,6 +73,7 @@ const Propertie = () => {
             field: "actions",
             headerName: "Ações",
             flex: 1,
+            minWidth: 100,
             renderCell: (params) => {
                 const { user_properties } = params.row;
                 return (
@@ -79,10 +83,87 @@ const Propertie = () => {
                         width="100%"
                         m="10px auto"
                     >
+                        <Modal
+                            open={openRemove}
+                            onClose={null} 
+                            aria-labelledby="transition-modal-title"
+                            aria-describedby="transition-modal-description"
+                            closeAfterTransition
+                            slots={{ backdrop: Backdrop }}
+                            slotProps={{
+                                backdrop: {
+                                    timeout: 500,
+                                },
+                            }}
+                        >
+                            <Fade in={openRemove}>
+                                <Box 
+                                    color={colors.grey[100]}
+                                    backgroundColor={colors.primary[400]}
+                                    sx={{ 
+                                        position: 'absolute',
+                                        top: '50%',
+                                        left: '50%',
+                                        transform: 'translate(-50%, -50%)',
+                                        width: 450,
+                                        borderRadius: 3, 
+                                        boxShadow: '0px 10px 30px rgba(0, 0, 0, 0.1)',
+                                        p: 4,
+                                    }}
+                                >
+                                    <Typography id="modal-modal-title" variant="h4" component="h2">
+                                        Deseja realmente remover este usuário da propriedade?
+                                    </Typography>
+                                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                                        Ao fazer isso, esteja ciente que:
+                                        <ul>
+                                            <li>Essa ação não pode ser revertida;</li>
+                                            <li>O usuário removido perderá o acesso total a todos os dados e recursos relacionados a essa propriedade.</li>
+                                        </ul>
+                                     </Typography>
+                                    <FormControlLabel
+                                            control={
+                                                <Checkbox
+                                                    checked={isChecked}
+                                                     onChange={handleCheckboxChange} 
+                                                />
+                                            }
+                                            label="Estou ciente e quero continuar."
+                                            sx={{ mt: 2 }}
+                                    />                                         
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
+                                        <Button 
+                                            onClick={handleCloseRemove} 
+                                            sx={{
+                                                color: colors.redAccent[500]
+                                            }}
+                                        >
+                                            Cancelar
+                                        </Button>
+                                        <Button 
+                                            onClick={() => handleRemoveUser(user_properties.propertyId, user_properties.userId)} 
+                                            variant="contained" 
+                                            sx={{ backgroundColor:  colors.redAccent[500],
+                                                "&:hover": {
+                                                    backgroundColor: colors.grey[700], 
+                                                },
+                                            }}
+                                            disabled={!isChecked} 
+                                        >
+                                            Remover
+                                        </Button>
+                                    </Box>
+                                </Box>
+                            </Fade>
+                        </Modal>
                         {isMobile ? (
                             <>
                                 <Tooltip title="Remover">
-                                    <IconButton onClick={() => handleDelete(params.row.id)}  style={{ color: user_properties.access !== "owner" ? colors.redAccent[500] : colors.grey[800] }}>
+                                    <IconButton 
+                                        onClick={() => handleOpenRemove()}  
+                                        style={{ color: !isOwner ? colors.grey[800] : user_properties.access !== "owner" ? colors.redAccent[500] : colors.grey[800] }}  
+                                        disabled={user_properties.access === "owner" || !isOwner } 
+                                    >
                                         <PersonRemoveIcon />
                                     </IconButton>
                                 </Tooltip>
@@ -92,16 +173,14 @@ const Propertie = () => {
                                 <Tooltip title="Remover">
                                     <Button 
                                         variant="contained" 
-                                        style={{ backgroundColor: user_properties.access !== "owner" ? colors.redAccent[500] : colors.grey[800] }} 
-                                        onClick={() => handleDelete(params.row.id)}
+                                        style={{ backgroundColor: !isOwner ? colors.grey[800] : user_properties.access !== "owner" ? colors.redAccent[500] : colors.grey[800] }} 
+                                        onClick={() => handleOpenRemove()}
                                         sx={{ ml: 2 }} 
-                                        disabled={user_properties.access === "owner"} 
+                                        disabled={user_properties.access === "owner" || !isOwner } 
                                     >
                                         <PersonRemoveIcon />
                                     </Button>
                                 </Tooltip>
-
-                                
                             </>
                         )}
                             
@@ -115,12 +194,13 @@ const Propertie = () => {
     ];
 
     const columnsGlebas = [
-        { field: "name", headerName: "Nome", flex: 1, cellClassName: "name-column--cell", resizable: false },
-        { field: "area", headerName: "Área", flex: 1, cellClassName: "area-column--cell", resizable: false },
+        { field: "name", headerName: "Nome", flex: 1,minWidth: 100, cellClassName: "name-column--cell", resizable: false },
+        { field: "area", headerName: "Área", flex: 1,minWidth: 100, cellClassName: "area-column--cell", resizable: false },
         {
             field: "actions",
             headerName: "Ações",
             flex: 1,
+            minWidth: 100,
             renderCell: (params) => {
                 const { id } = params.row;
 
@@ -167,15 +247,15 @@ const Propertie = () => {
     ];
 
     const columnsStorageItems = [
-        { field: "storedLocation", headerName: "Localização", flex: 1,minWidth: 180,  resizable: false },
-        { field: "category", headerName: "Categoria", flex: 1,  resizable: false },
-        { field: "name", headerName: "Nome", flex: 1,  resizable: false },
-        { field: "unit", headerName: "Unidade", flex: 1, resizable: false },
-        { field: "quantity", headerName: "Quantidade", flex: 1, resizable: false },
-        { field: "price", headerName: "Preço", flex: 1,  resizable: false },
-        { field: "totalValue", headerName: "Valor Total", flex: 1,  resizable: false },
-        { field: "expirationDate", headerName: "Data de Validade", flex: 1, resizable: false },
-        { field: "note", headerName: "Observação", flex: 1, resizable: false },
+        { field: "storedLocation", headerName: "Localização", flex: 1, minWidth: 180,  resizable: false },
+        { field: "category", headerName: "Categoria", flex: 1, minWidth: 100, resizable: false },
+        { field: "name", headerName: "Nome", flex: 1, minWidth: 100, resizable: false },
+        { field: "unit", headerName: "Unidade", flex: 1, minWidth: 100, resizable: false },
+        { field: "quantity", headerName: "Quantidade", flex: 1, minWidth: 100, resizable: false },
+        { field: "price", headerName: "Preço", flex: 1,  minWidth: 100, resizable: false },
+        { field: "totalValue", headerName: "Valor Total", flex: 1, minWidth: 100, resizable: false },
+        { field: "expirationDate", headerName: "Data de Validade", flex: 1, minWidth: 100, resizable: false },
+        { field: "note", headerName: "Observação", flex: 1, minWidth: 100, resizable: false },
         {
             field: "actions",
             headerName: "Ações",
@@ -194,7 +274,7 @@ const Propertie = () => {
                         {isMobile ? (
                             <>
                                 <Tooltip title="Visualizar">
-                                    <IconButton onClick={() => handleView(id)} sx={{ color: colors.greenAccent[500]}}>
+                                    <IconButton onClick={() => handleViewStorageItem(id)} sx={{ color: colors.greenAccent[500]}}>
                                         <VisibilityIcon />
                                     </IconButton>
                                 </Tooltip>
@@ -242,8 +322,11 @@ const Propertie = () => {
                     const users = property.users;
                     setProperty(property);
                     setUsers(users); 
+                    console.log(users);
                     const owner = users.filter(user => user.user_properties.access == 'owner');
                     setOwner(owner[0]);
+                    setIsOwner(userData.email === owner[0].email);
+                    console.log(userData.email === owner[0].email)
                     setGlebas(property.glebas);
                     setStorageItems(property.storage_items);
                 } catch (error) {
@@ -281,9 +364,30 @@ const Propertie = () => {
         setIsChecked(false);
     };
 
+    const handleOpenRemove = () => setOpenRemove(true);
+
+    const handleCloseRemove = () => {
+        setOpenRemove(false);
+        setIsChecked(false);
+    };
+    const handleRemoveUser = async (propertyId, userId) =>{
+        console.log("Usuário removido");
+        try {
+            const response = await axios.delete(`http://localhost:3000/user-properties`, {
+                params: { propertyId: propertyId, userId: userId }
+            });
+            navigate(`/propriedades?message=${encodeURIComponent("5")}`);
+        } catch (error) {
+            console.error("Erro ao remover usuário da propriedade:", error);
+        }
+        handleCloseRemove();
+    }
+
     const handleDelete = () =>{
         handleClose();
     }
+
+
 
     const handleCheckboxChange = (event) => {
         setIsChecked(event.target.checked);
@@ -616,7 +720,7 @@ const Propertie = () => {
                             alignItems="center"  
                             justifyContent="left"  
                             height="50px"
-                            mt={isMobile ? "370px": 60}
+                            mt={isMobile ? "620px": 60}
                         >                       
                             <Typography variant="h4" fontWeight="bold" color={colors.grey[100]}>
                                 Itens em Estoque
@@ -629,7 +733,7 @@ const Propertie = () => {
                             alignItems="center"
                             justifyContent="center"
                             minHeight="475px"
-                            mt={isMobile ? "30px": 49}
+                            mt={isMobile ? "540px": 49}
                             >
                             {storageItems.length === 0 ? (
                                 <Box

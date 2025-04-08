@@ -3,7 +3,6 @@ import { useNavigate,useParams } from 'react-router-dom';
 import secureLocalStorage from 'react-secure-storage';
 import axios from "axios";
 import { Box, Typography, useTheme, Button, useMediaQuery,Checkbox,FormControlLabel,Modal,Backdrop,Fade,Tooltip,IconButton} from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -38,13 +37,14 @@ const Gleba = () => {
                 try {
                     const response = await axios.get(`http://localhost:3000/glebas/${id}`);
                     const gleba = response.data;
-                    const safras = gleba.safras;
+                    const safras = gleba.safras ? gleba.safras[0].name + " - " + gleba.safras[0].cultivo : "";   
+                    console.log(safras)               
                     setGleba(gleba);
                     setPropriedade(gleba.property);
                     const users = gleba.property.users
                     const owner = users.filter(user => user.user_properties.access == 'owner');
                     setOwner(owner[0]);
-                    setSafra(safras[0]);
+                    setSafra(safras);
 
                 } catch (error) {
                     console.log(`ERROR - ao buscar a gleba de id = ${id} .`);
@@ -125,7 +125,7 @@ const Gleba = () => {
                             gridTemplateColumns={isMobile ? "1fr" : "repeat(2, 1fr)"} 
                             padding="25px 35px 30px 35px"
                             height={isMobile ? "auto" : "initial"} 
-                            minHeight={isMobile ? "320px" : "200px"} 
+                            minHeight={isMobile ? "400px" : "200px"} 
                             sx={{boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.07)",}}
                         >
                             
@@ -182,7 +182,7 @@ const Gleba = () => {
                                     Safra atual:
                                     </Typography>
                                     <Typography variant="body1" color={colors.grey[300]}>
-                                        {safra.dataFimPlantio + " - " + safra.dataFimColheita}
+                                        {safra}
                                     </Typography>
                                 </Box>
                                 {userData && owner && userData.email === owner.email &&  (

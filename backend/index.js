@@ -524,6 +524,30 @@ app.delete('/propriedades/:id', async(req,res) =>{
     }
 });
 
+/* Rota para --> REMOVER USUÁRIO DA PROPRIEDADE */
+app.delete('/user-properties', async(req,res) =>{
+    const { propertyId, userId }  = req.query;
+    try{
+        const propriedade = await Property.findByPk(propertyId);
+        if (!propriedade) {
+            return res.status(404).json({ error: 'Propriedade não encontrada.' });
+        }
+
+        await UserProperty.destroy({
+            where: {
+                propertyId: propertyId, 
+                userId: userId,
+            }
+        });
+
+        res.status(200).json({ message: 'Usuário removido da propriedade com sucesso.' });
+    }catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erro no servidor.' });
+    }
+
+});
+
 /*------------------------
         ROTAS GLEBAS
 --------------------------*/
