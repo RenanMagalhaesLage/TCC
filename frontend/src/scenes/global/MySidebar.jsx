@@ -220,7 +220,7 @@ const Sidebar = ({ onLogout }) => {
 
             <Item
               title="Custo Total"
-              to="/contacts"
+              to="/custo-total"
               icon={<AttachMoneyIcon/>}
               selected={selected}
               setSelected={setSelected}

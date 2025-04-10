@@ -25,15 +25,16 @@ import GlebaForm from './scenes/glebas/formPage';
 import GlebaEditForm from './scenes/glebas/editPage';
 import Safras from './scenes/safras'
 import SafraPage from './scenes/safras/infoPage';
-import SafraForm from './scenes/safras/form';
+import SafraForm from './scenes/safras/formPage';
 import SafraHistory from './scenes/safras/historyPage';
 import SafraEditPage from './scenes/safras/editPage';
 import Custos from './scenes/custos';
 import Invite from './scenes/invites';
-import InvitesForm from './scenes/invites/form';
-import CustosPage from './scenes/custos/custosPage';
+import InvitesForm from './scenes/invites/formPage';
+import CustosPage from './scenes/custos/infoPage';
 import CustosForm from './scenes/custos/formPage';
 import CustosEditPage from './scenes/custos/editPage';
+import CustoTotal from './scenes/custos/totalPage';
 import DashboardProjetado from './scenes/dashboard/dashboardProjetado';
 import DashboardRealizado from './scenes/dashboard/dashboardRealizado';
 import Storage from './scenes/storage/index';
@@ -96,6 +97,7 @@ function App() {
                   <Route path="/custos/:id" element={<CustosPage />} />
                   <Route path="/custos/add" element={<CustosForm />} />
                   <Route path="/custos/edit/:id" element={<CustosEditPage />} />
+                  <Route path="/custo-total" element={<CustoTotal />} />
                   <Route path="/historico-safras" element={<SafraHistory />} />
                   <Route path="/convites" element={<Invite />} />
                   <Route path="/convites/add" element={<InvitesForm />} />

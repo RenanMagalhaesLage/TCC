@@ -555,7 +555,6 @@ app.delete('/user-properties', async(req,res) =>{
 /*  Rota para --> BUSCAR GLEBA */
 app.get('/glebas/:id', async (req, res) => {
     const { id } = req.params;
-
     try {
         const gleba = await Gleba.findByPk(id);
         if (!gleba) {

@@ -37,14 +37,15 @@ const Gleba = () => {
                 try {
                     const response = await axios.get(`http://localhost:3000/glebas/${id}`);
                     const gleba = response.data;
-                    const safras = gleba.safras ? gleba.safras[0].name + " - " + gleba.safras[0].cultivo : "";   
-                    console.log(safras)               
+                    const safras = gleba.safras.length !== 0  ? gleba.safras[0].name + " - " + gleba.safras[0].cultivo : "";  
+                    setSafra(safras); 
+                    console.log(safras);               
                     setGleba(gleba);
                     setPropriedade(gleba.property);
                     const users = gleba.property.users
                     const owner = users.filter(user => user.user_properties.access == 'owner');
                     setOwner(owner[0]);
-                    setSafra(safras);
+                    
 
                 } catch (error) {
                     console.log(`ERROR - ao buscar a gleba de id = ${id} .`);
