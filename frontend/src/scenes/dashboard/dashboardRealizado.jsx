@@ -51,7 +51,6 @@ const DashboardRealizado = () => {
           });
                       
           const safras = response.data
-            .filter(safra => safra.status === false)
             .filter(safra => safra.type === "Realizado")
             .map(safra => ({
               id: safra.id,
@@ -311,8 +310,8 @@ const DashboardRealizado = () => {
                 }}
               >
                 <InfoBox
-                  //title={safraData ? "R$ " + safraData.custoMedio : ""}
-                  subtitle="Disp Prev vs. Real "
+                  title={safraData ? safraData.difProd + "%" : ""}
+                  subtitle="Dif. Prod. Prev vs. Real "
                 />
               </Box>
               <Box
@@ -327,7 +326,7 @@ const DashboardRealizado = () => {
               >
                 <InfoBox
                   title={safraData ? safraData.prodEstimada : ""}
-                  subtitle="Prod. Estimada (SCS)"
+                  subtitle="Prod. Realizada (SCS)"
                 />
               </Box>
               <Box

@@ -766,8 +766,6 @@ app.delete('/glebas/:id', async(req,res) =>{
     }
 });
 
-
-
 /*------------------------
         ROTAS SAFRAS
 --------------------------*/
@@ -1635,32 +1633,29 @@ app.get('/all-custos-pie-chart', async (req, res) => {
     for (let safraId of uniqueSafraIds) {
         try {
             sumCustos  = await connection.query(query, {
-            replacements: { safraId },  
-            type: QueryTypes.SELECT
-          });
-    
-          // Exibe os resultados da consulta para o safraId atual
-          console.log(`Custos para safraId ${safraId}:`, sumCustos);
+                replacements: { safraId },  
+                type: QueryTypes.SELECT
+            });
 
-          const categories = [
-            'Defensivos',
-            'Operações',
-            'Semente',
-            'Arrendamento',
-            'Administrativo',
-            'Corretivos e Fertilizantes'
-            
-        ];
+            const categories = [
+                'Defensivos',
+                'Operações',
+                'Semente',
+                'Arrendamento',
+                'Administrativo',
+                'Corretivos e Fertilizantes'
+                
+            ];
           
-        const result = categories.map(category => {
-            const categoryFound = Array.isArray(sumCustos) ? sumCustos.find(result => result.category === category) : null;
-            return {
-              id: category,  // Adiciona o atributo 'id' com o mesmo valor de 'category'
-              label: category,
-              value: categoryFound ? categoryFound.value : 0 
-            };
-        });
-        return res.json(result);
+            const result = categories.map(category => {
+                const categoryFound = Array.isArray(sumCustos) ? sumCustos.find(result => result.category === category) : null;
+                return {
+                id: category,  // Adiciona o atributo 'id' com o mesmo valor de 'category'
+                label: category,
+                value: categoryFound ? categoryFound.value : 0 
+                };
+            });
+            return res.json(result);
 
         } catch (error) {
           console.error(`Erro ao buscar custos para safraId ${safraId}:`, error);
@@ -1869,9 +1864,9 @@ app.get('/custos-hectares-glebas-bar-chart', async (req, res) => {
 
 /* Rota para --> GRÁFICO DE BARRA DE CUSTO MÉDIO POR HECTARE POR GLEBA */
 app.get('/custos-categoria-bar-chart', async (req, res) => {
-    const { safraId } = req.query;
+    const { id } = req.query;
 
-    const safra = await Safra.findByPk(safraId);
+    const safra = await Safra.findByPk(id);
         if (!safra) {
             return res.status(404).json({ error: 'Safra não encontrado' });
     }
@@ -1880,14 +1875,14 @@ app.get('/custos-categoria-bar-chart', async (req, res) => {
     const query = `
        SELECT category, SUM(totalValue) AS value
         FROM Custos
-        WHERE safraId = 2
+        WHERE safraId = :id
         AND type = 'Realizado'
         GROUP BY category;
     `;
   
     try {
         const sumCustos = await connection.query(query, {
-          replacements: { safraId },  
+          replacements: { id },  
           type: QueryTypes.SELECT  
         });
 
@@ -1904,6 +1899,7 @@ app.get('/custos-categoria-bar-chart', async (req, res) => {
       }
 });
 
+/* Rota para --> RELATÓRIO DE SAFRA */
 app.get('/report-safra', async (req, res) => {
     const { id } = req.query;
 
@@ -1912,48 +1908,249 @@ app.get('/report-safra', async (req, res) => {
             return res.status(404).json({ error: 'Safra não encontrado' });
     }
 
-    //Somando custos por categoria
     const query = `
         SELECT SUM(totalValue) AS totalCustos
         FROM custos
-        WHERE safraId = :id;
+        WHERE safraId = :id
+        AND type = :type;
     `;
   
     try {
+        const type = safra.type;
         const [sumCustos] = await connection.query(query, {
-          replacements: { id },  
+          replacements: { id, type },  
           type: QueryTypes.SELECT  
         });
 
+        let precoVenda = 0;
+        let producao = 0;
+        if(type === "Planejado"){
+            precoVenda = safra.precoVendaEstimado;
+            producao =  safra.prodPrevista;
+        }else{
+            precoVenda = safra.precoVendaRealizado;
+            producao =  safra.prodRealizada;
+        }
+
         const custoMedio = (sumCustos.totalCustos / safra.areaTotal);
-        const receitaBruta = safra.precoVendaEstimado * safra.areaTotal * safra.prodPrevista;
+        const receitaBruta = precoVenda * safra.areaTotal * producao;
         const lucroTotal = receitaBruta - sumCustos.totalCustos;
         const lucroHect = lucroTotal / safra.areaTotal;
         /* PONTO EQUILÍBRIO = CUSTO MÉDIO / PREÇO VENDA */
-        const pontoEquilibrio = custoMedio / safra.precoVendaEstimado;
+        const pontoEquilibrio = custoMedio / precoVenda;
         /* LAIR --> LUCRO ANTES DO IMPOSTO DE RENDA */
-        const receitaHect = safra.precoVendaEstimado * safra.prodPrevista;
-        const rentabilidadeLair = (receitaHect / custoMedio) - 1;
-        const funrural = receitaBruta*0.2;
+        const receitaHect = precoVenda * producao;
+        const rentabilidadeLair = ((receitaHect - custoMedio) / custoMedio) *100;
+        const funrural = receitaBruta*0.002;
         /* IMPOSTO DE RENDA --> (LUCRO TOTAL - FUNRURAL) * 20% */
         const importoRenda =  (lucroTotal - funrural) * 0.2;
         const lucroLiquido = lucroTotal - funrural - importoRenda;
         const lucroLiquidoHect = lucroLiquido / safra.areaTotal;
         const rentabilidadeTotal = lucroLiquidoHect / custoMedio;
 
+        /* DIFERENÇA PRODUÇÃO ESTIMADO VS REALIZADO */
+        const difProd = ((safra.prodRealizada - safra.prodPrevista) / safra.prodPrevista) * 100;
+
         const result = {
             areaTotal: formatarNumero(safra.areaTotal),
-            precoVenda: formatarNumero(safra.precoVendaEstimado),
+            precoVenda: formatarNumero(precoVenda),
             custoTotal: formatarNumero(sumCustos.totalCustos) || 0,
             custoMedio:  formatarNumero(custoMedio),
-            prodEstimada: formatarNumero(safra.prodPrevista), 
+            prodEstimada: formatarNumero(producao), 
             pontoEquilibrio: formatarNumero(pontoEquilibrio),
             receitaBruta: formatarNumero(receitaBruta),
             lucroTotal: formatarNumero(lucroTotal),
             lucroHect: formatarNumero(lucroHect),
             rentabilidadeLair: formatarNumero(rentabilidadeLair),
             rentabilidadeFinal: formatarNumero(rentabilidadeTotal),
+            difProd : formatarNumero(difProd)
 
+        };
+      
+        return res.json(result);
+        
+
+    } catch (error) {
+        console.error('Erro ao executar a consulta:', error);
+        res.status(500).json({ error: 'Erro ao acessar o banco de dados' });
+    }
+});
+
+/* Rota para --> RELATÓRIO DE CUSTO TOTAL */
+app.get('/report-custo', async (req, res) => {
+    const { id } = req.query;
+
+    const safra = await Safra.findByPk(id);
+        if (!safra) {
+            return res.status(404).json({ error: 'Safra não encontrado' });
+    }
+
+    const query = `
+        SELECT SUM(totalValue) AS totalCustos
+        FROM custos
+        WHERE safraId = :id
+        AND type = :type;
+    `;
+
+    const queryCategory =`
+        SELECT *,
+        SUM(totalValue) OVER () AS total
+        FROM custos
+        WHERE safraId = :id
+        AND type = :type
+        AND category = :category;
+    `;
+
+    const queryDescritivo = `
+        SELECT category, SUM(totalValue) AS value
+        FROM Custos
+        WHERE safraId = :id
+        AND type = :type
+        GROUP BY category;
+    `;
+  
+    try {
+        const type = safra.type;
+        const [sumCustos] = await connection.query(query, {
+          replacements: { id, type },  
+          type: QueryTypes.SELECT  
+        });
+
+        /* Querrys para custos de cada categoria */
+        const corretivosFertilizantes = await connection.query(queryCategory, {
+            replacements: { id, type, category: 'Corretivos e Fertilizantes' },  
+            type: QueryTypes.SELECT  
+        });
+
+        const sementes = await connection.query(queryCategory, {
+            replacements: { id, type, category: 'Sementes' },  
+            type: QueryTypes.SELECT  
+        });
+
+        const defensivos = await connection.query(queryCategory, {
+            replacements: { id, type, category: 'Defensivos' },  
+            type: QueryTypes.SELECT  
+        });
+
+        const operacoes = await connection.query(queryCategory, {
+            replacements: { id, type, category: 'Operações' },  
+            type: QueryTypes.SELECT  
+        });
+
+        const administrativo = await connection.query(queryCategory, {
+            replacements: { id, type, category: 'Administrativo' },  
+            type: QueryTypes.SELECT  
+        });
+
+        const arrendamento = await connection.query(queryCategory, {
+            replacements: { id, type, category: 'Arrendamento' },  
+            type: QueryTypes.SELECT  
+        });
+
+        const descritivo  = await connection.query(queryDescritivo, {
+            replacements: { id, type},  
+            type: QueryTypes.SELECT  
+        });
+
+        const categories = [
+            'Defensivos',
+            'Operações',
+            'Semente',
+            'Arrendamento',
+            'Administrativo',
+            'Corretivos e Fertilizantes'
+        ];
+      
+        const totalValue = descritivo.reduce((sum, item) => sum + Number(item.value), 0);
+
+        const resultDescritivo = categories.map(category => {
+            const categoryFound = Array.isArray(descritivo) ? descritivo.find(result => result.category === category) : null;
+            const value = categoryFound ? Number(categoryFound.value) : 0;
+            const percentage = totalValue > 0 ? (value / totalValue) * 100 : 0;
+
+            return {
+                category,
+                value: formatarNumero(value),
+                percentage: formatarNumero(percentage)
+            };
+        });
+
+        let precoVenda = 0;
+        let producao = 0;
+        if(type === "Planejado"){
+            precoVenda = safra.precoVendaEstimado;
+            producao =  safra.prodPrevista;
+        }else{
+            precoVenda = safra.precoVendaRealizado;
+            producao =  safra.prodRealizada;
+        }
+
+        const custoMedio = (sumCustos.totalCustos / safra.areaTotal);
+        const receitaBruta = precoVenda * safra.areaTotal * producao;
+        const receitaBrutaHec = precoVenda * producao;
+        const lucroTotal = receitaBruta - sumCustos.totalCustos;
+        const lucroHect = lucroTotal / safra.areaTotal;
+        /* PONTO EQUILÍBRIO = CUSTO MÉDIO / PREÇO VENDA */
+        const pontoEquilibrio = custoMedio / precoVenda;
+        /* LAIR --> LUCRO ANTES DO IMPOSTO DE RENDA */
+        const receitaHect = precoVenda * producao;
+        const rentabilidadeLair = ((receitaHect - custoMedio) / custoMedio) *100;
+        const funrural = receitaBruta*0.002;
+        /* IMPOSTO DE RENDA --> (LUCRO TOTAL - FUNRURAL) * 20% */
+        const importoRenda =  (lucroTotal - funrural) * 0.2;
+        const lucroLiquido = lucroTotal - funrural - importoRenda;
+        const lucroLiquidoHect = lucroLiquido / safra.areaTotal;
+        const rentabilidadeTotal = lucroLiquidoHect / custoMedio;
+
+        /* DIFERENÇA PRODUÇÃO ESTIMADO VS REALIZADO */
+        const difProd = ((safra.prodRealizada - safra.prodPrevista) / safra.prodPrevista) * 100;
+
+        const administrativoTotal = (administrativo.length > 0 && administrativo[0].total) || 0;
+        const operacoesTotal = (operacoes.length > 0 && operacoes[0].total) || 0;
+        
+        const custoFinanceiro = (administrativoTotal + operacoesTotal) * 0.095; //(adm + operacao) * 9,5%
+
+        const precoCusto = ((sumCustos.totalCustos / producao) / safra.areaTotal);
+        const nomeAjuste = safra.type === "Realizado" ? "realizado" : "esperado";
+        const nomeAjuste2 = safra.type === "Realizado" ? "realizada" : "esperada";
+
+        const result = {
+            safraName: safra.name,
+            type: safra.type,
+            status: safra.status,
+            areaTotal: formatarNumero(safra.areaTotal),
+            glebas: [],
+            cultivo: safra.cultivo,
+            corretivosFertilizantes: corretivosFertilizantes,
+            sementes: sementes,
+            defensivos: defensivos,
+            operacoes: operacoes,
+            administrativo: administrativo,
+            arrendamento: arrendamento,
+            descritivo: resultDescritivo,
+            custoTotal: formatarNumero(sumCustos.totalCustos) || 0,
+            custoFinanceiro: formatarNumero(custoFinanceiro),
+            seguro: formatarNumero(sumCustos.totalCustos * 0.02),
+            custoMedio:  formatarNumero(custoMedio),
+            prod: formatarNumero(producao), 
+            precoCusto: formatarNumero(precoCusto),
+
+            rentabilidade: [
+                { name: "Preço de venda " +  nomeAjuste + " (R$/saco)", value: formatarNumero(precoVenda)},
+                { name: "Receita bruta " + nomeAjuste2 +  " (R$/ha)", value: formatarNumero(receitaBrutaHec) },
+                { name: "Receita bruta total (Gleba)", value: formatarNumero(receitaBruta) },
+                { name: "Lucro " +  nomeAjuste + " (R$/ha)", value: formatarNumero(lucroHect) },
+                { name: "LAIR (R$)", value: formatarNumero(lucroTotal) },
+            ],
+            rentabilidadeLair: formatarNumero(rentabilidadeLair),
+
+            rentabilidadeImposto:[
+                {name: "Funrural (0,2%): ", value: formatarNumero(funrural)},
+                {name: "Imposto de Renda: ", value: formatarNumero(importoRenda)},
+                {name: "Lucro Liquido: ", value: formatarNumero(lucroLiquido)},
+                {name: "Lucro Liquido / Hectare: ", value: formatarNumero(lucroLiquidoHect)},
+            ],
+            rentabilidadeFinal: formatarNumero(rentabilidadeTotal),
         };
       
         return res.json(result);
