@@ -218,7 +218,7 @@ const CustosPage = () => {
                             height={isMobile ? "auto" : "initial"} 
                             minHeight={isMobile ? "600px" : "240px"} 
                             marginBottom={isMobile ? "0" :"118px"}
-                            marginTop={"-130px"}
+                            marginTop={isMobile ? "-60px" : "-130px"}
                             sx={{boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.07)",}}
                         >
                             {/* Primeira Coluna */}
@@ -310,13 +310,13 @@ const CustosPage = () => {
                                 justifyContent="flex-end"
                                 //sx={{border: "1px solid red"}} 
                             >
-                                        <Box 
-                                            display="flex" 
-                                            justifyContent= {isMobile ? "flex-start" : "flex-end"} 
-                                            alignItems="flex-end" 
-                                            flexGrow={1} 
-                                            width="100%"
-                                        >
+                                <Box 
+                                    display="flex" 
+                                    justifyContent= {isMobile ? "flex-start" : "flex-end"} 
+                                    alignItems="flex-end" 
+                                    flexGrow={1} 
+                                    width="100%"
+                                >
                                             <Tooltip title='Deletar'>
                                                 <Button 
                                                     disabled={custo.status === true}
@@ -420,9 +420,15 @@ const CustosPage = () => {
                                                     <EditIcon />
                                                 </Button>
                                             </Tooltip>
-                                        </Box>
+                                </Box>
                             </Box>
                         </Box>
+                        <Box
+                            gridColumn="span 12"
+                            display="grid"
+                            alignItems="flex-end"
+                            justifyContent="flex-end"
+                        ></Box>
                     </Box>
             </Box>
         </Box>

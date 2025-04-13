@@ -52,7 +52,6 @@ const Register = () => {
     });
     
     const handleFormSubmit = (values, { resetForm, setSubmitting }) => {
-        console.log(values);
         setTimeout(() => {
             resetForm();
             setSubmitting(false);

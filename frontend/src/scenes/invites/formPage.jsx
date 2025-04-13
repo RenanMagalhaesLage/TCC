@@ -58,7 +58,6 @@ const InvitesForm = () => {
 
   const navigate = useNavigate(); 
   const handleFormSubmit = async (values) => {
-    console.log("teste" + values);
     setErrorMessage(""); 
 
     if (id) {

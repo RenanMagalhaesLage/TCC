@@ -79,14 +79,14 @@ const SafrasPage = () => {
     ];
 
     const columns = [
-        { field: "category", headerName: "Categoria", flex: 1, minWidth: 80, resizable: false },
-        { field: "name", headerName: "Nome", flex: 1, minWidth: 80, resizable: false },
-        { field: "unit", headerName: "Unidade", flex: 1, resizable: false },
-        { field: "quantity", headerName: "Quantidade", flex: 1, resizable: false },
-        { field: "price", headerName: "Preço", flex: 1,  resizable: false },
-        { field: "totalValue", headerName: "Valor Total", flex: 1,  resizable: false },
-        { field: "expirationDate", headerName: "Data", flex: 1, resizable: false },
-        { field: "note", headerName: "Observação", flex: 1, minWidth: 80, resizable: false },
+        { field: "category", headerName: "Categoria", flex: 1, minWidth: 100, resizable: false },
+        { field: "name", headerName: "Nome", flex: 1, minWidth: 100, resizable: false },
+        { field: "unit", headerName: "Unidade", flex: 1,minWidth: 100, resizable: false },
+        { field: "quantity", headerName: "Quantidade", flex: 1, minWidth: 100, resizable: false },
+        { field: "price", headerName: "Preço", flex: 1,  minWidth: 100, resizable: false },
+        { field: "totalValue", headerName: "Valor Total", flex: 1, minWidth: 100,  resizable: false },
+        { field: "expirationDate", headerName: "Data", flex: 1, minWidth: 100, resizable: false },
+        { field: "note", headerName: "Observação", flex: 1, minWidth: 100, resizable: false },
         {
             field: "actions",
             headerName: "Ações",
@@ -137,11 +137,12 @@ const SafrasPage = () => {
     ];
 
     const glebasColumns = [
-        { field: "name", headerName: "Nome", flex: 1, cellClassName: "name-column--cell", resizable: false },
+        { field: "name", headerName: "Nome", flex: 1,minWidth: 100, cellClassName: "name-column--cell", resizable: false },
         {
             field: "property",
             headerName: "Propriedade",
             flex: 1,
+            minWidth: 100,
             cellClassName: "propertie-column--cell",
             resizable: false,
             renderCell: (params) => {
@@ -149,11 +150,12 @@ const SafrasPage = () => {
                 return property ? property.name : "";  
             },
         },
-        { field: "area", headerName: "Área", type: "number", flex: 1,headerAlign: "left", align: "left", resizable: false },
+        { field: "area", headerName: "Área", type: "number", flex: 1, minWidth: 100, headerAlign: "left", align: "left", resizable: false },
         {
             field: "access",
             headerName: "Nível de Acesso",
             flex: 1,
+            minWidth: 100,
             headerAlign: "center",
             resizable: false,
             renderCell: (params) => {
@@ -193,6 +195,7 @@ const SafrasPage = () => {
             field: "actions",
             headerName: "Ações",
             flex: 1,
+            minWidth: 100,
             minWidth: 100,
             renderCell: (params) => {
                 const { id } = params.row;
@@ -405,7 +408,7 @@ const SafrasPage = () => {
                             padding="25px 35px 30px 35px"
                             height={isMobile ? "120px" : "80px"} 
                             marginBottom={isMobile ? "0px" :"118px"}
-                            marginTop={"-130px"}
+                            marginTop={isMobile ? "-60px" : "-130px"}
                             sx={{boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.07)",}}
                         >
                             {/* Primeira Coluna */}
@@ -450,7 +453,7 @@ const SafrasPage = () => {
                             height={isMobile ? "auto" : "initial"} 
                             minHeight={isMobile ? "900px" : "550px"} 
                             marginBottom={isMobile ?"0px" :"80px"}
-                            marginTop={isMobile ? "-150px":"-190px"}
+                            marginTop={isMobile ? "-80px":"-190px"}
                             sx={{boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.07)",}}
                         >
                             {/* Primeira Coluna */}
@@ -661,7 +664,7 @@ const SafrasPage = () => {
                             alignItems="center"  
                             justifyContent="left"  
                             height="50px"
-                            mt={isMobile ? "610px": "225px"}
+                            mt={isMobile ? "680px": "225px"}
                         >
                             <Typography variant="h4" fontWeight="bold" color={colors.grey[100]}>
                                 Glebas
@@ -673,7 +676,7 @@ const SafrasPage = () => {
                             alignItems="center"
                             justifyContent="center"
                             minHeight="475px"
-                            mt={isMobile ? "500px": "120px"}
+                            mt={isMobile ? "570px": "120px"}
                         >
                             {glebas.length === 0 ? (
                                 <Box
@@ -716,7 +719,7 @@ const SafrasPage = () => {
                             alignItems="center"  
                             justifyContent="left"  
                             height="50px"
-                            mt={isMobile ? "820px": "440px"}
+                            mt={isMobile ? "890px": "440px"}
                         >
                             <Typography variant="h4" fontWeight="bold" color={colors.grey[100]}>
                                 Custos Planejados da Safra
@@ -728,7 +731,7 @@ const SafrasPage = () => {
                             alignItems="center"
                             justifyContent="center"
                             minHeight="475px"
-                            mt={isMobile ? "715px": "340px"}
+                            mt={isMobile ? "785px": "340px"}
                         >
                             {custosPlanejados.length === 0 ? (
                                 <Box
@@ -772,7 +775,7 @@ const SafrasPage = () => {
                             alignItems="center"  
                             justifyContent="left"  
                             height="50px"
-                            mt={isMobile ? "1030px": "660px"}
+                            mt={isMobile ? "1100px": "660px"}
                         >
                             <Typography variant="h4" fontWeight="bold" color={colors.grey[100]}>
                                 Custos Realizados da Safra
@@ -784,7 +787,7 @@ const SafrasPage = () => {
                             alignItems="center"
                             justifyContent="center"
                             minHeight="475px"
-                            mt={isMobile ? "925px": "560px"}
+                            mt={isMobile ? "995px": "560px"}
                         >
                             {custosRealizados.length === 0 ? (
                                 <Box

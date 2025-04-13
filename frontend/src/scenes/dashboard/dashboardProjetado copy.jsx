@@ -42,7 +42,7 @@ const DashboardProjetado = () => {
           secondarySelection: "",
         }}
         onSubmit={(values) => {
-          console.log(values);
+          //console.log(values);
         }}
       >
       {({ values, handleChange, setFieldValue }) => (

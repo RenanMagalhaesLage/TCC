@@ -123,7 +123,6 @@ router.post('/safras', async (req, res) => {
             prodPrevista, 
             precoVendaEstimado,
         } = req.body;
-        console.log("TESTEEEE " + precoVendaEstimado);
         const user = await User.findOne({ where: { email: email } });
 
         const ids = glebaIds.map(id => Number(id));

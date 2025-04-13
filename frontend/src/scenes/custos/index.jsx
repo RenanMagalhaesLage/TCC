@@ -81,14 +81,14 @@ const Custos = () => {
                 );
             }
         },
-        { field: "category", headerName: "Categoria", flex: 1,  resizable: false },
-        { field: "name", headerName: "Nome", flex: 1,  resizable: false },
-        { field: "unit", headerName: "Unidade", flex: 1, resizable: false },
-        { field: "quantity", headerName: "Quantidade", flex: 1, resizable: false },
-        { field: "price", headerName: "Preço", flex: 1,  resizable: false },
-        { field: "totalValue", headerName: "Valor Total", flex: 1,  resizable: false },
-        { field: "expirationDate", headerName: "Data de Validade", flex: 1, resizable: false },
-        { field: "note", headerName: "Observação", flex: 1, resizable: false },
+        { field: "category", headerName: "Categoria", flex: 1, minWidth: 100, resizable: false },
+        { field: "name", headerName: "Nome", flex: 1, minWidth: 100, resizable: false },
+        { field: "unit", headerName: "Unidade", flex: 1, minWidth: 100, resizable: false },
+        { field: "quantity", headerName: "Quantidade", flex: 1, minWidth: 100, resizable: false },
+        { field: "price", headerName: "Preço", flex: 1, minWidth: 100, resizable: false },
+        { field: "totalValue", headerName: "Valor Total", flex: 1, minWidth: 100, resizable: false },
+        { field: "expirationDate", headerName: "Data de Validade", flex: 1, minWidth: 100, resizable: false },
+        { field: "note", headerName: "Observação", flex: 1, minWidth: 100, resizable: false },
         {
             field: "actions",
             headerName: "Ações",

@@ -64,7 +64,7 @@ const PieChart = ({isDashboard, safraId }) => {
   return (
     emptyData ? (
       <div style={{ textAlign: "center", padding: "2rem" }}>
-        <img src="/farm-img.svg" alt="Farm" style={{ width: "300px" }} />
+        <img src="/farm-img.svg" alt="Farm" style={{ width:isMobile ?"200px" : "300px" }} />
         <p style={{ color: "#aaa", marginTop: "1rem" }}>Nenhum dado disponível para exibir</p>
       </div>
     ) : (

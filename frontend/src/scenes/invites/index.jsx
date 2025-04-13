@@ -378,13 +378,13 @@ const Invite = () => {
                     </Alert>
                 </Snackbar>
                 )}
-                {message && (
+                {message !== 0 && (
                     <Snackbar 
-                    open={openSnackbar} 
-                    autoHideDuration={2500} 
-                    onClose={handleCloseSnackbar}
-                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }} 
-                >
+                        open={openSnackbar} 
+                        autoHideDuration={2500} 
+                        onClose={handleCloseSnackbar}
+                        anchorOrigin={{ vertical: 'top', horizontal: 'center' }} 
+                    >
                     <Alert
                         onClose={handleCloseSnackbar}
                         severity={styleSnackBar}

@@ -324,11 +324,9 @@ const Propertie = () => {
                     const users = property.users;
                     setProperty(property);
                     setUsers(users); 
-                    console.log(users);
                     const owner = users.filter(user => user.user_properties.access == 'owner');
                     setOwner(owner[0]);
                     setIsOwner(userData.email === owner[0].email);
-                    console.log(userData.email === owner[0].email)
                     setGlebas(property.glebas);
                     setStorageItems(property.storage_items);
                 } catch (error) {
@@ -373,7 +371,6 @@ const Propertie = () => {
         setIsChecked(false);
     };
     const handleRemoveUser = async (propertyId, userId) =>{
-        console.log("Usuário removido");
         try {
             const response = await axios.delete(`http://localhost:3000/user-properties`, {
                 params: { propertyId: propertyId, userId: userId }

@@ -170,9 +170,7 @@ const SafrasEditPage = () => {
     }
   };
   const handleAdicionarGleba = () =>{
-    setOpenModalGleba(false);
-    console.log("adicionado");
-  
+    setOpenModalGleba(false);  
   };
 
   if (loading || !safra ) {
