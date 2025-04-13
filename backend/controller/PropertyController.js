@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const connection = require("../database/database");
 const { QueryTypes } = require('sequelize');
+const { Op } = require("sequelize");
 /*-------------------------------
             Models
 ---------------------------------*/
@@ -17,8 +18,8 @@ const StorageItem = require("../database/StorageItem");
 
 /* Rota para --> BUSCAR PROPRIEDADE 
    Retorno: Propriedade, Glebas e Users associados à Propriedade */
-router.get('/properties/:id', async (req, res) => {
-    const { id } = req.params;
+router.get('/properties', async (req, res) => {
+    const { id }  = req.query;
 
     try {
         const result = await Property.findOne({
@@ -152,7 +153,7 @@ router.get('/properties-by-safra', async (req, res) => {
 });
 
 /* Rota para --> CADASTRAR PROPRIEDADE */
-router.post('/propriedades', async (req, res) => {
+router.post('/properties', async (req, res) => {
     try {
         const { name, city, area, email } = req.body;
         const user = await User.findOne({ where: { email: email } });
@@ -185,17 +186,17 @@ router.post('/propriedades', async (req, res) => {
 });
 
 /* Rota para --> EDITAR PROPRIEDADE */
-router.put('/propriedades/:id', async (req, res) => {
+router.put('/properties', async (req, res) => {
     try {
-        const { name, area, city } = req.body;
+        const {id, name, area, city } = req.body;
         const [updated] = await Property.update(
             { name, area, city},
-            { where: { id: req.params.id } }
+            { where: { id: id } }
         );
 
 
         if (updated) {
-            const updatedProperty = await Property.findByPk(req.params.id);
+            const updatedProperty = await Property.findByPk(id);
             return res.json(updatedProperty);
         }
 
@@ -206,29 +207,41 @@ router.put('/propriedades/:id', async (req, res) => {
 });
 
 /* Rota para --> REMOVER PROPRIEDADE */
-router.delete('/propriedades/:id', async(req,res) =>{
+router.delete('/properties', async(req,res) =>{
+    const { id }  = req.query;
     try {
-        const { id } = req.params;
         const propriedade = await Property.findByPk(id);
         if (!propriedade) {
             return res.status(404).json({ error: 'Propriedade não encontrada.' });
-        }
+        };
+
+        await StorageItem.destroy({
+            where: { propertyId: id }
+        });
+
+        await Invite.destroy({
+            where: { propertyId: id }
+        });
+
         const glebas = await Gleba.findAll({
             where: { propertyId: id }
         });
         const glebasIds = glebas.map(gleba => gleba.id);
 
-        const safras = await Safra.findAll({
-            where: { glebaId: glebasIds }
+        await SafraGleba.destroy({
+            where: {
+              glebaId: {
+                [Op.in]: glebasIds
+              }
+            }
         });
-        const safraIds = safras.map(safra => safra.id);
 
         await Custo.destroy({
-            where: { safraId: safraIds }
-        });
-
-        await Safra.destroy({
-            where: { glebaId: glebasIds }
+            where: {
+                glebaId: {
+                  [Op.in]: glebasIds
+                }
+            }
         });
 
         await Gleba.destroy({

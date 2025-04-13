@@ -29,7 +29,9 @@ const PropertiesEditForm = () => {
         if (userData && userData.email) {
             const fetchPropertyData = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:3000/properties/${id}`);
+                    const response = await axios.get(`http://localhost:3000/properties`, {
+                        params: { id: id }
+                    });
                     setPropertyData(response.data);
                     setLoading(false); 
                 } catch (error) {
@@ -51,7 +53,8 @@ const PropertiesEditForm = () => {
 
     const handleFormSubmit = async (values) => {
         try {
-            const response = await axios.put(`http://localhost:3000/propriedades/${id}`, {
+            const response = await axios.put(`http://localhost:3000/properties`, {
+                id: id,
                 name: values.namePropertie,
                 area: values.area,
                 city: values.city,

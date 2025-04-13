@@ -317,7 +317,9 @@ const Propertie = () => {
         if (userData && userData.email) { 
             const fetchPropriedades = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:3000/properties/${id}`);
+                    const response = await axios.get(`http://localhost:3000/properties`, {
+                        params: { id: id }
+                    });
                     const property = response.data;
                     const users = property.users;
                     setProperty(property);
@@ -383,11 +385,18 @@ const Propertie = () => {
         handleCloseRemove();
     }
 
-    const handleDelete = () =>{
+    const handleDelete = async () =>{
         handleClose();
+        try {
+            const response = await axios.delete(`http://localhost:3000/properties`, {
+                params: { id: id }
+            });
+            navigate(`/propriedades?message=${encodeURIComponent("3")}`);
+        } catch (error) {
+            console.error("Erro ao deletar propriedade:", error);
+        }
+
     }
-
-
 
     const handleCheckboxChange = (event) => {
         setIsChecked(event.target.checked);
