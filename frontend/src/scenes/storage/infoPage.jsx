@@ -89,7 +89,9 @@ const StoragePage = () => {
         if (userData && userData.email) { 
             const fetchStorageData = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:3000/storage/${id}`);
+                    const response = await axios.get(`http://localhost:3000/storage-by-id`,{
+                        params: { id: id }
+                    });
                     setCusto(response.data);
                     setStorageQuantity(response.data.quantity)
                     setPropertyName(response.data.property.name);

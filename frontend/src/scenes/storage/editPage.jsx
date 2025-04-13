@@ -51,7 +51,9 @@ const StorageForm = () => {
     if (userData && userData.email) {
       const fetchStorageData = async () => {
         try {
-          const responseStorage = await axios.get(`http://localhost:3000/storage/${id}`);
+          const responseStorage = await axios.get(`http://localhost:3000/storage-by-id`,{
+            params: { id: id }
+          });
           setStorageItem(responseStorage.data);
 
           const responseProperties = await axios.get(`http://localhost:3000/user`, {

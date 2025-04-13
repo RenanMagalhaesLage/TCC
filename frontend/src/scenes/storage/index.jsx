@@ -121,7 +121,7 @@ const Storage = () => {
         if (userData && userData.email) { 
             const fetchStorageData = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:3000/storage`, {
+                    const response = await axios.get(`http://localhost:3000/storage-by-user`, {
                         params: { email: userData.email }
                     });
                     const linhasDaTabela = response.data;
