@@ -14,6 +14,7 @@ const PieChart = ({isDashboard, safraId }) => {
   const isMediumDivice = useMediaQuery("(max-width: 1800px)");
   const [userData, setUserData] = useState(null);
   const [pieData, setPieData] = useState([]);
+  const [emptyData, setEmptyData] = useState(false);
   
   useEffect(() => {
       const storedUser = secureLocalStorage.getItem('userData'); 
@@ -30,18 +31,30 @@ const PieChart = ({isDashboard, safraId }) => {
             const response = await axios.get(`http://localhost:3000/all-custos-pie-chart`, {
               params: { email: userData.email }
             });
-            setPieData(response.data); 
+
+            if (response.data.length === 0) {
+              setEmptyData(true);
+              setPieData([]);
+            } else {
+              setEmptyData(false);
+              setPieData(response.data);
+            }
 
           }else{
             const response = await axios.get(`http://localhost:3000/custos-pie-chart`, {
               params: { safraId: safraId }
-            });
-                        
+            });  
             setPieData(response.data); 
+            setEmptyData(false);
           }
                         
         } catch (error) {
-          console.log("ERRO - ao buscar no banco de dados.");
+          if (error.response && error.response.status === 404) {
+            setEmptyData(true);
+            console.log("Nenhum dado encontrado (404)");
+          } else {
+            console.error("Erro ao buscar dados:", error);
+          }
         }
       };
       fetchPieData();
@@ -49,6 +62,12 @@ const PieChart = ({isDashboard, safraId }) => {
   }, [userData]);  
 
   return (
+    emptyData ? (
+      <div style={{ textAlign: "center", padding: "2rem" }}>
+        <img src="/farm-img.svg" alt="Farm" style={{ width: "300px" }} />
+        <p style={{ color: "#aaa", marginTop: "1rem" }}>Nenhum dado disponível para exibir</p>
+      </div>
+    ) : (
     <ResponsivePie
       data={pieData}
       theme={{
@@ -172,7 +191,7 @@ const PieChart = ({isDashboard, safraId }) => {
           ]
         }
     />
-  );
+  ));
 };
 
 export default PieChart;

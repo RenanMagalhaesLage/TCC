@@ -46,7 +46,6 @@ router.get('/custos-pie-chart', async (req, res) => {
             'Arrendamento',
             'Administrativo',
             'Corretivos e Fertilizantes'
-            
         ];
           
         const result = categories.map(category => {
@@ -78,7 +77,11 @@ router.get('/all-custos-pie-chart', async (req, res) => {
         where: { userId: user.id },
         attributes: ['propertyId', 'access']
     });
-    
+
+    if(userProperties.length === 0){
+        return res.status(404).json({ error: "Usuário não possui propriedades." });
+    }
+
     const propertyIds = userProperties.map(up => up.propertyId);
     const access = userProperties.map(up => up.access);
     
@@ -98,15 +101,26 @@ router.get('/all-custos-pie-chart', async (req, res) => {
         }
     });
 
+    let allSafrasEmpty = true;
+
+    
+
     const safraIds = new Set();  
 
     properties.forEach(property => {
         property.glebas.forEach(gleba => {
+            if (gleba.safras && gleba.safras.length > 0) {
+                allSafrasEmpty = false;
+            }
             gleba.safras.forEach(safra => {
                 safraIds.add(safra.id);  
             });
         });
     });
+
+    if (allSafrasEmpty) {
+        return res.status(404).json({ error: "Usuário não possui safras realizadas." });
+    } 
 
     const uniqueSafraIds = [...safraIds];
     const query = `
@@ -137,11 +151,16 @@ router.get('/all-custos-pie-chart', async (req, res) => {
             const result = categories.map(category => {
                 const categoryFound = Array.isArray(sumCustos) ? sumCustos.find(result => result.category === category) : null;
                 return {
-                id: category,  // Adiciona o atributo 'id' com o mesmo valor de 'category'
-                label: category,
-                value: categoryFound ? categoryFound.value : 0 
+                    id: category, 
+                    label: category,
+                    value: categoryFound ? categoryFound.value : 0 
                 };
             });
+            const allValuesAreZero = result.every(item => item.value === 0);
+
+            if (allValuesAreZero) {
+                return res.status(404).json({ error: "Safras não possuem custos." });
+            } 
             return res.json(result);
 
         } catch (error) {

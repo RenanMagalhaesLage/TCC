@@ -79,6 +79,8 @@ const Sidebar = ({ onLogout }) => {
       setSelected('Estoque');
     }else if(location.pathname.startsWith('/convites')){
       setSelected('Convites');
+    }else if(location.pathname.startsWith('/home')){
+      setSelected('Início');
     }
   }, [location.pathname]);
 
