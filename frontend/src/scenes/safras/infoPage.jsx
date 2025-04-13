@@ -38,7 +38,6 @@ const SafrasPage = () => {
     const headerNames = [
         "Cultivo",
         "Semente",
-        "Metro Linear",
         "Dosagem",
         "Toneladas",
         "Adubo",
@@ -51,20 +50,17 @@ const SafrasPage = () => {
         "Grãos Avariados",
         "Grãos Esverdeados",
         "Grãos Quebrados",
-        "Prod. Total",
     ];
 
     const comparativoProd = [
         "Prod. Prevista",
         "Prod. Realizada",
         "Comparativo",
-        "Porcentagem / HA",
     ]
 
     const fieldNames = [
         "cultivo",
         "semente",
-        "metroLinear",
         "dosagem",
         "toneladas",
         "adubo",
@@ -77,11 +73,9 @@ const SafrasPage = () => {
         "graosAvariados",
         "graosEsverdeados",
         "graosQuebrados",
-        "prodTotal",
         "prodPrevista",
         "prodRealizada",
         "comparativo",
-        "porcentHect",
     ];
 
     const columns = [
@@ -90,8 +84,8 @@ const SafrasPage = () => {
         { field: "unit", headerName: "Unidade", flex: 1, resizable: false },
         { field: "quantity", headerName: "Quantidade", flex: 1, resizable: false },
         { field: "price", headerName: "Preço", flex: 1,  resizable: false },
-        { field: "total_value", headerName: "Valor Total", flex: 1,  resizable: false },
-        { field: "date", headerName: "Data", flex: 1, resizable: false },
+        { field: "totalValue", headerName: "Valor Total", flex: 1,  resizable: false },
+        { field: "expirationDate", headerName: "Data", flex: 1, resizable: false },
         { field: "note", headerName: "Observação", flex: 1, minWidth: 80, resizable: false },
         {
             field: "actions",
@@ -482,7 +476,7 @@ const SafrasPage = () => {
                                             {headerName}:
                                         </Typography>
                                         <Typography variant="body1" color={colors.grey[300]}>
-                                            {safra[fieldNames[index+8]]} 
+                                            {safra[fieldNames[index+7]]} 
                                         </Typography>
                                     </Box>
                                 ))}
@@ -529,15 +523,6 @@ const SafrasPage = () => {
                                     >
                                         {isHigher ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />} 
                                     </Box>
-                                    </Typography>
-                                </Box>
-
-                                <Box display="flex" alignItems={isMobile ? "flex-start":"center" } marginBottom="15px" flexDirection={isMobile ? "column":"row" }>
-                                    <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginBottom="5px" marginRight="10px">
-                                    Porcentagem / HA:
-                                    </Typography>
-                                    <Typography variant="body1" color={colors.grey[300]}>
-                                        {safra.porcentHect}
                                     </Typography>
                                 </Box>
                                 

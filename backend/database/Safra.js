@@ -29,10 +29,6 @@ const Safra = connection.define('safra',{
         type: Sequelize.STRING,
         allowNull:false
     },
-    metroLinear:{
-        type: Sequelize.STRING,
-        allowNull:false
-    },
     dosagem:{ //kg/ha
         type: Sequelize.INTEGER,
         allowNull:false
@@ -83,19 +79,11 @@ const Safra = connection.define('safra',{
         type: Sequelize.DOUBLE,
         allowNull:false
     },
-    prodTotal:{
-        type: Sequelize.INTEGER,
-        allowNull:false
-    },
     prodPrevista:{
         type: Sequelize.DOUBLE,
         allowNull:false
     },
     prodRealizada:{
-        type: Sequelize.DOUBLE,
-        allowNull:false
-    },
-    porcentHect:{ //% Produto /hectare
         type: Sequelize.DOUBLE,
         allowNull:false
     },

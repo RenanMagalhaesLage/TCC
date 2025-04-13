@@ -114,14 +114,12 @@ router.post('/safras', async (req, res) => {
             safraName,
             cultivo, 
             semente,
-            metroLinear,
             dosagem,
             toneladas,
             adubo,
             dataFimPlantio,
             dataFimColheita,
             tempoLavoura,
-            prodTotal,
             prodPrevista, 
             precoVendaEstimado,
         } = req.body;
@@ -137,12 +135,11 @@ router.post('/safras', async (req, res) => {
         });
 
         if (
-            !email || !glebaIds || !safraName || !cultivo || !semente || !metroLinear || !dosagem || !toneladas || 
-            !adubo || !dataFimPlantio || !dataFimColheita || !tempoLavoura || !prodTotal || !prodPrevista || !precoVendaEstimado
+            !email || !glebaIds || !safraName || !cultivo || !semente  || !dosagem || !toneladas || 
+            !adubo || !dataFimPlantio || !dataFimColheita || !tempoLavoura  || !prodPrevista || !precoVendaEstimado
         ) {
             return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
         }
-        console.log("PASSOUUU");
 
         const newSafra = await Safra.create({
             type: "Planejado",
@@ -151,14 +148,12 @@ router.post('/safras', async (req, res) => {
             status: false,
             cultivo: cultivo,
             semente: semente,
-            metroLinear: metroLinear,
             dosagem: dosagem,
             toneladas: toneladas,
             adubo: adubo,
             dataFimPlantio: dataFimPlantio,
             dataFimColheita: dataFimColheita,
             tempoLavoura: tempoLavoura,
-            prodTotal: prodTotal,
             prodPrevista: prodPrevista, 
             precoVendaEstimado: precoVendaEstimado,
             precMilimetrica: 0,  
@@ -168,7 +163,6 @@ router.post('/safras', async (req, res) => {
             graosEsverdeados: 0, 
             graosQuebrados: 0,   
             prodRealizada: 0,  
-            porcentHect: 0,
             precoVendaRealizado: 0,
         });
 
@@ -218,7 +212,6 @@ router.put('/safras', async (req, res) => {
             graosEsverdeados, 
             graosQuebrados,   
             prodRealizada,  
-            //porcentHect,
         } = req.body;
 
         let areaGleba = 0;

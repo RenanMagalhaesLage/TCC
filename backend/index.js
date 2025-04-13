@@ -239,7 +239,6 @@ app.use("/", glebaController);
 app.use("/", safraController);
 app.use("/", dashboardController);
 
-
 /* Rota para --> BUSCA TODOS OS DADOS DO USER - DADO DETERMINADO EMAIL 
    Retorno: Propriedades, Glebas, Safras e Custos associados ao user */
 app.get('/user', async (req, res) => {
@@ -312,41 +311,9 @@ app.get('/user', async (req, res) => {
     }
 });
 
-/*------------------------
-        ROTAS PROPRIEDADE
---------------------------*/
-
-/*------------------------
-        ROTAS GLEBAS
---------------------------*/
-
-/*------------------------
-        ROTAS SAFRAS
---------------------------*/
-
-/*------------------------
-        ROTAS CUSTOS
---------------------------*/
-
-/*------------------------
-        ROTAS ESTOQUE
---------------------------*/
-
-/*------------------------
-        ROTAS DASHBOARD 
---------------------------*/
-
-/*------------------------
-        ROTAS INVITE
---------------------------*/
-
-
-
-
 app.listen(port,()=>{
     console.log(`Servidor rodando na porta ${port}`);
 })
-
 
 
 /*
@@ -357,18 +324,3 @@ app.get("/",(req,res) =>{
 app.listen(8080,()=>{
     console.log("App rodando na porta 8080");
 })*/
-
-function formatarNumero(valor) {
-    const numeroFormatado = new Intl.NumberFormat('pt-BR', { 
-        style: 'decimal', 
-        minimumFractionDigits: 0, 
-        maximumFractionDigits: 2 
-    }).format(valor);
-    
-    // Verificar se as casas decimais são "00" e removê-las se for o caso
-    if (valor % 1 === 0) {
-        return numeroFormatado; 
-    } else {
-        return numeroFormatado.replace(/(\,00)$/, ''); // Remove a vírgula com "00" no final
-    }
-}
