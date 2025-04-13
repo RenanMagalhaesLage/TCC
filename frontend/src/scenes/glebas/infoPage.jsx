@@ -39,7 +39,6 @@ const Gleba = () => {
                     const gleba = response.data;
                     const safras = gleba.safras.length !== 0  ? gleba.safras[0].name + " - " + gleba.safras[0].cultivo : "";  
                     setSafra(safras); 
-                    console.log(safras);               
                     setGleba(gleba);
                     setPropriedade(gleba.property);
                     const users = gleba.property.users
@@ -72,8 +71,16 @@ const Gleba = () => {
         setIsChecked(false);
     };
 
-    const handleDelete = () =>{
+    const handleDelete = async () =>{
         handleClose();
+        try {
+            const response = await axios.delete(`http://localhost:3000/glebas`, {
+                params: { id: id }
+            });
+            navigate(`/glebas?message=${encodeURIComponent("3")}`);
+        } catch (error) {
+                    console.error("Erro ao deletar gleba:", error);
+        }
     }
 
     const handleCheckboxChange = (event) => {

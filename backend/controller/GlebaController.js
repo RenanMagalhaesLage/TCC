@@ -201,24 +201,24 @@ router.put('/glebas/:id', async (req, res) => {
 });
 
 /* Rota para --> REMOVER GLEBA */
-router.delete('/glebas/:id', async(req,res) =>{
+router.delete('/glebas', async(req,res) =>{
+    const { id }  = req.query;
     try {
-        const { id } = req.params;
         const gleba = await Gleba.findByPk(id);
         if (!gleba) {
             return res.status(404).json({ error: 'Gleba não encontrada.' });
         }
-        const safras = await Safra.findAll({
-            where: { glebaId: id }
+
+        await SafraGleba.destroy({
+            where: {
+              glebaId: id
+            }
         });
 
-        const safraIds = safras.map(safra => safra.id);
         await Custo.destroy({
-            where: { safraId: safraIds }
-        });
-
-        await Safra.destroy({
-            where: { glebaId: id }
+            where: {
+                glebaId: id
+            }
         });
 
         await gleba.destroy();
