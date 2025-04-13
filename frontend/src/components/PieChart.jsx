@@ -26,7 +26,6 @@ const PieChart = ({isDashboard, safraId }) => {
     if (userData && userData.email) { 
       const fetchPieData = async () => {
         try {
-          console.log(safraId)
           if(safraId === '0' || safraId === 0){
             const response = await axios.get(`http://localhost:3000/all-custos-pie-chart`, {
               params: { email: userData.email }

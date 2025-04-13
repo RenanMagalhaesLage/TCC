@@ -30,7 +30,7 @@ const BarChart = ({isDashboard, safraId}) => {
       const fetchBarData = async () => {
         try {
           const response = await axios.get(`http://localhost:3000/custos-categoria-bar-chart`, {
-            params: { safraId: safraId }
+            params: { id: safraId }
           });
                       
           setBarData(response.data); 
