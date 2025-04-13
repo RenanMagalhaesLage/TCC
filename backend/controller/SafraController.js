@@ -234,9 +234,14 @@ router.put('/safras', async (req, res) => {
         }
 
         if(status){
-            //Caso for finalizar a safra atualizar status das glebas
+            //Caso for finalizar a safra atualizar status das glebas e dos seus custos
             const [glebasUpdated] = await SafraGleba.update(
                 { statusSafra: status},
+                { where: { safraId: id } }
+            )
+
+            const [custosUpdated] = await Custo.update(
+                { status: status},
                 { where: { safraId: id } }
             )
         }
@@ -286,13 +291,19 @@ router.put('/safras', async (req, res) => {
 });
 
 /* Rota para --> REMOVER SAFRAS */
-router.delete('/safras/:id', async(req,res) =>{
+router.delete('/safras', async(req,res) =>{
+    const { id }  = req.query;
     try {
-        const { id } = req.params; 
         const safra = await Safra.findByPk(id);
         if (!safra) {
             return res.status(404).json({ error: 'Safra não encontrada.' });
         }
+
+        await SafraGleba.destroy({
+            where: {
+                safraId: id
+            }
+        });
 
         await Custo.destroy({
             where: { safraId: id },

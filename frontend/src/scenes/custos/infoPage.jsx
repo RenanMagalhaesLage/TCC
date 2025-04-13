@@ -319,6 +319,7 @@ const CustosPage = () => {
                                         >
                                             <Tooltip title='Deletar'>
                                                 <Button 
+                                                    disabled={custo.status === true}
                                                     variant="contained" 
                                                     onClick={handleOpen} 
                                                     sx={{ backgroundColor:  colors.redAccent[500],
@@ -406,6 +407,7 @@ const CustosPage = () => {
                                             </Modal>
                                             <Tooltip title='Editar'>
                                                 <Button 
+                                                    disabled={custo.status === true}
                                                     variant="contained" 
                                                     onClick={() => handleEdit()} 
                                                     sx={{ml:2,

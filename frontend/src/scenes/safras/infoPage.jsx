@@ -302,8 +302,8 @@ const SafrasPage = () => {
     const handleDelete = async () =>{
         handleClose();
         try {
-            const response = await axios.delete(`http://localhost:3000/safras/${id}`, {
-                answer: false, 
+            const response = await axios.delete(`http://localhost:3000/safras`, {
+                params: { id: id }
             });
             navigate(`/safras?message=${encodeURIComponent("3")}`);
         } catch (error) {
@@ -544,6 +544,7 @@ const SafrasPage = () => {
                                     >
                                         <Tooltip title='Deletar'>
                                             <Button 
+                                                disabled={safra.status === true}
                                                 variant="contained" 
                                                 onClick={handleOpen} 
                                                 sx={{ backgroundColor:  colors.redAccent[500],
@@ -634,6 +635,7 @@ const SafrasPage = () => {
                                         </Modal>
                                         <Tooltip title='Editar'>
                                             <Button 
+                                                disabled={safra.status === true}
                                                 variant="contained" 
                                                 onClick={() => handleEdit()} 
                                                 sx={{ml:2,

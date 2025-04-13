@@ -108,8 +108,9 @@ router.get('/custos-by-user', async (req, res) => {
 /* Rota para --> CADASTRAR CUSTOS */
 router.post('/custos', async (req, res) => {
     try {
-        const { email, 
-            idSafra, 
+        const { 
+            email, 
+            safraId, 
             glebaId,
             name,
             category,
@@ -122,11 +123,11 @@ router.post('/custos', async (req, res) => {
         } = req.body;
 
         if (
-            !email || !idSafra || !glebaId || !name || !category || !unit || !quantity || !price || !totalValue 
+            !email || !safraId || !glebaId || !name || !category || !unit || !quantity || !price || !totalValue 
         ) {
             return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
         }
-        const safra = await Safra.findByPk(idSafra);
+        const safra = await Safra.findByPk(safraId);
 
         const newCusto = await Custo.create({
             type: safra.type,
