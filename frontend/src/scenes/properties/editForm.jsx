@@ -29,8 +29,8 @@ const PropertiesEditForm = () => {
         if (userData && userData.email) {
             const fetchPropertyData = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:3000/propriedades/${id}`);
-                    setPropertyData(response.data.property);
+                    const response = await axios.get(`http://localhost:3000/properties/${id}`);
+                    setPropertyData(response.data);
                     setLoading(false); 
                 } catch (error) {
                     console.error("Erro ao buscar dados da propriedade:", error);
@@ -115,7 +115,7 @@ const PropertiesEditForm = () => {
                                 fullWidth
                                 variant="filled"
                                 type="text"
-                                label="Área"
+                                label="Área em Hectares"
                                 onBlur={handleBlur}
                                 onChange={handleChange}
                                 value={values.area}

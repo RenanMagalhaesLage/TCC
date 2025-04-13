@@ -144,7 +144,7 @@ const Gleba = () => {
                                     Área:
                                     </Typography>
                                     <Typography variant="body1" color={colors.grey[300]}>
-                                    {gleba.area}
+                                    {gleba.area + " hectares"}
                                     </Typography>
                                 </Box>
                                 <Box display="flex" alignItems="center" marginBottom={isMobile ? "15px" : "0px"}>

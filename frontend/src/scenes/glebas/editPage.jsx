@@ -34,8 +34,8 @@ const GlebasEditForm = () => {
         const fetchPropertyData = async () => {
             try {
                 const response = await axios.get(`http://localhost:3000/glebas/${id}`);
-                const { gleba, property, owner } = response.data;
-                setGleba(gleba);
+                const { property } = response.data;
+                setGleba(response.data);
                 setProperty(property);
                 setLoading(false); 
             } catch (error) {
@@ -121,7 +121,7 @@ const GlebasEditForm = () => {
                   fullWidth
                   variant="filled"
                   type="text"
-                  label="Área"
+                  label="Área em Hectares"
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.area}

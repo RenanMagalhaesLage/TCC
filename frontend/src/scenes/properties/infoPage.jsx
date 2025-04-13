@@ -646,7 +646,6 @@ const Propertie = () => {
                         </Box>
                         <Box
                             gridColumn="span 12"
-                            backgroundColor={glebas.length === 0 ? "":colors.primary[400]}
                             display="flex"
                             alignItems="center"
                             justifyContent="center"
@@ -728,7 +727,6 @@ const Propertie = () => {
                         </Box> 
                         <Box
                             gridColumn="span 12"
-                            backgroundColor={glebas.length === 0 ? "":colors.primary[400]}
                             display="flex"
                             alignItems="center"
                             justifyContent="center"
