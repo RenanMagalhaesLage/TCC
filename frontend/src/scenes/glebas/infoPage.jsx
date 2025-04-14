@@ -37,7 +37,7 @@ const Gleba = () => {
                 try {
                     const response = await axios.get(`http://localhost:3000/glebas/${id}`);
                     const gleba = response.data;
-                    const safras = gleba.safras.length !== 0  ? gleba.safras[0].name + " - " + gleba.safras[0].cultivo : "";  
+                    const safras = gleba.safras.length !== 0  ? gleba.safras[0].name + " - " + gleba.safras[0].crop : "";  
                     setSafra(safras); 
                     setGleba(gleba);
                     setPropriedade(gleba.property);

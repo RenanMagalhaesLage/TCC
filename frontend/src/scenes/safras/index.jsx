@@ -51,254 +51,18 @@ const Safras = () => {
         }
       }, [message]);
 
-    const columns = [
-        { field: "propertie", headerName: "Propriedade", flex: 1, minWidth: 150, cellClassName: "name-column--cell", resizable: false },
-        { field: "gleba", headerName: "Gleba", flex: 2, minWidth: 150, cellClassName: "name-column--cell", resizable: false },
-        { field: "area", headerName: "Área da Gleba", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
-        {
-            field: "type",
-            headerName: "Tipo",
-            flex: 1,
-            headerAlign: "center",
-            minWidth: 200,
-            resizable: false,
-            renderCell: ({ row: { type } }) => {
-                return (
-                    <Box
-                        width="60%"
-                        m="10px auto"
-                        p="5px"
-                        display="flex"
-                        justifyContent="center"
-                        backgroundColor={
-                            type === "Planejado" ? colors.orangeAccent[500] : colors.orangeAccent[300]
-                        }
-                        borderRadius="4px"
-                        sx={{color: theme.palette.mode === 'dark' ?colors.primary[400]: colors.grey[100]}}
-                    >
-                        {type === "Planejado" && <EqualizerIcon/>}
-                        {type === "Realizado" && <TimelineIcon />}
-                        {!isSmallDivice && (
-                            <Typography
-                                sx={{ ml: "5px", fontWeight: "bold"}}
-                            >
-                                {type}
-                            </Typography>
-                        )}
-                    </Box>
-                );
-            }
-        },    
-        /*    
-        { field: "status", headerName: "Status", flex: 1, type: "boolean", resizable: false, minWidth: 170,
-            renderCell: ({ row: { status } }) => (
-              <Box
-                  width="60%"
-                  m="10px auto"
-                  p="5px"
-                  display="flex"
-                  justifyContent="center"
-                  backgroundColor={status ? "red" : "green"}
-                  borderRadius="4px"
-              >
-                  <Typography sx={{ fontWeight: "bold", color: "#FFFFFF" }}>
-                      {status ? "Finalizada" : "Andamento"}
-                  </Typography>
-              </Box>
-            )
-        },*/
-        { field: "cultivo", headerName: "Cultivo", flex: 1, minWidth: 100, cellClassName: "city-column--cell", resizable: false },
-        { field: "semente", headerName: "Semente", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
-        { field: "metroLinear", headerName: "Metro Linear", type: "number", headerAlign: "left", align: "left", minWidth: 120, resizable: false },
-        { field: "dosagem", headerName: "Dosagem", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
-        { field: "toneladas", headerName: "Toneladas", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
-        { field: "adubo", headerName: "Adubo", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
-        { field: "dataFimPlantio", headerName: "Fim Plantio", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
-        { field: "dataFimColheita", headerName: "Fim Colheita", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
-        { field: "tempoLavoura", headerName: "Tempo Lavoura", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
-        { field: "precMilimetrica", headerName: "Preção Milimetrica", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
-        { 
-            field: "umidade", 
-            headerName: "Umidade", 
-            type: "number", 
-            headerAlign: "left", 
-            align: "left", 
-            minWidth: 100, 
-            resizable: false, 
-            renderCell: ({ row: { umidade } }) =>{
-                return (
-                <Typography  sx={{mt: "16px"}}>
-                                {umidade + "%"}
-                </Typography>
-            )}
-        },
-        
-        { 
-            field: "impureza", 
-            headerName: "Impureza", 
-            type: "number", 
-            headerAlign: "left", 
-            align: "left", 
-            minWidth: 100, 
-            resizable: false,
-            renderCell: ({ row: { impureza } }) =>{
-                return (
-                <Typography  sx={{mt: "16px"}}>
-                                {impureza + "%"}
-                </Typography>
-            )}
-        },
-        { 
-            field: "graosAvariados", 
-            headerName: "Grãos Avariados", 
-            type: "number", 
-            headerAlign: "left", 
-            align: "left", 
-            minWidth: 100, 
-            resizable: false,
-            renderCell: ({ row: { graosAvariados } }) =>{
-                return (
-                <Typography  sx={{mt: "16px"}}>
-                                {graosAvariados + "%"}
-                </Typography>
-            )}
-         },
-        { 
-            field: "graosEsverdeados", 
-            headerName: "Grãos Esverdeados", 
-            type: "number", 
-            headerAlign: "left", 
-            align: "left", 
-            minWidth: 100, 
-            resizable: false,
-            renderCell: ({ row: { graosEsverdeados } }) =>{
-                return (
-                <Typography  sx={{mt: "16px"}}>
-                                {graosEsverdeados + "%"}
-                </Typography>
-            )}
-         },
-         { 
-            field: "graosQuebrados", 
-            headerName: "Grãos Quebrados", 
-            type: "number", 
-            headerAlign: "left", 
-            align: "left", 
-            minWidth: 100, 
-            resizable: false,
-            renderCell: ({ row: { graosQuebrados } }) =>{
-                return (
-                <Typography  sx={{mt: "16px"}}>
-                                {graosQuebrados + "%"}
-                </Typography>
-            )}
-         },
-        { field: "prodTotal", headerName: "Prod. Total", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
-        { field: "prodPrevista", headerName: "Prod. Prevista", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
-        { field: "prodRealizada", headerName: "Prod. Realizada", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
-        { 
-            field: "comparativo", 
-            headerName: "Comparativo", 
-            type: "number", 
-            headerAlign: "center", 
-            minWidth: 100, 
-            resizable: false,
-            renderCell: ({ row: { prodPrevista, prodRealizada  } }) => {
-                const isHigher = prodRealizada > prodPrevista; 
-
-                return (
-                    <Box
-                        width="40%"
-                        m="10px auto"
-                        p="5px"
-                        display="flex"
-                        justifyContent="center"
-                        alignItems="center"
-                        backgroundColor={isHigher ? colors.mygreen[500] : colors.redAccent[500]} 
-                        borderRadius="4px"
-                    >
-                        {isHigher ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />} 
-                    </Box>
-                );
-            }
-         },
-        /*
-        {
-            field: "porcentHect",
-            headerName: "Porcentagem / HA",
-            headerAlign: "center",
-            flex: 1,
-            align: "center",
-            minWidth: 120,
-            resizable: false,
-            renderCell: ({ row: { porcentHect } }) =>{
-                return (
-                <Typography  sx={{mt: "16px"}}>
-                                {porcentHect + "%"}
-                </Typography>
-            )}
-
-        },*/
-        {
-            field: "actions",
-            headerName: "Ações",
-            flex: 1,
-            minWidth: 100,
-            renderCell: (params) => {
-                const { id } = params.row;
-
-                return (
-                    <Box 
-                        display="flex" 
-                        justifyContent="center" 
-                        width="100%"
-                        m="10px auto"
-                    >
-                        {isMobile ? (
-                            <>
-                                <Tooltip title="Visualizar">
-                                    <IconButton onClick={() => handleView(id)} sx={{ color: colors.greenAccent[500]}}>
-                                        <VisibilityIcon />
-                                    </IconButton>
-                                </Tooltip>
-                            </>
-                        ):(
-                            <>
-                                <Tooltip title="Visualizar">
-                                    <Button
-                                        variant="contained"
-                                        sx={{
-                                            backgroundColor: colors.greenAccent[500],
-                                            "&:hover": {
-                                                backgroundColor: colors.grey[700], 
-                                            },
-                                        }}
-                                        onClick={() => handleView(id)}
-                                    >
-                                        <VisibilityIcon />
-                                    </Button>
-                                </Tooltip>
-                            </>
-                        )}
-                    </Box>
-                );
-            },
-            headerAlign: "center"
-        },  
-    ];
-
     const columnsPlanejadas = [
         { field: "name", headerName: "Nome", flex: 1, minWidth: 100, cellClassName: "name-column--cell", resizable: false },
-        { field: "areaTotal", headerName: "Área", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },    
-        { field: "cultivo", headerName: "Cultivo", flex: 1, minWidth: 100, cellClassName: "city-column--cell", resizable: false },
-        { field: "semente", headerName: "Semente", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
-        { field: "dosagem", headerName: "Dosagem", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
-        { field: "toneladas", headerName: "Toneladas", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
-        { field: "adubo", headerName: "Adubo", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
-        { field: "dataFimPlantio", headerName: "Fim Plantio", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
-        { field: "dataFimColheita", headerName: "Fim Colheita", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
-        { field: "tempoLavoura", headerName: "Tempo Lavoura", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
-        { field: "prodPrevista", headerName: "Prod. Prevista", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
+        { field: "totalArea", headerName: "Área", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },    
+        { field: "crop", headerName: "Cultivo", flex: 1, minWidth: 100, cellClassName: "city-column--cell", resizable: false },
+        { field: "seed", headerName: "Semente", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
+        { field: "dosage", headerName: "Dosagem", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
+        { field: "tons", headerName: "Toneladas", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
+        { field: "fertilizer", headerName: "Adubo", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
+        { field: "plantingEndDate", headerName: "Fim Plantio", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
+        { field: "harvestEndDate", headerName: "Fim Colheita", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
+        { field: "fieldDuration", headerName: "Tempo Lavoura", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
+        { field: "expectedYield", headerName: "Prod. Prevista", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
         {
             field: "actions",
             headerName: "Ações",
@@ -349,85 +113,85 @@ const Safras = () => {
 
     const columnsRealizadas = [
         { field: "name", headerName: "Nome", flex: 1, minWidth: 100, cellClassName: "name-column--cell", resizable: false },
-        { field: "areaTotal", headerName: "Área", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },    
-        { field: "cultivo", headerName: "Cultivo", flex: 1, minWidth: 70, cellClassName: "city-column--cell", resizable: false },
-        { field: "precMilimetrica", headerName: "Precipitação Milimetrica", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
+        { field: "totalArea", headerName: "Área", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },    
+        { field: "crop", headerName: "Cultivo", flex: 1, minWidth: 70, cellClassName: "city-column--cell", resizable: false },
+        { field: "rainfall", headerName: "Precipitação Milimetrica", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
         { 
-            field: "umidade", 
+            field: "moisture", 
             headerName: "Umidade", 
             type: "number", 
             headerAlign: "left", 
             align: "left", 
             minWidth: 100, 
             resizable: false, 
-            renderCell: ({ row: { umidade } }) =>{
+            renderCell: ({ row: { moisture } }) =>{
                 return (
                 <Typography  sx={{mt: "16px"}}>
-                                {umidade + "%"}
+                                {moisture + "%"}
                 </Typography>
             )}
         },    
         { 
-            field: "impureza", 
+            field: "impurity", 
             headerName: "Impureza", 
             type: "number", 
             headerAlign: "left", 
             align: "left", 
             minWidth: 100, 
             resizable: false,
-            renderCell: ({ row: { impureza } }) =>{
+            renderCell: ({ row: { impurity } }) =>{
                 return (
                 <Typography  sx={{mt: "16px"}}>
-                                {impureza + "%"}
+                                {impurity + "%"}
                 </Typography>
             )}
         },
         { 
-            field: "graosAvariados", 
+            field: "damagedGrains", 
             headerName: "Grãos Avariados", 
             type: "number", 
             headerAlign: "left", 
             align: "left", 
             minWidth: 100, 
             resizable: false,
-            renderCell: ({ row: { graosAvariados } }) =>{
+            renderCell: ({ row: { damagedGrains } }) =>{
                 return (
                 <Typography  sx={{mt: "16px"}}>
-                                {graosAvariados + "%"}
+                                {damagedGrains + "%"}
                 </Typography>
             )}
          },
         { 
-            field: "graosEsverdeados", 
+            field: "greenGrains", 
             headerName: "Grãos Esverdeados", 
             type: "number", 
             headerAlign: "left", 
             align: "left", 
             minWidth: 100, 
             resizable: false,
-            renderCell: ({ row: { graosEsverdeados } }) =>{
+            renderCell: ({ row: { greenGrains } }) =>{
                 return (
                 <Typography  sx={{mt: "16px"}}>
-                                {graosEsverdeados + "%"}
+                                {greenGrains + "%"}
                 </Typography>
             )}
          },
          { 
-            field: "graosQuebrados", 
+            field: "brokenGrains", 
             headerName: "Grãos Quebrados", 
             type: "number", 
             headerAlign: "left", 
             align: "left", 
             minWidth: 100, 
             resizable: false,
-            renderCell: ({ row: { graosQuebrados } }) =>{
+            renderCell: ({ row: { brokenGrains } }) =>{
                 return (
                 <Typography  sx={{mt: "16px"}}>
-                                {graosQuebrados + "%"}
+                                {brokenGrains + "%"}
                 </Typography>
             )}
          },
-         { field: "prodRealizada", headerName: "Prod. Realizada", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
+         { field: "actualYield", headerName: "Prod. Realizada", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
         {
             field: "actions",
             headerName: "Ações",

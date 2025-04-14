@@ -130,17 +130,17 @@ const SafrasForm = () => {
       const response = await axios.post("http://localhost:3000/safras", {
         email: userData.email,
         glebaIds: values.gleba,
-        safraName: values.safraName,
-        cultivo: values.cultivo, 
-        semente: values.semente,
-        dosagem: values.dosagem,
-        toneladas: values.toneladas,
-        adubo: values.adubo,
-        dataFimPlantio: values.dataFimPlantio,
-        dataFimColheita: values.dataFimColheita,
-        tempoLavoura: values.tempoLavoura,
-        prodPrevista: values.prodPrevista,
-        precoVendaEstimado: values.precoVendaEstimado,
+        name: values.safraName,
+        crop: values.cultivo, 
+        seed: values.semente,
+        dosage: values.dosagem,
+        tons: values.toneladas,
+        fertilizer: values.adubo,
+        plantingEndDate: values.dataFimPlantio,
+        harvestEndDate: values.dataFimColheita,
+        fieldDuration: values.tempoLavoura,
+        expectedYield: values.prodPrevista,
+        estimatedSalePrice: values.precoVendaEstimado,
       });
       if (response.status === 201) {  
         navigate(`/safras?message=${encodeURIComponent("1")}`);

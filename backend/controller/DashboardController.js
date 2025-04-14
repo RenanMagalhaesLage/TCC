@@ -145,7 +145,6 @@ router.get('/all-custos-pie-chart', async (req, res) => {
                 'Arrendamento',
                 'Administrativo',
                 'Corretivos e Fertilizantes'
-                
             ];
           
             const result = categories.map(category => {
@@ -432,17 +431,17 @@ router.get('/report-safra', async (req, res) => {
         let precoVenda = 0;
         let producao = 0;
         if(type === "Planejado"){
-            precoVenda = safra.precoVendaEstimado;
-            producao =  safra.prodPrevista;
+            precoVenda = safra.estimatedSalePrice;
+            producao =  safra.expectedYield;
         }else{
-            precoVenda = safra.precoVendaRealizado;
-            producao =  safra.prodRealizada;
+            precoVenda = safra.actualSalePrice;
+            producao =  safra.actualYield;
         }
 
-        const custoMedio = (sumCustos.totalCustos / safra.areaTotal);
-        const receitaBruta = precoVenda * safra.areaTotal * producao;
+        const custoMedio = (sumCustos.totalCustos / safra.totalArea);
+        const receitaBruta = precoVenda * safra.totalArea * producao;
         const lucroTotal = receitaBruta - sumCustos.totalCustos;
-        const lucroHect = lucroTotal / safra.areaTotal;
+        const lucroHect = lucroTotal / safra.totalArea;
         /* PONTO EQUILÍBRIO = CUSTO MÉDIO / PREÇO VENDA */
         const pontoEquilibrio = custoMedio / precoVenda;
         /* LAIR --> LUCRO ANTES DO IMPOSTO DE RENDA */
@@ -452,14 +451,14 @@ router.get('/report-safra', async (req, res) => {
         /* IMPOSTO DE RENDA --> (LUCRO TOTAL - FUNRURAL) * 20% */
         const importoRenda =  (lucroTotal - funrural) * 0.2;
         const lucroLiquido = lucroTotal - funrural - importoRenda;
-        const lucroLiquidoHect = lucroLiquido / safra.areaTotal;
+        const lucroLiquidoHect = lucroLiquido / safra.totalArea;
         const rentabilidadeTotal = lucroLiquidoHect / custoMedio;
 
         /* DIFERENÇA PRODUÇÃO ESTIMADO VS REALIZADO */
-        const difProd = ((safra.prodRealizada - safra.prodPrevista) / safra.prodPrevista) * 100;
+        const difProd = ((safra.actualYield - safra.expectedYield) / safra.expectedYield) * 100;
 
         const result = {
-            areaTotal: formatarNumero(safra.areaTotal),
+            totalArea: formatarNumero(safra.totalArea),
             precoVenda: formatarNumero(precoVenda),
             custoTotal: formatarNumero(sumCustos.totalCustos) || 0,
             custoMedio:  formatarNumero(custoMedio),
@@ -592,11 +591,11 @@ router.get('/report-custo', async (req, res) => {
             producao =  safra.prodRealizada;
         }
 
-        const custoMedio = (sumCustos.totalCustos / safra.areaTotal);
-        const receitaBruta = precoVenda * safra.areaTotal * producao;
+        const custoMedio = (sumCustos.totalCustos / safra.totalArea);
+        const receitaBruta = precoVenda * safra.totalArea * producao;
         const receitaBrutaHec = precoVenda * producao;
         const lucroTotal = receitaBruta - sumCustos.totalCustos;
-        const lucroHect = lucroTotal / safra.areaTotal;
+        const lucroHect = lucroTotal / safra.totalArea;
         /* PONTO EQUILÍBRIO = CUSTO MÉDIO / PREÇO VENDA */
         const pontoEquilibrio = custoMedio / precoVenda;
         /* LAIR --> LUCRO ANTES DO IMPOSTO DE RENDA */
@@ -606,7 +605,7 @@ router.get('/report-custo', async (req, res) => {
         /* IMPOSTO DE RENDA --> (LUCRO TOTAL - FUNRURAL) * 20% */
         const importoRenda =  (lucroTotal - funrural) * 0.2;
         const lucroLiquido = lucroTotal - funrural - importoRenda;
-        const lucroLiquidoHect = lucroLiquido / safra.areaTotal;
+        const lucroLiquidoHect = lucroLiquido / safra.totalArea;
         const rentabilidadeTotal = lucroLiquidoHect / custoMedio;
 
         /* DIFERENÇA PRODUÇÃO ESTIMADO VS REALIZADO */
@@ -617,17 +616,17 @@ router.get('/report-custo', async (req, res) => {
         
         const custoFinanceiro = (administrativoTotal + operacoesTotal) * 0.095; //(adm + operacao) * 9,5%
 
-        const precoCusto = ((sumCustos.totalCustos / producao) / safra.areaTotal);
+        const precoCusto = ((sumCustos.totalCustos / producao) / safra.totalArea);
         const nomeAjuste = safra.type === "Realizado" ? "realizado" : "esperado";
         const nomeAjuste2 = safra.type === "Realizado" ? "realizada" : "esperada";
 
         const result = {
-            safraName: safra.name,
+            name: safra.name,
             type: safra.type,
             status: safra.status,
-            areaTotal: formatarNumero(safra.areaTotal),
+            totalArea: formatarNumero(safra.totalArea),
             glebas: [],
-            cultivo: safra.cultivo,
+            crop: safra.crop,
             corretivosFertilizantes: corretivosFertilizantes,
             sementes: sementes,
             defensivos: defensivos,

@@ -6,7 +6,7 @@ const Safra = connection.define('safra',{
         type: Sequelize.STRING,
         allowNull: false,
     },
-    areaTotal:{
+    totalArea: {
         type: Sequelize.DOUBLE,
         allowNull: false
     },
@@ -21,79 +21,79 @@ const Safra = connection.define('safra',{
         type: Sequelize.BOOLEAN, //Safra finalizada ? Sim --> true
         allowNull: false,
     },
-    cultivo:{
+    crop: {
         type: Sequelize.STRING,
         allowNull: false
     },
-    semente:{
+    seed: {
         type: Sequelize.STRING,
-        allowNull:false
+        allowNull: false
     },
-    dosagem:{ //kg/ha
+    dosage: { // kg/ha
         type: Sequelize.INTEGER,
-        allowNull:false
+        allowNull: false
     },
-    toneladas:{
+    tons: {
         type: Sequelize.DOUBLE,
-        allowNull:false
+        allowNull: false
     },
-    adubo:{
+    fertilizer: {
         type: Sequelize.STRING,
-        allowNull:false
+        allowNull: false
     },
-    dataFimPlantio:{
+    plantingEndDate: {
         type: Sequelize.DATEONLY,
-        allowNull:false,
+        allowNull: false,
         defaultValue: Sequelize.NOW
     },
-    dataFimColheita:{
+    harvestEndDate: {
         type: Sequelize.DATEONLY,
-        allowNull:false,
+        allowNull: false,
         defaultValue: Sequelize.NOW
     },
-    tempoLavoura:{ //dias
+    fieldDuration: { // days
         type: Sequelize.INTEGER,
-        allowNull:false
+        allowNull: false
     },
-    precMilimetrica:{
+    rainfall: {
         type: Sequelize.INTEGER,
-        allowNull:false
+        allowNull: false
     },
-    umidade:{
+    moisture: {
         type: Sequelize.DOUBLE,
-        allowNull:false
+        allowNull: false
     },
-    impureza:{
+    impurity: {
         type: Sequelize.DOUBLE,
-        allowNull:false
+        allowNull: false
     },
-    graosAvariados:{
+    damagedGrains: {
         type: Sequelize.DOUBLE,
-        allowNull:false
+        allowNull: false
     },
-    graosEsverdeados:{
+    greenGrains: {
         type: Sequelize.DOUBLE,
-        allowNull:false
+        allowNull: false
     },
-    graosQuebrados:{
+    brokenGrains: {
         type: Sequelize.DOUBLE,
-        allowNull:false
+        allowNull: false
     },
-    prodPrevista:{
+    expectedYield: {
         type: Sequelize.DOUBLE,
-        allowNull:false
+        allowNull: false
     },
-    prodRealizada:{
+    actualYield: {
         type: Sequelize.DOUBLE,
-        allowNull:false
+        allowNull: false
     },
-    precoVendaEstimado:{ 
+    estimatedSalePrice: {
         type: Sequelize.DOUBLE,
-        allowNull:false
+        allowNull: false
     },
-    precoVendaRealizado:{ 
+    actualSalePrice: {
         type: Sequelize.DOUBLE,
-        allowNull:false
+        allowNull: false
     },
 });
 

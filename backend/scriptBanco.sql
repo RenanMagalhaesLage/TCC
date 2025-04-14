@@ -17,7 +17,10 @@ INSERT INTO glebas (name, area, propertyId, createdAt, updatedAt) VALUES
 ('Gleba 10', 501.56, 1, NOW(), NOW()),
 ('Gleba 11', 49.51, 1, NOW(), NOW());
 
-INSERT INTO safras (type, status, cultivo, semente, dosagem, toneladas, adubo, dataFimPlantio, dataFimColheita, tempoLavoura, precMilimetrica, umidade, impureza, graosAvariados, graosEsverdeados, graosQuebrados, prodPrevista, prodRealizada, createdAt, updatedAt, areaTotal,precoVendaEstimado,precoVendaRealizado, name) 
+INSERT INTO safras (type, status, crop, seed, dosage, tons, fertilizer, plantingEndDate, harvestEndDate, 
+    fieldDuration, rainfall, moisture, impurity, damagedGrains, greenGrains, brokenGrains, expectedYield, actualYield, 
+    createdAt, updatedAt, totalArea, estimatedSalePrice, actualSalePrice, name
+)
 VALUES
   ('Planejado', false, 'Milho', 'Semente A',  50, 20.5, 'Adubo X', '2024-03-01', '2024-09-01', 180, 0, 0, 0, 0, 0, 0, 150, 200.5,  NOW(), NOW(), 300, 50, 55, 'Safra 1'),
   ('Planejado', false, 'Soja', 'Semente B',  60, 30.0, 'Adubo Y', '2024-04-01', '2024-10-01', 160, 0, 0, 0, 0, 0, 0, 200, 250.0,  NOW(), NOW(), 200, 120.2, 118.6, 'Safra 2'),
@@ -59,7 +62,7 @@ VALUES
 ('Armazém de Insumos', 'Adubo Orgânico', 'kg', 800, 8.00, 'Corretivos e Fertilizantes', 6400.00, NOW(), 'Adubo orgânico para plantio', 1, NOW(), NOW()),
 ('Armazém de Insumos', 'Fungicida', 'litro', 100, 40.00, 'Defensivos', 4000.00, NOW(), 'Fungicida para controle de doenças', 1, NOW(), NOW());
 
-INSERT INTO safra_glebas (statusSafra, safraId, glebaId, createdAt, updatedAt) VALUES
+INSERT INTO safra_glebas (status, safraId, glebaId, createdAt, updatedAt) VALUES
 (false,1, 1, NOW(), NOW()),  -- Safra 1 associada à Gleba 1
 (false,1, 2, NOW(), NOW()),  -- Safra 1 associada à Gleba 2
 (false,2, 3, NOW(), NOW()),  -- Safra 2 associada à Gleba 1

@@ -54,7 +54,7 @@ const DashboardRealizado = () => {
             .filter(safra => safra.type === "Realizado")
             .map(safra => ({
               id: safra.id,
-              name: `${safra.name} - ${safra.cultivo}`
+              name: `${safra.name} - ${safra.crop}`
           }));
           setSafraOptions(safras);
 
@@ -249,7 +249,7 @@ const DashboardRealizado = () => {
                 }}
               >
                 <InfoBox
-                  title={safraData ? safraData.areaTotal : ""}
+                  title={safraData ? safraData.totalArea : ""}
                   subtitle="Hectares"
                 />
               </Box>

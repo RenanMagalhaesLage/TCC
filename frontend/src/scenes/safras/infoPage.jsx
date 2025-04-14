@@ -59,22 +59,22 @@ const SafrasPage = () => {
     ]
 
     const fieldNames = [
-        "cultivo",
-        "semente",
-        "dosagem",
-        "toneladas",
-        "adubo",
-        "dataFimPlantio",
-        "dataFimColheita",
-        "tempoLavoura",
-        "precMilimetrica",
-        "umidade",
-        "impureza",
-        "graosAvariados",
-        "graosEsverdeados",
-        "graosQuebrados",
-        "prodPrevista",
-        "prodRealizada",
+        "crop",
+        "seed",
+        "dosage",
+        "tons",
+        "fertilizer",
+        "plantingEndDate",
+        "harvestEndDate",
+        "fieldDuration",
+        "rainfall",
+        "moisture",
+        "impurity",
+        "damagedGrains",
+        "greenGrains",
+        "brokenGrains",
+        "expectedYield",
+        "actualYield",
         "comparativo",
     ];
 
@@ -196,7 +196,6 @@ const SafrasPage = () => {
             headerName: "Ações",
             flex: 1,
             minWidth: 100,
-            minWidth: 100,
             renderCell: (params) => {
                 const { id } = params.row;
 
@@ -268,7 +267,7 @@ const SafrasPage = () => {
                     //console.log(JSON.stringify(glebas, null, 2));
                     const owner = users.filter(user => user.user_properties.access == 'owner');
                     setOwner(owner[0]);
-                    setIsHigher(safra.prodRealizada >= safra.prodPrevista);
+                    setIsHigher(safra.actualYield >= safra.expectedYield);
                 } catch (error) {
                     console.log(`ERROR - ao buscar a safra de id = ${id}`);
                     console.log(error);
@@ -438,7 +437,7 @@ const SafrasPage = () => {
                                     Área da Safra:
                                     </Typography>
                                     <Typography variant="body1" color={colors.grey[300]}>
-                                    {safra.areaTotal}
+                                    {safra.totalArea}
                                     </Typography>
                                 </Box>
                             </Box>   
@@ -496,7 +495,7 @@ const SafrasPage = () => {
                                         Prod. Prevista:
                                     </Typography>
                                     <Typography variant="body1" color={colors.grey[300]}>
-                                        {safra.prodPrevista}
+                                        {safra.expectedYield}
                                     </Typography>
                                 </Box>
 
@@ -505,7 +504,7 @@ const SafrasPage = () => {
                                     Prod. Realizada:
                                     </Typography>
                                     <Typography variant="body1" color={colors.grey[300]}>
-                                        {safra.prodRealizada}
+                                        {safra.actualYield}
                                     </Typography>
                                 </Box>
 

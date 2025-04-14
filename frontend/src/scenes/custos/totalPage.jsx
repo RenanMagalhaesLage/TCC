@@ -95,7 +95,7 @@ const TotalPage = () => {
               const safras = response.data
                 .map(safra => ({
                   id: safra.id,
-                  name: `${safra.name} - ${safra.cultivo}`
+                  name: `${safra.name} - ${safra.crop}`
               }));
               setSafraOptions(safras);
     
@@ -116,6 +116,7 @@ const TotalPage = () => {
             });
             const custo = response.data;
             setCusto(custo);
+            console.log(custo)
       
           setShowPanel(true); 
         } catch (error) {
@@ -296,7 +297,7 @@ const TotalPage = () => {
                                 Safra:
                                 </Typography>
                                 <Typography variant="body1" color={colors.grey[300]}>
-                                {custo.safraName}
+                                {custo.name}
                                 </Typography>
                             </Box>
                             <Box display="flex" alignItems="center" marginBottom="15px">
@@ -317,7 +318,7 @@ const TotalPage = () => {
                                 Área (hectares):
                                 </Typography>
                                 <Typography variant="body1" color={colors.grey[300]}>
-                                {custo.areaTotal}
+                                {custo.totalArea}
                                 </Typography>
                             </Box>  
                             <Box display="flex" alignItems="center" marginBottom="15px">
@@ -325,7 +326,7 @@ const TotalPage = () => {
                                 Cultivo:
                                 </Typography>
                                 <Typography variant="body1" color={colors.grey[300]}>
-                                {custo.cultivo}
+                                {custo.crop}
                                 </Typography>
                             </Box>       
                         </Box>

@@ -109,19 +109,20 @@ router.get('/safras-by-user', async (req, res) => {
 /* Rota para --> CADASTRAR SAFRAS*/
 router.post('/safras', async (req, res) => {
     try {
-        const { email, 
+        const { 
+            email, 
             glebaIds, 
-            safraName,
-            cultivo, 
-            semente,
-            dosagem,
-            toneladas,
-            adubo,
-            dataFimPlantio,
-            dataFimColheita,
-            tempoLavoura,
-            prodPrevista, 
-            precoVendaEstimado,
+            name,
+            crop, 
+            seed,
+            dosage,
+            tons,
+            fertilizer,
+            plantingEndDate,
+            harvestEndDate,
+            fieldDuration,
+            expectedYield, 
+            estimatedSalePrice,
         } = req.body;
         const user = await User.findOne({ where: { email: email } });
 
@@ -134,35 +135,35 @@ router.post('/safras', async (req, res) => {
         });
 
         if (
-            !email || !glebaIds || !safraName || !cultivo || !semente  || !dosagem || !toneladas || 
-            !adubo || !dataFimPlantio || !dataFimColheita || !tempoLavoura  || !prodPrevista || !precoVendaEstimado
+            !email || !glebaIds || !name || !crop || !seed  || !dosage || !tons || 
+            !fertilizer || !plantingEndDate || !harvestEndDate || !fieldDuration  || !expectedYield || !estimatedSalePrice
         ) {
             return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
         }
 
         const newSafra = await Safra.create({
             type: "Planejado",
-            name: safraName,
-            areaTotal: totalArea,
+            name: name,
+            totalArea: totalArea,
             status: false,
-            cultivo: cultivo,
-            semente: semente,
-            dosagem: dosagem,
-            toneladas: toneladas,
-            adubo: adubo,
-            dataFimPlantio: dataFimPlantio,
-            dataFimColheita: dataFimColheita,
-            tempoLavoura: tempoLavoura,
-            prodPrevista: prodPrevista, 
-            precoVendaEstimado: precoVendaEstimado,
-            precMilimetrica: 0,  
-            umidade: 0,          
-            impureza: 0,         
-            graosAvariados: 0,   
-            graosEsverdeados: 0, 
-            graosQuebrados: 0,   
-            prodRealizada: 0,  
-            precoVendaRealizado: 0,
+            crop: crop,
+            seed: seed,
+            dosage: dosage,
+            tons: tons,
+            fertilizer: fertilizer,
+            plantingEndDate: plantingEndDate,
+            harvestEndDate: harvestEndDate,
+            fieldDuration: fieldDuration,
+            expectedYield: expectedYield,
+            estimatedSalePrice: estimatedSalePrice,
+            rainfall: 0,  
+            moisture: 0,         
+            impurity: 0,        
+            damagedGrains: 0,   
+            greenGrains: 0,     
+            brokenGrains: 0,    
+            actualYield: 0,
+            actualSalePrice: 0,
         });
 
         if (glebaIds && glebaIds.length > 0) {
@@ -170,7 +171,7 @@ router.post('/safras', async (req, res) => {
                 await SafraGleba.create({
                     safraId: newSafra.id,   
                     glebaId: glebaId, 
-                    statusSafra: newSafra.status    
+                    status: newSafra.status    
                 });
             }
         }
@@ -189,29 +190,31 @@ router.put('/safras', async (req, res) => {
     try {
         const { 
             id, 
+            type,
             glebas,
             name,
             status, 
-            cultivo, 
-            semente,
-            metroLinear,
-            dosagem,
-            toneladas,
-            adubo,
-            dataFimPlantio,
-            dataFimColheita,
-            tempoLavoura,
-            prodTotal,
-            prodPrevista, 
-            type,
-            precMilimetrica,  
-            umidade,          
-            impureza,         
-            graosAvariados,   
-            graosEsverdeados, 
-            graosQuebrados,   
-            prodRealizada,  
+            crop, 
+            seed,
+            dosage,
+            tons,
+            fertilizer,
+            plantingEndDate,
+            harvestEndDate,
+            fieldDuration,
+            expectedYield,
+            actualYield,
+            rainfall,  
+            moisture,          
+            impurity,         
+            damagedGrains,   
+            greenGrains, 
+            brokenGrains, 
+            estimatedSalePrice,
+            actualSalePrice
         } = req.body;
+
+        console.log("PASSOU")
 
         let areaGleba = 0;
         //Adicionando primeiro a(s) gleba(s)
@@ -220,7 +223,7 @@ router.put('/safras', async (req, res) => {
                 await SafraGleba.create({
                     safraId: id,   
                     glebaId: glebaId, 
-                    statusSafra: status    
+                    status: status    
                 });
             }
             const glebasIds = glebas.map(id => Number(id));
@@ -232,10 +235,12 @@ router.put('/safras', async (req, res) => {
             });
         }
 
+        console.log("PASSOU 2")
+
         if(status){
             //Caso for finalizar a safra atualizar status das glebas e dos seus custos
             const [glebasUpdated] = await SafraGleba.update(
-                { statusSafra: status},
+                { status: status},
                 { where: { safraId: id } }
             )
 
@@ -245,35 +250,37 @@ router.put('/safras', async (req, res) => {
             )
         }
 
- 
+        console.log("PASSOU 2")
 
         const safra = await Safra.findByPk(id);
-        const areaTotal = safra.areaTotal + areaGleba;
+        const totalArea = safra.totalArea + areaGleba;
+
+        console.log("PASSOU 3")
 
         const [updated] = await Safra.update(
             { 
                 name,
-                areaTotal,
+                totalArea,
                 type,
                 status,
-                cultivo, 
-                semente,
-                metroLinear,
-                dosagem,
-                toneladas,
-                adubo,
-                dataFimPlantio,
-                dataFimColheita,
-                tempoLavoura,
-                prodTotal,
-                prodPrevista,
-                precMilimetrica,  
-                umidade,          
-                impureza,         
-                graosAvariados,   
-                graosEsverdeados, 
-                graosQuebrados,   
-                prodRealizada, 
+                crop,
+                seed,
+                dosage,
+                tons,
+                fertilizer,
+                plantingEndDate,
+                harvestEndDate,
+                fieldDuration,
+                expectedYield,
+                actualYield,
+                rainfall,  
+                moisture,          
+                impurity,         
+                damagedGrains,   
+                greenGrains, 
+                brokenGrains,   
+                estimatedSalePrice,
+                actualSalePrice
             },
             { where: { id: id } }
         );

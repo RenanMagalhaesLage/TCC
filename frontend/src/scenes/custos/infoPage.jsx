@@ -228,7 +228,7 @@ const CustosPage = () => {
                                     Safra:
                                     </Typography>
                                     <Typography variant="body1" color={colors.grey[300]}>
-                                    {safra.name + " - " + safra.cultivo}
+                                    {safra.name + " - " + safra.crop}
                                     </Typography>
                                 </Box>
                                 <Box display="flex" alignItems="center" marginBottom="15px">

@@ -88,11 +88,11 @@ router.get('/glebas-available', async (req, res) => {
         });
         
         const glebaIdsComStatusTrue = glebasComStatus
-            .filter(gleba => gleba.statusSafra === true) 
+            .filter(gleba => gleba.status === true) 
             .map(gleba => gleba.glebaId); 
         
         const glebaIdsFiltrados = glebaIdsComStatusTrue.filter(glebaId => {
-            return !glebasComStatus.some(gleba => gleba.glebaId === glebaId && gleba.statusSafra === false);
+            return !glebasComStatus.some(gleba => gleba.glebaId === glebaId && gleba.status === false);
         });
 
         const glebasRegistradas = await SafraGleba.findAll({
