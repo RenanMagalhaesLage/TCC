@@ -22,93 +22,93 @@ const SafrasHistory = () => {
 
     const columns = [
         { field: "name", headerName: "Nome", flex: 2, minWidth: 150, cellClassName: "name-column--cell", resizable: false },
-        { field: "areaTotal", headerName: "Área", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
-        { field: "cultivo", headerName: "Cultivo", flex: 1, minWidth: 100, cellClassName: "city-column--cell", resizable: false },
-        { field: "semente", headerName: "Semente", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
-        { field: "dosagem", headerName: "Dosagem", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
-        { field: "toneladas", headerName: "Toneladas", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
-        { field: "adubo", headerName: "Adubo", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
-        { field: "dataFimPlantio", headerName: "Fim Plantio", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
-        { field: "dataFimColheita", headerName: "Fim Colheita", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
-        { field: "tempoLavoura", headerName: "Tempo Lavoura", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
-        { field: "precMilimetrica", headerName: "Preção Milimetrica", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
+        { field: "totalArea", headerName: "Área", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
+        { field: "crop", headerName: "Cultivo", flex: 1, minWidth: 100, cellClassName: "city-column--cell", resizable: false },
+        { field: "seed", headerName: "Semente", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
+        { field: "dosage", headerName: "Dosagem", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
+        { field: "tons", headerName: "Toneladas", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
+        { field: "fertilizer", headerName: "Adubo", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
+        { field: "plantingEndDate", headerName: "Fim Plantio", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
+        { field: "harvestEndDate", headerName: "Fim Colheita", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
+        { field: "fieldDuration", headerName: "Tempo Lavoura", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
+        { field: "rainfall", headerName: "Preção Milimetrica", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
         { 
-            field: "umidade", 
+            field: "moisture", 
             headerName: "Umidade", 
             type: "number", 
             headerAlign: "left", 
             align: "left", 
             minWidth: 100, 
             resizable: false, 
-            renderCell: ({ row: { umidade } }) =>{
+            renderCell: ({ row: { moisture } }) =>{
                 return (
                 <Typography  sx={{mt: "16px"}}>
-                                {umidade + "%"}
+                                {moisture + "%"}
                 </Typography>
             )}
         }, 
         { 
-            field: "impureza", 
+            field: "impurity", 
             headerName: "Impureza", 
             type: "number", 
             headerAlign: "left", 
             align: "left", 
             minWidth: 100, 
             resizable: false,
-            renderCell: ({ row: { impureza } }) =>{
+            renderCell: ({ row: { impurity } }) =>{
                 return (
                 <Typography  sx={{mt: "16px"}}>
-                                {impureza + "%"}
+                                {impurity + "%"}
                 </Typography>
             )}
         },
         { 
-            field: "graosAvariados", 
+            field: "damagedGrains", 
             headerName: "Grãos Avariados", 
             type: "number", 
             headerAlign: "left", 
             align: "left", 
             minWidth: 100, 
             resizable: false,
-            renderCell: ({ row: { graosAvariados } }) =>{
+            renderCell: ({ row: { damagedGrains } }) =>{
                 return (
                 <Typography  sx={{mt: "16px"}}>
-                                {graosAvariados + "%"}
+                                {damagedGrains + "%"}
                 </Typography>
             )}
          },
         { 
-            field: "graosEsverdeados", 
+            field: "greenGrains", 
             headerName: "Grãos Esverdeados", 
             type: "number", 
             headerAlign: "left", 
             align: "left", 
             minWidth: 100, 
             resizable: false,
-            renderCell: ({ row: { graosEsverdeados } }) =>{
+            renderCell: ({ row: { greenGrains } }) =>{
                 return (
                 <Typography  sx={{mt: "16px"}}>
-                                {graosEsverdeados + "%"}
+                                {greenGrains + "%"}
                 </Typography>
             )}
          },
          { 
-            field: "graosQuebrados", 
+            field: "brokenGrains", 
             headerName: "Grãos Quebrados", 
             type: "number", 
             headerAlign: "left", 
             align: "left", 
             minWidth: 100, 
             resizable: false,
-            renderCell: ({ row: { graosQuebrados } }) =>{
+            renderCell: ({ row: { brokenGrains } }) =>{
                 return (
                 <Typography  sx={{mt: "16px"}}>
-                                {graosQuebrados + "%"}
+                                {brokenGrains + "%"}
                 </Typography>
             )}
          },
-        { field: "prodPrevista", headerName: "Prod. Prevista", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
-        { field: "prodRealizada", headerName: "Prod. Realizada", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
+        { field: "expectedYield", headerName: "Prod. Prevista", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
+        { field: "actualYield", headerName: "Prod. Realizada", type: "number", headerAlign: "left", align: "left", minWidth: 100, resizable: false },
         { 
             field: "comparativo", 
             headerName: "Comparativo", 
@@ -116,8 +116,8 @@ const SafrasHistory = () => {
             headerAlign: "center", 
             minWidth: 100, 
             resizable: false,
-            renderCell: ({ row: { prodPrevista, prodRealizada  } }) => {
-                const isHigher = prodRealizada > prodPrevista; 
+            renderCell: ({ row: { expectedYield, actualYield  } }) => {
+                const isHigher = actualYield > expectedYield; 
 
                 return (
                     <Box

@@ -584,11 +584,11 @@ router.get('/report-custo', async (req, res) => {
         let precoVenda = 0;
         let producao = 0;
         if(type === "Planejado"){
-            precoVenda = safra.precoVendaEstimado;
-            producao =  safra.prodPrevista;
+            precoVenda = safra.estimatedSalePrice;
+            producao =  safra.expectedYield;
         }else{
-            precoVenda = safra.precoVendaRealizado;
-            producao =  safra.prodRealizada;
+            precoVenda = safra.actualSalePrice;
+            producao =  safra.actualYield;
         }
 
         const custoMedio = (sumCustos.totalCustos / safra.totalArea);
@@ -615,10 +615,12 @@ router.get('/report-custo', async (req, res) => {
         const operacoesTotal = (operacoes.length > 0 && operacoes[0].total) || 0;
         
         const custoFinanceiro = (administrativoTotal + operacoesTotal) * 0.095; //(adm + operacao) * 9,5%
+        const custoSeguro = sumCustos.totalCustos * 0.02 // seguro de 2%
 
         const precoCusto = ((sumCustos.totalCustos / producao) / safra.totalArea);
         const nomeAjuste = safra.type === "Realizado" ? "realizado" : "esperado";
         const nomeAjuste2 = safra.type === "Realizado" ? "realizada" : "esperada";
+        const total = sumCustos.totalCustos + custoFinanceiro + custoSeguro; //soma de todos os gastos
 
         const result = {
             name: safra.name,
@@ -636,7 +638,7 @@ router.get('/report-custo', async (req, res) => {
             descritivo: resultDescritivo,
             custoTotal: formatarNumero(sumCustos.totalCustos) || 0,
             custoFinanceiro: formatarNumero(custoFinanceiro),
-            seguro: formatarNumero(sumCustos.totalCustos * 0.02),
+            seguro: formatarNumero(custoSeguro),
             custoMedio:  formatarNumero(custoMedio),
             prod: formatarNumero(producao), 
             precoCusto: formatarNumero(precoCusto),
@@ -657,6 +659,7 @@ router.get('/report-custo', async (req, res) => {
                 {name: "Lucro Liquido / Hectare: ", value: formatarNumero(lucroLiquidoHect)},
             ],
             rentabilidadeFinal: formatarNumero(rentabilidadeTotal),
+            total: formatarNumero(total)
         };
       
         return res.json(result);

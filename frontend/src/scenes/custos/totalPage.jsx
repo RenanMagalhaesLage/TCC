@@ -285,30 +285,21 @@ const TotalPage = () => {
                         gridTemplateColumns={isMobile ? "1fr" : "repeat(2, 1fr)"} 
                         padding="25px 35px 30px 35px"
                         height={isMobile ? "auto" : "initial"} 
-                        minHeight={isMobile ? "500px" : "100px"} 
+                        minHeight={isMobile ? "200px" : "100px"} 
                         marginBottom={isMobile ? "0" :"150px"}
                         marginTop={isMobile ? "-60px" :"-130px"}
                         sx={{boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.07)",}}
                     >
                         {/* Primeira Coluna */}
                         <Box  gridColumn={isMobile ? "span 12" : "span 1"} display="flex" flexDirection="column" alignItems="flex-start" >
-                            <Box display="flex" alignItems="center" marginBottom="15px" >
+                            <Box display="flex" alignItems="center">
                                 <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
                                 Safra:
                                 </Typography>
                                 <Typography variant="body1" color={colors.grey[300]}>
                                 {custo.name}
                                 </Typography>
-                            </Box>
-                            <Box display="flex" alignItems="center" marginBottom="15px">
-                                <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
-                                Glebas:
-                                </Typography>
-                                <Typography variant="body1" color={colors.grey[300]}>
-                                {custo.glebas}
-                                </Typography>
-                            </Box>
-                                                     
+                            </Box>                     
                         </Box>
 
                         {/* Segunda Coluna */}
@@ -338,7 +329,7 @@ const TotalPage = () => {
                         display="grid"
                         padding="25px 35px 30px 35px"
                         height="auto"
-                        marginTop={isMobile ?"300px" :"-130px"}
+                        marginTop={isMobile ?"0px" :"-130px"}
                         minHeight={isMobile ?"400px" :"260px"} 
                         sx={{
                             boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.07)",
@@ -413,7 +404,7 @@ const TotalPage = () => {
                         display="grid"
                         padding="25px 35px 30px 35px"
                         height="auto"
-                        marginTop={isMobile ?"550px" :"0px"}
+                        marginTop={isMobile ?"250px" :"0px"}
                         minHeight={isMobile ?"400px" :"260px"} 
                         sx={{
                             boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.07)",
@@ -488,7 +479,7 @@ const TotalPage = () => {
                         display="grid"
                         padding="25px 35px 30px 35px"
                         height="auto"
-                        marginTop={isMobile ?"800px" :"120px"}
+                        marginTop={isMobile ?"500px" :"120px"}
                         minHeight={isMobile ?"400px" :"260px"}  
                         sx={{
                             boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.07)",
@@ -563,7 +554,7 @@ const TotalPage = () => {
                         display="grid"
                         padding="25px 35px 30px 35px"
                         height="auto"
-                        marginTop={isMobile ?"1050px" :"240px"}
+                        marginTop={isMobile ?"750px" :"240px"}
                         minHeight={isMobile ?"400px" :"260px"} 
                         sx={{
                             boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.07)",
@@ -638,7 +629,7 @@ const TotalPage = () => {
                         display="grid"
                         padding="25px 35px 30px 35px"
                         height="auto"
-                        marginTop={isMobile ?"1300px" :"360px"}
+                        marginTop={isMobile ?"1000px" :"360px"}
                         minHeight={isMobile ?"400px" :"260px"} 
                         //maxWidth={"600px"} 
                         sx={{
@@ -736,7 +727,7 @@ const TotalPage = () => {
                                 Custo Total:
                             </Typography>
                             <Typography variant="body2">
-                                R$ {}
+                                R$ {custo.total}
                             </Typography>
                         </Box>
                     </Box>
@@ -747,7 +738,7 @@ const TotalPage = () => {
                         display="grid"
                         padding="25px 35px 30px 35px"
                         height="auto"
-                        marginTop={isMobile ?"1550px" :"360px"}
+                        marginTop={isMobile ?"1250px" :"360px"}
                         minHeight={isMobile ?"400px" :"260px"} 
                         sx={{
                             boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.07)",
@@ -832,7 +823,7 @@ const TotalPage = () => {
                         display="grid"
                         padding="25px 35px 30px 35px"
                         height="auto"
-                        marginTop={isMobile ? "1750px":"480px"}
+                        marginTop={isMobile ? "1450px":"480px"}
                         minHeight={"10px"}
                         sx={{
                             boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.07)",

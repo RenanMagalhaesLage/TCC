@@ -170,7 +170,8 @@ const DashboardProjetado = () => {
                 />
               )}
               noOptionsText="Nenhuma Safra disponível"
-            />     
+            />   
+            {/* 
             <Autocomplete
               disablePortal
               id="properties"
@@ -197,8 +198,8 @@ const DashboardProjetado = () => {
                 />
               )}
               noOptionsText="Nenhuma propriedade disponível"
-            />  
-          </Box>
+            /> */} 
+          </Box>  
           <Box
             display="grid"
             gridTemplateColumns="repeat(12, 1fr)"
