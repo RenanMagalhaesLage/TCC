@@ -321,6 +321,16 @@ const SafrasPage = () => {
         //console.info('You clicked the Chip.');
     };  
 
+    const handleAddCusto = () =>{
+        navigate(`/custos/add`);
+    }
+
+    const handleAddGleba = () =>{
+        navigate(`/glebas/add`);
+    }
+
+    
+
     return (
         <Box m="20px">
             <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -334,7 +344,7 @@ const SafrasPage = () => {
                             fontWeight: "bold",
                             padding: "10px 20px",
                             }}
-                            onClick={() => handleAdd()}
+                            onClick={() => handleAddCusto()}
                         >
                             <AddCircleOutlineIcon sx={{ mr: isMobile? "0px" :"10px" }} />
                             {!isMobile && ("Adicionar Custo")}
@@ -696,7 +706,7 @@ const SafrasPage = () => {
                                         fontWeight: "bold",
                                         padding: "10px 20px",
                                         }}
-                                        onClick={() => handleAdd()}
+                                        onClick={() => handleAddGleba()}
                                     >
                                         <AddCircleOutlineIcon sx={{ mr: "10px" }} />
                                         {("Adicionar Gleba")}
@@ -751,7 +761,7 @@ const SafrasPage = () => {
                                         fontWeight: "bold",
                                         padding: "10px 20px",
                                         }}
-                                        onClick={() => handleAdd()}
+                                        onClick={() => handleAddCusto()}
                                     >
                                         <AddCircleOutlineIcon sx={{ mr: "10px" }} />
                                         {("Adicionar Custo")}
@@ -807,7 +817,7 @@ const SafrasPage = () => {
                                         fontWeight: "bold",
                                         padding: "10px 20px",
                                         }}
-                                        onClick={() => handleAdd()}
+                                        onClick={() => handleAddCusto()}
                                     >
                                         <AddCircleOutlineIcon sx={{ mr: "10px" }} />
                                         {("Adicionar Custo")}

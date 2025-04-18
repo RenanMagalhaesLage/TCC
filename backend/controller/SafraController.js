@@ -214,8 +214,6 @@ router.put('/safras', async (req, res) => {
             actualSalePrice
         } = req.body;
 
-        console.log("PASSOU")
-
         let areaGleba = 0;
         //Adicionando primeiro a(s) gleba(s)
         if (glebas && glebas.length > 0) {
@@ -235,8 +233,6 @@ router.put('/safras', async (req, res) => {
             });
         }
 
-        console.log("PASSOU 2")
-
         if(status){
             //Caso for finalizar a safra atualizar status das glebas e dos seus custos
             const [glebasUpdated] = await SafraGleba.update(
@@ -250,12 +246,8 @@ router.put('/safras', async (req, res) => {
             )
         }
 
-        console.log("PASSOU 2")
-
         const safra = await Safra.findByPk(id);
         const totalArea = safra.totalArea + areaGleba;
-
-        console.log("PASSOU 3")
 
         const [updated] = await Safra.update(
             { 

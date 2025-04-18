@@ -42,7 +42,7 @@ router.get('/custos-pie-chart', async (req, res) => {
         const categories = [
             'Defensivos',
             'Operações',
-            'Semente',
+            'Sementes',
             'Arrendamento',
             'Administrativo',
             'Corretivos e Fertilizantes'
@@ -141,7 +141,7 @@ router.get('/all-custos-pie-chart', async (req, res) => {
             const categories = [
                 'Defensivos',
                 'Operações',
-                'Semente',
+                'Sementes',
                 'Arrendamento',
                 'Administrativo',
                 'Corretivos e Fertilizantes'
@@ -206,7 +206,7 @@ router.get('/custos-glebas-line-chart', async (req, res) => {
         const categories = [
             'Defensivos',
             'Operações',
-            'Semente',
+            'Sementes',
             'Arrendamento',
             'Administrativo',
             'Corretivos e Fertilizantes'
@@ -281,7 +281,7 @@ router.get('/custos-glebas-bar-chart', async (req, res) => {
         const categories = [
             'Defensivos',
             'Operações',
-            'Semente',
+            'Sementes',
             'Arrendamento',
             'Administrativo',
             'Corr. e Fert.'
@@ -299,7 +299,7 @@ router.get('/custos-glebas-bar-chart', async (req, res) => {
             // Para cada categoria, buscar o valor correspondente
             categories.forEach(category => {
                 const categoryFound = sumCustos.find(item => item.glebaId === glebaId && item.category === category);
-                glebaData[category.toLowerCase()] = categoryFound ? categoryFound.value : 0; // Adicionar o valor ou 0 se não encontrado
+                glebaData[category.toLowerCase()] = categoryFound ? categoryFound.value.toFixed(2) : 0; // Adicionar o valor ou 0 se não encontrado
             });
     
             return glebaData; // Retorna o objeto da gleba com todas as categorias
@@ -353,7 +353,7 @@ router.get('/custos-hectares-glebas-bar-chart', async (req, res) => {
 
             sumCustos.forEach(item => {
                 if (item.glebaId === glebaId) {
-                    glebaData["custo"] = item.value; 
+                    glebaData["custo"] = item.value.toFixed(2); 
                 }
             });
     
@@ -522,36 +522,85 @@ router.get('/report-custo', async (req, res) => {
           type: QueryTypes.SELECT  
         });
 
+        const formatCurrency = (value) => {
+            return value.toLocaleString('pt-BR', {
+                style: 'currency',
+                currency: 'BRL',
+            });
+        };
+
         /* Querrys para custos de cada categoria */
         const corretivosFertilizantes = await connection.query(queryCategory, {
             replacements: { id, type, category: 'Corretivos e Fertilizantes' },  
             type: QueryTypes.SELECT  
         });
 
+        const resultCorretivosFertilizantes = corretivosFertilizantes.map(item => ({
+            ...item, 
+            price: formatCurrency(item.price), 
+            totalValue: formatCurrency(item.totalValue),
+            total: formatCurrency(item.total), 
+        }));
+
         const sementes = await connection.query(queryCategory, {
             replacements: { id, type, category: 'Sementes' },  
             type: QueryTypes.SELECT  
         });
+
+        const resultSementes = sementes.map(item => ({
+            ...item, 
+            price: formatCurrency(item.price), 
+            totalValue: formatCurrency(item.totalValue),
+            total: formatCurrency(item.total), 
+        }));
 
         const defensivos = await connection.query(queryCategory, {
             replacements: { id, type, category: 'Defensivos' },  
             type: QueryTypes.SELECT  
         });
 
+        const resultDefensivos = defensivos.map(item => ({
+            ...item, 
+            price: formatCurrency(item.price), 
+            totalValue: formatCurrency(item.totalValue),
+            total: formatCurrency(item.total), 
+        }));
+
         const operacoes = await connection.query(queryCategory, {
             replacements: { id, type, category: 'Operações' },  
             type: QueryTypes.SELECT  
         });
+
+        const resultOperacoes = operacoes.map(item => ({
+            ...item, 
+            price: formatCurrency(item.price), 
+            totalValue: formatCurrency(item.totalValue),
+            total: formatCurrency(item.total), 
+        }));
 
         const administrativo = await connection.query(queryCategory, {
             replacements: { id, type, category: 'Administrativo' },  
             type: QueryTypes.SELECT  
         });
 
+        const resultAdministrativo = administrativo.map(item => ({
+            ...item, 
+            price: formatCurrency(item.price), 
+            totalValue: formatCurrency(item.totalValue),
+            total: formatCurrency(item.total), 
+        }));
+
         const arrendamento = await connection.query(queryCategory, {
             replacements: { id, type, category: 'Arrendamento' },  
             type: QueryTypes.SELECT  
         });
+
+        const resultArrendamento = arrendamento.map(item => ({
+            ...item, 
+            price: formatCurrency(item.price), 
+            totalValue: formatCurrency(item.totalValue),
+            total: formatCurrency(item.total), 
+        }));
 
         const descritivo  = await connection.query(queryDescritivo, {
             replacements: { id, type},  
@@ -561,7 +610,7 @@ router.get('/report-custo', async (req, res) => {
         const categories = [
             'Defensivos',
             'Operações',
-            'Semente',
+            'Sementes',
             'Arrendamento',
             'Administrativo',
             'Corretivos e Fertilizantes'
@@ -576,7 +625,7 @@ router.get('/report-custo', async (req, res) => {
 
             return {
                 category,
-                value: formatarNumero(value),
+                value: formatCurrency(value),
                 percentage: formatarNumero(percentage)
             };
         });
@@ -606,7 +655,7 @@ router.get('/report-custo', async (req, res) => {
         const importoRenda =  (lucroTotal - funrural) * 0.2;
         const lucroLiquido = lucroTotal - funrural - importoRenda;
         const lucroLiquidoHect = lucroLiquido / safra.totalArea;
-        const rentabilidadeTotal = lucroLiquidoHect / custoMedio;
+        const rentabilidadeTotal = (lucroLiquidoHect / custoMedio) *100;
 
         /* DIFERENÇA PRODUÇÃO ESTIMADO VS REALIZADO */
         const difProd = ((safra.prodRealizada - safra.prodPrevista) / safra.prodPrevista) * 100;
@@ -629,12 +678,12 @@ router.get('/report-custo', async (req, res) => {
             totalArea: formatarNumero(safra.totalArea),
             glebas: [],
             crop: safra.crop,
-            corretivosFertilizantes: corretivosFertilizantes,
-            sementes: sementes,
-            defensivos: defensivos,
-            operacoes: operacoes,
-            administrativo: administrativo,
-            arrendamento: arrendamento,
+            corretivosFertilizantes: resultCorretivosFertilizantes,
+            sementes: resultSementes,
+            defensivos: resultDefensivos,
+            operacoes: resultOperacoes,
+            administrativo: resultAdministrativo,
+            arrendamento: resultArrendamento,
             descritivo: resultDescritivo,
             custoTotal: formatarNumero(sumCustos.totalCustos) || 0,
             custoFinanceiro: formatarNumero(custoFinanceiro),
@@ -644,19 +693,19 @@ router.get('/report-custo', async (req, res) => {
             precoCusto: formatarNumero(precoCusto),
 
             rentabilidade: [
-                { name: "Preço de venda " +  nomeAjuste + " (R$/saco)", value: formatarNumero(precoVenda)},
-                { name: "Receita bruta " + nomeAjuste2 +  " (R$/ha)", value: formatarNumero(receitaBrutaHec) },
-                { name: "Receita bruta total (Gleba)", value: formatarNumero(receitaBruta) },
-                { name: "Lucro " +  nomeAjuste + " (R$/ha)", value: formatarNumero(lucroHect) },
-                { name: "LAIR (R$)", value: formatarNumero(lucroTotal) },
+                { name: "Preço de venda " +  nomeAjuste + " (R$/saco)", value: formatCurrency(precoVenda)},
+                { name: "Receita bruta " + nomeAjuste2 +  " (R$/ha)", value: formatCurrency(receitaBrutaHec) },
+                { name: "Receita bruta total (Gleba)", value: formatCurrency(receitaBruta) },
+                { name: "Lucro " +  nomeAjuste + " (R$/ha)", value: formatCurrency(lucroHect) },
+                { name: "LAIR (R$)", value: formatCurrency(lucroTotal) },
             ],
             rentabilidadeLair: formatarNumero(rentabilidadeLair),
 
             rentabilidadeImposto:[
-                {name: "Funrural (0,2%): ", value: formatarNumero(funrural)},
-                {name: "Imposto de Renda: ", value: formatarNumero(importoRenda)},
-                {name: "Lucro Liquido: ", value: formatarNumero(lucroLiquido)},
-                {name: "Lucro Liquido / Hectare: ", value: formatarNumero(lucroLiquidoHect)},
+                {name: "Funrural (0,2%): ", value: formatCurrency(funrural)},
+                {name: "Imposto de Renda: ", value: formatCurrency(importoRenda)},
+                {name: "Lucro Liquido: ", value: formatCurrency(lucroLiquido)},
+                {name: "Lucro Liquido / Hectare: ", value: formatCurrency(lucroLiquidoHect)},
             ],
             rentabilidadeFinal: formatarNumero(rentabilidadeTotal),
             total: formatarNumero(total)

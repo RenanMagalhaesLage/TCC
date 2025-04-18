@@ -83,7 +83,7 @@ const BarChart = ({isDashboard, safraId}) => {
         keys={[
             'defensivos',
             'operações',
-            'semente',
+            'sementes',
             'arrendamento',
             'administrativo',
             'corr. e fert.'
@@ -126,6 +126,7 @@ const BarChart = ({isDashboard, safraId}) => {
             truncateTickAt: 0
         }}
         enableTotals={true}
+        valueFormat={(value) => Number(value).toFixed(2)}
         labelSkipWidth={12}
         labelSkipHeight={12}
         labelTextColor={{

@@ -354,6 +354,10 @@ const Propertie = () => {
         navigate(`/glebas/add/${id}`);
     }
 
+    const handleAddEstoque = () =>{
+        navigate(`/estoque/add/${id}`);
+    }
+
     const handleInvite = () =>{
         navigate(`/convites/add/${id}`);
     }
@@ -758,7 +762,7 @@ const Propertie = () => {
                                         fontWeight: "bold",
                                         padding: "10px 20px",
                                         }}
-                                        onClick={() => handleAdd()}
+                                        onClick={() => handleAddEstoque()}
                                     >
                                         <AddCircleOutlineIcon sx={{ mr: "10px" }} />
                                         {("Adicionar Item no estoque")}

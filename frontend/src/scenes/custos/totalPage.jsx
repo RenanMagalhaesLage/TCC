@@ -375,8 +375,8 @@ const TotalPage = () => {
                                 <Typography variant="body2">{item.name}</Typography>
                                 <Typography variant="body2">{item.quantity}</Typography>
                                 <Typography variant="body2">{item.unit}</Typography>
-                                <Typography variant="body2">R$ {item.price.toFixed(2)}</Typography>
-                                <Typography variant="body2">R$ {item.totalValue.toFixed(2)}</Typography>
+                                <Typography variant="body2">{item.price}</Typography>
+                                <Typography variant="body2">{item.totalValue}</Typography>
                             </Box>
                         ))}
                         {/* Linha de Total Geral */}
@@ -393,7 +393,7 @@ const TotalPage = () => {
                                 Total - Corretivos e Fertilizantes:
                             </Typography>
                             <Typography variant="body2">
-                                R$ {custo.corretivosFertilizantes?.[0]?.total|| "0,00"}                             
+                                {custo.corretivosFertilizantes?.[0]?.total|| "R$ 0,00"}                             
                             </Typography>
                         </Box>
                     </Box>
@@ -450,8 +450,8 @@ const TotalPage = () => {
                                 <Typography variant="body2">{item.name}</Typography>
                                 <Typography variant="body2">{item.quantity}</Typography>
                                 <Typography variant="body2">{item.unit}</Typography>
-                                <Typography variant="body2">R$ {item.price.toFixed(2)}</Typography>
-                                <Typography variant="body2">R$ {item.totalValue.toFixed(2)}</Typography>
+                                <Typography variant="body2">{item.price}</Typography>
+                                <Typography variant="body2">{item.totalValue}</Typography>
                             </Box>
                         ))}
                         {/* Linha de Total Geral */}
@@ -468,7 +468,7 @@ const TotalPage = () => {
                                 Total - Sementes:
                             </Typography>
                             <Typography variant="body2">
-                                R$ {custo.sementes?.[0]?.total|| "0,00"} 
+                                {custo.sementes?.[0]?.total|| "R$ 0,00"} 
                             </Typography>
                         </Box>
                     </Box>
@@ -525,8 +525,8 @@ const TotalPage = () => {
                                 <Typography variant="body2">{item.name}</Typography>
                                 <Typography variant="body2">{item.quantity}</Typography>
                                 <Typography variant="body2">{item.unit}</Typography>
-                                <Typography variant="body2">R$ {item.price.toFixed(2)}</Typography>
-                                <Typography variant="body2">R$ {item.totalValue.toFixed(2)}</Typography>
+                                <Typography variant="body2">{item.price}</Typography>
+                                <Typography variant="body2">{item.totalValue}</Typography>
                             </Box>
                         ))}
                         {/* Linha de Total Geral */}
@@ -543,7 +543,7 @@ const TotalPage = () => {
                                 Total - Defensivos:
                             </Typography>
                             <Typography variant="body2">
-                                R$ {custo.defensivos?.[0]?.total|| "0,00"}
+                                {custo.defensivos?.[0]?.total|| "R$ 0,00"}
                             </Typography>
                         </Box>
                     </Box>
@@ -600,8 +600,8 @@ const TotalPage = () => {
                                 <Typography variant="body2">{item.name}</Typography>
                                 <Typography variant="body2">{item.quantity}</Typography>
                                 <Typography variant="body2">{item.unit}</Typography>
-                                <Typography variant="body2">R$ {item.price.toFixed(2)}</Typography>
-                                <Typography variant="body2">R$ {item.totalValue.toFixed(2)}</Typography>
+                                <Typography variant="body2">{item.price}</Typography>
+                                <Typography variant="body2">{item.totalValue}</Typography>
                             </Box>
                         ))}
                         {/* Linha de Total Geral */}
@@ -618,7 +618,7 @@ const TotalPage = () => {
                                 Total - Operações:
                             </Typography>
                             <Typography variant="body2">
-                                R$ {custo.operacoes?.[0]?.total|| "0,00"} 
+                                {custo.operacoes?.[0]?.total|| "R$ 0,00"} 
                             </Typography>
                         </Box>
                     </Box>
@@ -673,7 +673,7 @@ const TotalPage = () => {
                             >
                                 <Typography variant="body2">{item.category}</Typography>
                                 <Typography variant="body2">{item.value}</Typography>
-                                <Typography variant="body2">{item.percentage}</Typography>
+                                <Typography variant="body2">{item.percentage + " %"}</Typography>
                             </Box>
                         ))}
                         {/* Linha de Total Geral */}
