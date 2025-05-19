@@ -452,7 +452,7 @@ router.get('/report-safra', async (req, res) => {
         const importoRenda =  (lucroTotal - funrural) * 0.2;
         const lucroLiquido = lucroTotal - funrural - importoRenda;
         const lucroLiquidoHect = lucroLiquido / safra.totalArea;
-        const rentabilidadeTotal = lucroLiquidoHect / custoMedio;
+        const rentabilidadeTotal = (lucroLiquidoHect / custoMedio) *100;
 
         /* DIFERENÇA PRODUÇÃO ESTIMADO VS REALIZADO */
         const difProd = ((safra.actualYield - safra.expectedYield) / safra.expectedYield) * 100;

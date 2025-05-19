@@ -346,7 +346,7 @@ const StoragePage = () => {
                                 justifyContent="flex-end"
                                 //sx={{border: "1px solid red"}} 
                             >
-                                {userData && owner && userData.email === owner.email &&  (
+                                {userData &&  (
                                         <Box 
                                             display="flex" 
                                             justifyContent= {isMobile ? "flex-start" : "flex-end"} 
