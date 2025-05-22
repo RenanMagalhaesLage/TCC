@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const connection = require("../database/database");
 const { QueryTypes } = require('sequelize');
+const verifyToken = require('../middlewares/verifyToken');
 /*-------------------------------
             Models
 ---------------------------------*/
@@ -16,7 +17,7 @@ const SafraGleba = require("../database/SafraGleba");
 const StorageItem = require("../database/StorageItem");
 
 /*  Rota para --> BUSCAR GLEBA */
-router.get('/glebas/:id', async (req, res) => {
+router.get('/glebas/:id', verifyToken, async (req, res) => {
     const { id } = req.params;
     try {
         const gleba = await Gleba.findByPk(id);
@@ -50,11 +51,10 @@ router.get('/glebas/:id', async (req, res) => {
 });
 
 /*  Rota para --> BUSCAR GLEBAS DISPONÍVEIS PARA SAFRA */
-router.get('/glebas-available', async (req, res) => {
-    const { email }  = req.query;
-
+router.get('/glebas-available', verifyToken, async (req, res) => {
+    const userEmail = req.user.email;
     try {
-        const user = await User.findOne({ where: { email: email } });
+        const user = await User.findOne({ where: { email: userEmail } });
         if (!user) {
             return res.status(404).json({ error: 'Usuário não encontrado' });
         }
@@ -124,7 +124,7 @@ router.get('/glebas-available', async (req, res) => {
 });
 
 /*  Rota para --> BUSCAR GLEBA PELA SAFRA*/
-router.get('/glebas-by-safra', async (req, res) => {
+router.get('/glebas-by-safra', verifyToken, async (req, res) => {
     const { id }  = req.query;
 
     try {
@@ -153,7 +153,7 @@ router.get('/glebas-by-safra', async (req, res) => {
 });
 
 /* Rota para --> CADASTRAR GLEBA*/
-router.post('/glebas', async (req, res) => {
+router.post('/glebas', verifyToken, async (req, res) => {
     try {
         const { name, propertyId, area, email } = req.body;
         const user = await User.findOne({ where: { email: email } });
@@ -180,17 +180,17 @@ router.post('/glebas', async (req, res) => {
 });
 
 /*  Rota para --> EDITAR GLEBAS */
-router.put('/glebas/:id', async (req, res) => {
+router.put('/glebas/:id', verifyToken, async (req, res) => {
     try {
-        const { name, area } = req.body;
+        const { name, area, id } = req.body;
         const [updated] = await Gleba.update(
             { name, area},
-            { where: { id: req.params.id } }
+            { where: { id: id } }
         );
 
 
         if (updated) {
-            const updatedGleba = await Gleba.findByPk(req.params.id);
+            const updatedGleba = await Gleba.findByPk(id);
             return res.json(updatedGleba);
         }
 
@@ -201,7 +201,7 @@ router.put('/glebas/:id', async (req, res) => {
 });
 
 /* Rota para --> REMOVER GLEBA */
-router.delete('/glebas', async(req,res) =>{
+router.delete('/glebas', verifyToken, async(req,res) =>{
     const { id }  = req.query;
     try {
         const gleba = await Gleba.findByPk(id);

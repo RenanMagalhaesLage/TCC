@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const connection = require("../database/database");
 const { QueryTypes } = require('sequelize');
+const verifyToken = require('../middlewares/verifyToken');
 /*-------------------------------
             Models
 ---------------------------------*/
@@ -16,11 +17,11 @@ const SafraGleba = require("../database/SafraGleba");
 const StorageItem = require("../database/StorageItem");
 
 /* Rota para --> BUSCA DE INVITES */
-router.get('/searchInvites/:email', async (req, res) => {
-    const { email } = req.params;
+router.get('/invites', verifyToken, async (req, res) => {
+    const userEmail = req.user.email;
 
     try {
-        const user = await User.findOne({ where: { email: email } });
+        const user = await User.findOne({ where: { email: userEmail } });
         if (!user) {
             return res.status(404).json({ error: 'Usuário não encontrado' });
         }
@@ -57,7 +58,7 @@ router.get('/searchInvites/:email', async (req, res) => {
 });
 
 /* Rota para --> CADASTRO DE INVITES */
-router.post('/createInvite', async (req, res) => {
+router.post('/invites', verifyToken, async (req, res) => {
     try {
         const { reciverEmail, propertyId, senderEmail } = req.body;
         const sender = await User.findOne({ where: { email: senderEmail } });
@@ -94,7 +95,7 @@ router.post('/createInvite', async (req, res) => {
 });
 
 /* Rota para --> ACEITAR OU RECUSAR INVITE */
-router.post('/acceptInvite/:id', async (req, res) => {
+router.post('/invites-answer/:id', verifyToken, async (req, res) => {
     const { id } = req.params;
 
     try {

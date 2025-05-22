@@ -8,6 +8,7 @@ import secureLocalStorage from 'react-secure-storage';
 import axios from "axios";
 
 const BarChart = ({isDashboard, safraId}) => {
+  const token = secureLocalStorage.getItem('auth_token');
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const isMobile = useMediaQuery("(max-width: 800px)");
@@ -30,13 +31,20 @@ const BarChart = ({isDashboard, safraId}) => {
       const fetchBarData = async () => {
         try {
           const response = await axios.get(`http://localhost:3000/custos-categoria-bar-chart`, {
-            params: { id: safraId }
+            params: { id: safraId }, headers: {Authorization: `Bearer ${token}`}
           });
                       
           setBarData(response.data); 
                         
         } catch (error) {
-          console.log("ERRO - ao buscar no banco de dados.");
+          if (error.response?.status === 401) {
+            alert('Sessão expirada. Faça login novamente.');
+            secureLocalStorage.removeItem('userData');
+            secureLocalStorage.removeItem('auth_token');
+            window.location.href = '/login';
+          } else {
+            console.log("ERRO - ao buscar no banco de dados.");
+          }
         }
       };
       fetchBarData();
@@ -119,7 +127,7 @@ const BarChart = ({isDashboard, safraId}) => {
         tickSize: isSmallDivice ? 0 : 5, 
         tickPadding: isSmallDivice ? 0 : 5,
         tickRotation: isSmallDivice ? 0 : 0, 
-        legend: isDashboard ? undefined : "gleba", // changed
+        legend: isDashboard ? undefined : "gleba", 
         legendPosition: "middle",
         legendOffset: 32,
         format: isSmallDivice ? () => "" : undefined,
@@ -128,7 +136,7 @@ const BarChart = ({isDashboard, safraId}) => {
         tickSize: 5,
         tickPadding: 5,
         tickRotation: 0,
-        legend: isDashboard ? undefined : "food", // changed
+        legend: undefined, 
         legendPosition: "middle",
         legendOffset: -40,
       }}

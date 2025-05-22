@@ -109,16 +109,15 @@ const Home = () => {
                                 color={colors.grey[100]}
                             >
                                 Custos por categoria das suas safras atuais
-                            </Typography>
-                            
+                            </Typography> 
                         </Box>
                     <Box>
                         <Tooltip title="Visualizar">
-                        <IconButton onClick={() => handleClickPie()}>
-                            <VisibilityIcon
-                            sx={{ fontSize: "26px", color: colors.mygreen[500] }}
-                            />
-                        </IconButton>
+                            <IconButton onClick={() => handleClickPie()}>
+                                <VisibilityIcon
+                                    sx={{ fontSize: "26px", color: colors.mygreen[500] }}
+                                />
+                            </IconButton>
                         </Tooltip>
                     </Box>
                     </Box>

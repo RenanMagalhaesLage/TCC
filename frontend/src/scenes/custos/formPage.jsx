@@ -11,6 +11,7 @@ import secureLocalStorage from 'react-secure-storage';
 import { NumericFormat } from 'react-number-format';
 
 const CustosForm = () => {
+  const token = secureLocalStorage.getItem('auth_token');
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const isNonMobile = useMediaQuery("(min-width:600px)");
@@ -53,33 +54,49 @@ const CustosForm = () => {
       const fetchCustosData = async () => {
         try {
             const response = await axios.get(`http://localhost:3000/safras-by-user`, {
-              params: { email: userData.email }
+              params: { email: userData.email }, headers: {Authorization: `Bearer ${token}`}
             });
             const safraData = response.data
             .filter(safra => safra.status === false)
             .map(safra => ({
               id: safra.id,
-              name: `${safra.name} - ${safra.cultivo}`
+              name: `${safra.name} - ${safra.crop}`
             }));
             setSafraOptions(safraData);
 
             if(id){
               const fetchSafraData = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:3000/glebas/${id}`);
-                    const { gleba, propriedade, owner } = response.data;
-                    setPropertie(propriedade);
-                    setLoading(false); 
+                  const response = await axios.get(`http://localhost:3000/glebas/${id}`, {
+                    headers: {Authorization: `Bearer ${token}`}
+                  });
+                  const { gleba, propriedade, owner } = response.data;
+                  setPropertie(propriedade);
+                  setLoading(false); 
                 } catch (error) {
+                  if (error.response?.status === 401) {
+                    alert('Sessão expirada. Faça login novamente.');
+                    secureLocalStorage.removeItem('userData');
+                    secureLocalStorage.removeItem('auth_token');
+                    window.location.href = '/login';
+                  } else {
                     console.error("Erro ao buscar dados da gleba:", error);
-                    setLoading(false); 
+                  }
+                  setLoading(false); 
                 }
             };
             fetchSafraData();
-            }
+          }
 
-        } catch (err) {
-            console.error('Erro ao buscar custos:', err);  
+        } catch (error) {
+          if (error.response?.status === 401) {
+            alert('Sessão expirada. Faça login novamente.');
+            secureLocalStorage.removeItem('userData');
+            secureLocalStorage.removeItem('auth_token');
+            window.location.href = '/login';
+          } else {
+            console.error('Erro ao buscar custos:', error);
+          }
         }finally {
           setLoading(false);
         }
@@ -130,7 +147,7 @@ const CustosForm = () => {
   const fetchGlebaData = useCallback(async (safraId) => {
     try {
       const response = await axios.get(`http://localhost:3000/glebas-by-safra`, {
-        params: { id: safraId }
+        params: { id: safraId }, headers: {Authorization: `Bearer ${token}`}
       });
       const glebaData = response.data.map(gleba => ({
         id: gleba.id,
@@ -138,7 +155,15 @@ const CustosForm = () => {
       }));
       setGlebaOptions(response.data);
     } catch (error) {
-      console.error('Erro ao buscar dados da safra:', error);
+      if (error.response?.status === 401) {
+        alert('Sessão expirada. Faça login novamente.');
+        secureLocalStorage.removeItem('userData');
+        secureLocalStorage.removeItem('auth_token');
+        window.location.href = '/login';
+      } else {
+        console.error('Erro ao buscar dados da safra:', error);
+      }
+      
     }
   }, []);
   
@@ -147,6 +172,7 @@ const CustosForm = () => {
   const handleFormSubmit = async (values) => {
     try {
       const response = await axios.post("http://localhost:3000/custos", {
+        
         email: userData.email,
         safraId: values.safra,
         glebaId: values.gleba,
@@ -158,13 +184,21 @@ const CustosForm = () => {
         totalValue: values.totalValue,
         date: values.date || null,
         note: values.note || null,
-      });
+      }, {headers: {Authorization: `Bearer ${token}`}} );
       if (response.status === 201) {  
         navigate(`/custos?message=${encodeURIComponent("1")}`);
       }
       
     } catch (error) {
-      console.error("Erro ao criar custo: " , error);
+      if (error.response?.status === 401) {
+        alert('Sessão expirada. Faça login novamente.');
+        secureLocalStorage.removeItem('userData');
+        secureLocalStorage.removeItem('auth_token');
+        window.location.href = '/login';
+      } else {
+        console.error("Erro ao criar custo: " , error);
+      }
+      
     }
   };
 
@@ -206,7 +240,7 @@ const CustosForm = () => {
                   <TextField
                     fullWidth
                     variant="filled"
-                    label="Gleba"
+                    label="Talhão"
                     value={gleba.name}
                     disabled 
                     sx={{ gridColumn: "span 2" }}
@@ -263,7 +297,7 @@ const CustosForm = () => {
                   renderInput={(params) => (
                     <TextField 
                       {...params} 
-                      label="Gleba"
+                      label="Talhão"
                       variant="filled"
                       name="gleba"
                       error={!!touched.gleba && !!errors.gleba}
@@ -271,7 +305,7 @@ const CustosForm = () => {
                       onBlur={handleBlur} 
                       />
                   )}
-                  noOptionsText="Nenhuma Gleba Disponível"
+                  noOptionsText="Nenhum talhão disponível"
                   />
                 <TextField
                   fullWidth

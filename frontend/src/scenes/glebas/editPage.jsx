@@ -10,6 +10,7 @@ import secureLocalStorage from 'react-secure-storage';
 
 
 const GlebasEditForm = () => {
+  const token = secureLocalStorage.getItem('auth_token');
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const isNonMobile = useMediaQuery("(min-width:600px)");
@@ -33,14 +34,23 @@ const GlebasEditForm = () => {
     if (userData && userData.email) {
         const fetchPropertyData = async () => {
             try {
-                const response = await axios.get(`http://localhost:3000/glebas/${id}`);
+                const response = await axios.get(`http://localhost:3000/glebas/${id}`, {
+                  headers: {Authorization: `Bearer ${token}`}
+                });
                 const { property } = response.data;
                 setGleba(response.data);
                 setProperty(property);
                 setLoading(false); 
             } catch (error) {
+              if (error.response?.status === 401) {
+                alert('Sessão expirada. Faça login novamente.');
+                secureLocalStorage.removeItem('userData');
+                secureLocalStorage.removeItem('auth_token');
+                window.location.href = '/login';
+              } else {
                 console.error("Erro ao buscar dados da gleba:", error);
-                setLoading(false); 
+              }
+              setLoading(false); 
             }
         };
         fetchPropertyData();
@@ -58,18 +68,29 @@ const GlebasEditForm = () => {
   const navigate = useNavigate(); 
   const handleFormSubmit = async (values) => {
     try {
-      const response = await axios.put(`http://localhost:3000/glebas/${id}`, {
+      const response = await axios.put(`http://localhost:3000/glebas`, {
         name: values.nameGleba,
-        area: values.area,          
-      });
+        area: values.area, 
+        id: id
+      },
+      {
+        headers: {Authorization: `Bearer ${token}`}
+      }
+    );
   
-      if (response.status === 200) {
-        //console.log("Gleba editada com sucesso:", response.data);
-  
-        navigate(`/glebas?message=${encodeURIComponent("2")}`);
+      if (response.status === 200) {  
+        navigate(`/talhoes?message=${encodeURIComponent("2")}`);
       }
     } catch (error) {
-      console.error("Erro ao editar gleba: " , error);
+      if (error.response?.status === 401) {
+        alert('Sessão expirada. Faça login novamente.');
+        secureLocalStorage.removeItem('userData');
+        secureLocalStorage.removeItem('auth_token');
+        window.location.href = '/login';
+      } else {
+        console.error("Erro ao editar talhão: " , error);
+      }
+      
     }
   };
 
@@ -79,7 +100,7 @@ const GlebasEditForm = () => {
   
   return (
     <Box m="20px">
-      <Header title="Editar Gleba" subtitle="Edite as informações da Gleba" />
+      <Header title="Editar Talhão" subtitle="Edite as informações do Talhão" />
 
       <Formik
         onSubmit={handleFormSubmit}
@@ -108,7 +129,7 @@ const GlebasEditForm = () => {
                 fullWidth
                 variant="filled"
                 type="text"
-                label="Nome da Gleba"
+                label="Nome do Talhão"
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.nameGleba}

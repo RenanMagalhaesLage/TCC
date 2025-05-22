@@ -14,6 +14,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import DoneIcon from '@mui/icons-material/Done';
 
 const Invite = () => {
+    const token = secureLocalStorage.getItem('auth_token');
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const isMobile = useMediaQuery("(max-width: 1000px)");
@@ -201,7 +202,9 @@ const Invite = () => {
         if (userData && userData.email) { 
             const fetchInvites = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:3000/searchInvites/${userData.email}`);
+                    const response = await axios.get(`http://localhost:3000/invites`,{
+                        headers: {Authorization: `Bearer ${token}`}
+                    });
                     const linhasDaTabela = response.data.flatMap(item => {
                         const { invite, property, sender } = item; 
                         return {
@@ -215,7 +218,15 @@ const Invite = () => {
                     //console.log(linhasDaTabela)
                     setInvites(linhasDaTabela); 
                 } catch (error) {
-                    console.log("ERROR - ao buscar convites.");
+                    if (error.response?.status === 401) {
+                        alert('Sessão expirada. Faça login novamente.');
+                        secureLocalStorage.removeItem('userData');
+                        secureLocalStorage.removeItem('auth_token');
+                        window.location.href = '/login';
+                    } else {
+                        console.log("ERROR - ao buscar convites.");
+                    }
+                    
                 }
             };
             fetchInvites();
@@ -242,13 +253,21 @@ const Invite = () => {
         setOpenSnackbar(true);
 
         try {
-            const response = await axios.post(`http://localhost:3000/acceptInvite/${inviteId}`, {
+            const response = await axios.post(`http://localhost:3000/invites-answer/${inviteId}`, {
                 answer: true, 
-            });
+            }, {headers: {Authorization: `Bearer ${token}`}});
     
             setReload(prevState => !prevState);
         } catch (error) {
-            console.error("Erro ao enviar a recusa do convite:", error);
+            if (error.response?.status === 401) {
+                alert('Sessão expirada. Faça login novamente.');
+                secureLocalStorage.removeItem('userData');
+                secureLocalStorage.removeItem('auth_token');
+                window.location.href = '/login';
+            } else {
+                console.error("Erro ao enviar a recusa do convite:", error);    
+            }
+            
         }
     };
 
@@ -266,13 +285,21 @@ const Invite = () => {
         setOpenSnackbar(true);
 
         try {
-            const response = await axios.post(`http://localhost:3000/acceptInvite/${inviteId}`, {
+            const response = await axios.post(`http://localhost:3000/invites-answer/${inviteId}`, {
                 answer: false, 
-            });
+            },{headers: {Authorization: `Bearer ${token}`}});
     
             setReload(prevState => !prevState);
         } catch (error) {
-            console.error("Erro ao enviar a recusa do convite:", error);
+            if (error.response?.status === 401) {
+                alert('Sessão expirada. Faça login novamente.');
+                secureLocalStorage.removeItem('userData');
+                secureLocalStorage.removeItem('auth_token');
+                window.location.href = '/login';
+            } else {
+                console.error("Erro ao enviar a recusa do convite:", error);
+            }
+            
         }
     };
 

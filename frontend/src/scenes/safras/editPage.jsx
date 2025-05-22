@@ -11,6 +11,7 @@ import InfoIcon from '@mui/icons-material/Info';
 
 
 const SafrasEditPage = () => {
+  const token = secureLocalStorage.getItem('auth_token');
   const { id } = useParams(); 
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -65,7 +66,9 @@ const SafrasEditPage = () => {
     if (userData && userData.email) {
       const fetchSafras = async () => {
         try {
-          const response = await axios.get(`http://localhost:3000/safras/${id}`);
+          const response = await axios.get(`http://localhost:3000/safras/${id}`, {
+            headers: {Authorization: `Bearer ${token}`}
+          });
           const safra = response.data;
           const glebas = response.data.glebas;
           setSafra(safra);
@@ -75,7 +78,7 @@ const SafrasEditPage = () => {
           setLoading(false); 
 
           const responseGlebas = await axios.get(`http://localhost:3000/glebas-available`, {
-            params: { email: userData.email }
+            headers: {Authorization: `Bearer ${token}`}
           });
           
           const glebaData = responseGlebas.data.map(gleba => ({
@@ -85,7 +88,15 @@ const SafrasEditPage = () => {
           setGlebaOptions(glebaData);
 
         } catch (error) {
-            console.error('Erro ao buscar safras:', error);  
+          if (error.response?.status === 401) {
+            alert('Sessão expirada. Faça login novamente.');
+            secureLocalStorage.removeItem('userData');
+            secureLocalStorage.removeItem('auth_token');
+            window.location.href = '/login';
+          } else {
+            console.error('Erro ao buscar safras:', error); 
+          }
+             
         }finally {
           setLoading(false);
         }
@@ -147,13 +158,20 @@ const SafrasEditPage = () => {
         actualYield:values.type === "Planejado" ? 0 : values.prodRealizada, 
         estimatedSalePrice: values.precoVendaEstimado,
         actualSalePrice: values.type === "Planejado" ? 0 : values.precoVendaRealizado
-      });
+      }, {headers: {Authorization: `Bearer ${token}`}});
   
       if (response.status === 200) {  
         navigate(`/safras?message=${encodeURIComponent("2")}`);
       }
     } catch (error) {
-      console.error("Erro ao editar safra: " , error);
+      if (error.response?.status === 401) {
+        alert('Sessão expirada. Faça login novamente.');
+        secureLocalStorage.removeItem('userData');
+        secureLocalStorage.removeItem('auth_token');
+        window.location.href = '/login';
+      }else{
+        console.error("Erro ao editar safra: " , error);
+      }
     }
   };
 
@@ -342,7 +360,7 @@ const SafrasEditPage = () => {
                 }} 
                 variant="contained"
               >
-                Adicionar Gleba
+                Adicionar Talhão
               </Button>
               <Modal
                 open={openModalGleba}
@@ -373,7 +391,7 @@ const SafrasEditPage = () => {
                     }}
                   >
                     <Typography id="modal-modal-title" variant="h4" component="h2" >
-                      Adicionar uma Gleba
+                      Adicionar Talhão
                     </Typography>
                     <Box
                       gridColumn="span 12"
@@ -395,7 +413,7 @@ const SafrasEditPage = () => {
                       <IconButton sx={{ p: 0, mr: 1 }}>
                         <InfoIcon fontSize="small" />
                       </IconButton>
-                        Uma vez que uma Gleba é adicionada a uma Safra, essa ação não pode ser desfeita!
+                        Uma vez que um Talhão é adicionado à uma Safra, essa ação não pode ser desfeita!
                     </Typography>
                     <Autocomplete
                       disablePortal
@@ -418,7 +436,7 @@ const SafrasEditPage = () => {
                       renderInput={(params) => (
                         <TextField
                           {...params}
-                          label="Gleba"
+                          label="Talhão"
                           variant="filled"
                           name="glebas"
                           error={!!touched.glebas && !!errors.glebas}
@@ -426,7 +444,7 @@ const SafrasEditPage = () => {
                           onBlur={handleBlur}
                         />
                       )}
-                      noOptionsText="Nenhuma Gleba Disponível"
+                      noOptionsText="Nenhum talhão disponível"
                       />                                         
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
                         <Button 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Grid, Paper, Avatar, Typography, useTheme, useMediaQuery} from '@mui/material';
+import { Grid, Paper, Avatar, Typography, useTheme, useMediaQuery, Box,TextField,Link,Button} from '@mui/material';
 import AgricultureIcon from '@mui/icons-material/Agriculture';
 import { GoogleLogin } from '@react-oauth/google';
 import axios from 'axios'; 
@@ -35,21 +35,26 @@ const Login = ({ onLogin }) => {
     };
 
     const handleLoginSuccess = async (credentialResponse) => {
-        //console.log(credentialResponse);
-
-        // Envia o token para o servidor para criar o usuário
         try {
-            const response = await axios.post('/protegida', {
-                token: credentialResponse.credential
-            }, {
-                headers: {
-                    Authorization: `Bearer ${credentialResponse.credential}`
+            const response = await axios.post('/login', 
+                {
+                    token: credentialResponse.credential
+                }, 
+                {
+                    headers: {
+                        Authorization: `Bearer ${credentialResponse.credential}`
+                    }
                 }
-            });
-            console.log(response.data); // Log para verificar a resposta do servidor
-            handleSave(response.data.name, response.data.email, response.data.picture);
-            onLogin(); // Chama a função onLogin para atualizar o estado no App
+            );
+            handleSave(response.data.name, response.data.email, response.data.picture, credentialResponse.credential);
+            onLogin();
         } catch (error) {
+            if (error.response?.status === 401) {
+                alert('Sessão expirada. Faça login novamente.');
+                secureLocalStorage.removeItem('userData');
+                secureLocalStorage.removeItem('auth_token');
+                window.location.href = '/login';
+            }
             console.log(error.message);
         }
     };
@@ -62,9 +67,10 @@ const Login = ({ onLogin }) => {
 
     const [retrievedUser, setRetrievedUser] = useState(null);
 
-    const handleSave = (name, email, picture) => {
+    const handleSave = (name, email, picture, credential) => {
         const user = { name, email, picture }; 
         secureLocalStorage.setItem('userData', JSON.stringify(user)); 
+        secureLocalStorage.setItem('auth_token', credential);
         //alert('Dados armazenados com sucesso!');
     };
 
@@ -77,33 +83,75 @@ const Login = ({ onLogin }) => {
         //alert('Nenhum dado encontrado!');
         }
     };
-
     
     const handleRemove = () => {
         secureLocalStorage.removeItem('userData');
+        secureLocalStorage.removeItem('auth_token');
         setRetrievedUser(null); // Limpa o estado do objeto recuperado
         //alert('Dados removidos com sucesso!');
     };
 
-    return (
-        <Grid container style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden', backgroundImage: 'radial-gradient(at 70% 51%, rgba(200, 255, 200, 0.7), rgba(255, 255, 255, 1))'
-        }}>
-            <Grid item>
-                <Paper elevation={3} style={paperStyle}>
-                    <Avatar style={avatarStyle}>
-                        <AgricultureIcon sx={{ fontSize: 50 }} />
-                    </Avatar>
-                    <Typography variant="h1" gutterBottom style={{ marginBottom: "60px" }}>
-                        SmartPlantio
-                    </Typography>
-                    <GoogleLogin
-                        onSuccess={handleLoginSuccess} // Atualizado para a nova função
-                        onError={handleLoginError}
-                    />
-                </Paper>
-            </Grid>
-        </Grid>
-    );
+  return (
+    <Grid
+      container
+      sx={{
+        height: '100vh',
+        justifyContent: 'center',
+        alignItems: 'center',
+        background: 'radial-gradient(at 70% 51%, rgba(200, 255, 200, 0.7), rgba(255, 255, 255, 1))',
+      }}
+    >
+      <Grid item container sx={{ width: '70%', height: '80%', borderRadius: 2, overflow: 'hidden' }}>
+        {/* Formulário */}
+        <Box
+          sx={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#fff',
+            padding: 4,
+            borderRadius: '3px 0 0 3px',
+          }}
+        >
+            <Avatar style={avatarStyle}>
+                <AgricultureIcon sx={{ fontSize: 50 }} />
+            </Avatar>
+            <Typography variant="h1" gutterBottom style={{ marginBottom: "15px" }}>
+                SmartPlantio
+            </Typography>
+            <Typography variant="p" gutterBottom style={{ marginBottom: "60px" }}>
+                SISTEMA DE GESTÃO DE SAFRAS PARA PEQUENOS PRODUTORES
+            </Typography>
+            <GoogleLogin
+                onSuccess={handleLoginSuccess} 
+                onError={handleLoginError}
+            />
+        </Box>
+
+        {/* Box com a imagem */}
+        <Box
+          sx={{
+            flex: 1,
+            backgroundImage: 'url(/pexels-alejandro-barron-21404-96715.jpg)',  
+            backgroundSize: 'cover', 
+            backgroundPosition: 'center',  
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderLeft: '1px solid #ddd',
+            '@media (max-width:700px)': {
+              display: 'none',
+            },
+          }}
+        >
+        </Box>
+      </Grid>
+    </Grid>
+  );
 };
+
+
 
 export default Login;

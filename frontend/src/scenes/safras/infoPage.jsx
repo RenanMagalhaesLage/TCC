@@ -19,6 +19,7 @@ import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettin
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 
 const SafrasPage = () => {
+    const token = secureLocalStorage.getItem('auth_token');
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const isMobile = useMediaQuery("(max-width: 1000px)");
@@ -251,7 +252,9 @@ const SafrasPage = () => {
         if (userData && userData.email) { 
             const fetchSafras = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:3000/safras/${id}`);
+                    const response = await axios.get(`http://localhost:3000/safras/${id}`,{
+                        headers: {Authorization: `Bearer ${token}`}
+                    });
                     const safra = response.data;
                     const glebas = response.data.glebas;
                     const custos = response.data.custos;
@@ -269,8 +272,16 @@ const SafrasPage = () => {
                     setOwner(owner[0]);
                     setIsHigher(safra.actualYield >= safra.expectedYield);
                 } catch (error) {
-                    console.log(`ERROR - ao buscar a safra de id = ${id}`);
-                    console.log(error);
+                    if (error.response?.status === 401) {
+                        alert('Sessão expirada. Faça login novamente.');
+                        secureLocalStorage.removeItem('userData');
+                        secureLocalStorage.removeItem('auth_token');
+                        window.location.href = '/login';
+                    } else {
+                       console.log(`ERROR - ao buscar a safra de id = ${id}`);
+                        console.log(error); 
+                    }
+                    
                 }
             };
             fetchSafras();
@@ -292,7 +303,7 @@ const SafrasPage = () => {
     };
 
     const handleViewGleba = (id) => {
-        navigate(`/glebas/${id}`);
+        navigate(`/talhoes/${id}`);
     };
 
     const handleOpen = () => setOpen(true);
@@ -305,11 +316,19 @@ const SafrasPage = () => {
         handleClose();
         try {
             const response = await axios.delete(`http://localhost:3000/safras`, {
-                params: { id: id }
+                params: { id: id }, headers: {Authorization: `Bearer ${token}`}
             });
             navigate(`/safras?message=${encodeURIComponent("3")}`);
         } catch (error) {
-            console.error("Erro ao deletar safra:", error);
+            if (error.response?.status === 401) {
+                alert('Sessão expirada. Faça login novamente.');
+                secureLocalStorage.removeItem('userData');
+                secureLocalStorage.removeItem('auth_token');
+                window.location.href = '/login';
+            } else {
+                console.error("Erro ao deletar safra:", error);
+            }
+            
         }
     }
 
@@ -326,7 +345,7 @@ const SafrasPage = () => {
     }
 
     const handleAddGleba = () =>{
-        navigate(`/glebas/add`);
+        navigate(`/talhoes/add`);
     }
 
     
@@ -556,7 +575,7 @@ const SafrasPage = () => {
                                     >
                                         <Tooltip title='Deletar'>
                                             <Button 
-                                                disabled={safra.status === true}
+                                                
                                                 variant="contained" 
                                                 onClick={handleOpen} 
                                                 sx={{ backgroundColor:  colors.redAccent[500],
@@ -676,7 +695,7 @@ const SafrasPage = () => {
                             mt={isMobile ? "680px": "225px"}
                         >
                             <Typography variant="h4" fontWeight="bold" color={colors.grey[100]}>
-                                Glebas
+                                Talhões
                             </Typography>
                         </Box>
                         <Box
@@ -696,7 +715,7 @@ const SafrasPage = () => {
                                     gap="20px"
                                 >
                                     <Typography variant={isMobile ? "h6": "h5"} fontWeight="bold" color={colors.grey[100]}>
-                                        Nenhuma gleba da safra foi encontrada.
+                                        Nenhum talhão da safra foi encontrado.
                                     </Typography>
                                     <Button
                                         sx={{
@@ -709,7 +728,7 @@ const SafrasPage = () => {
                                         onClick={() => handleAddGleba()}
                                     >
                                         <AddCircleOutlineIcon sx={{ mr: "10px" }} />
-                                        {("Adicionar Gleba")}
+                                        {("Adicionar Talhao")}
                                     </Button>
                                 </Box>
                             ):(

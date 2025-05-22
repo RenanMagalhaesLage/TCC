@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const connection = require("../database/database");
 const { QueryTypes } = require('sequelize');
+const verifyToken = require('../middlewares/verifyToken');
 /*-------------------------------
             Models
 ---------------------------------*/
@@ -16,7 +17,7 @@ const SafraGleba = require("../database/SafraGleba");
 const StorageItem = require("../database/StorageItem");
 
 /*  Rota para --> GRÁFICO DE PIZZA DE CUSTOS */
-router.get('/custos-pie-chart', async (req, res) => {
+router.get('/custos-pie-chart', verifyToken, async (req, res) => {
     const { safraId } = req.query;
 
     const safra = await Safra.findByPk(safraId);
@@ -64,10 +65,10 @@ router.get('/custos-pie-chart', async (req, res) => {
 });
 
 /*  Rota para --> GRÁFICO DE PIZZA DE TODOS CUSTOS DE SAFRAS */
-router.get('/all-custos-pie-chart', async (req, res) => {
-    const { email} = req.query;
+router.get('/all-custos-pie-chart', verifyToken, async (req, res) => {
+    const userEmail = req.user.email;
 
-    const user = await User.findOne({ where: { email: email } });
+    const user = await User.findOne({ where: { email: userEmail } });
     if (!user) {
         return res.status(404).json({ error: 'Usuário não encontrado' });
     }
@@ -169,7 +170,7 @@ router.get('/all-custos-pie-chart', async (req, res) => {
 });
 
 /*  Rota para --> GRÁFICO DE LINHA DE CUSTOS POR GLEBA */
-router.get('/custos-glebas-line-chart', async (req, res) => {
+router.get('/custos-glebas-line-chart', verifyToken, async (req, res) => {
     const { safraId } = req.query;
 
     const safra = await Safra.findByPk(safraId);
@@ -236,16 +237,14 @@ router.get('/custos-glebas-line-chart', async (req, res) => {
 });
 
 /*  Rota para --> GRÁFICO DE BARRA DE CUSTOS POR CATEGORIA POR GLEBA */
-router.get('/custos-glebas-bar-chart', async (req, res) => {
-    const { safraId } = req.query;
+router.get('/custos-glebas-bar-chart', verifyToken, async (req, res) => {
+    const { safraId, safraType } = req.query;
 
     const safra = await Safra.findByPk(safraId);
         if (!safra) {
             return res.status(404).json({ error: 'Safra não encontrado' });
     }
-    //console.log("safra type = " + safra.type);
 
-    //Somando custos por categoria
     const query = `
         SELECT 
             sg.glebaId, 
@@ -268,9 +267,10 @@ router.get('/custos-glebas-bar-chart', async (req, res) => {
   
     try {
         const sumCustos = await connection.query(query, {
-            replacements: { safraId, type: safra.type },  
+            replacements: { safraId, type: safraType },  
             type: QueryTypes.SELECT  
         });
+        console.log(JSON.stringify(sumCustos, null, 2));
 
         sumCustos.forEach(item => {
             if (item.category === 'Corretivos e Fertilizantes') {
@@ -287,22 +287,26 @@ router.get('/custos-glebas-bar-chart', async (req, res) => {
             'Corr. e Fert.'
         ];
          
-        const glebas = [...new Set(sumCustos.map(item => item.glebaId))];
+        const glebaIds = [...new Set(sumCustos.map(item => item.glebaId))];
 
-        // Criar o resultado no formato desejado
-        const result = glebas.map(glebaId => {
-            // Iniciar o objeto para a gleba
+        const glebasInfo = await Gleba.findAll({
+            where: {
+                id: glebaIds
+            },
+            attributes: ['id', 'name']
+        });
+
+        const result = glebasInfo.map(gleba => {
             const glebaData = {
-                gleba: `Gleba ${glebaId}` // Nome da gleba
+                gleba: gleba.name
             };
     
-            // Para cada categoria, buscar o valor correspondente
             categories.forEach(category => {
-                const categoryFound = sumCustos.find(item => item.glebaId === glebaId && item.category === category);
-                glebaData[category.toLowerCase()] = categoryFound ? categoryFound.value.toFixed(2) : 0; // Adicionar o valor ou 0 se não encontrado
+                const categoryFound = sumCustos.find(item => item.glebaId === gleba.id && item.category === category);
+                glebaData[category.toLowerCase()] = categoryFound ? categoryFound.value.toFixed(2) : 0; 
             });
-    
-            return glebaData; // Retorna o objeto da gleba com todas as categorias
+            
+            return glebaData; 
         });
 
         return res.json(result);
@@ -313,8 +317,8 @@ router.get('/custos-glebas-bar-chart', async (req, res) => {
 });
 
 /* Rota para --> GRÁFICO DE BARRA DE CUSTO MÉDIO POR HECTARE POR GLEBA */
-router.get('/custos-hectares-glebas-bar-chart', async (req, res) => {
-    const { safraId } = req.query;
+router.get('/custos-hectares-glebas-bar-chart', verifyToken, async (req, res) => {
+    const { safraId, safraType } = req.query;
 
     const safra = await Safra.findByPk(safraId);
         if (!safra) {
@@ -325,35 +329,45 @@ router.get('/custos-hectares-glebas-bar-chart', async (req, res) => {
     const query = `
         SELECT 
             sg.glebaId,  
-            IFNULL(SUM(custos.totalValue), 0) AS value
+            g.area,
+            IFNULL(SUM(c.totalValue), 0) AS value,
+            IFNULL(SUM(c.totalValue), 0) / NULLIF(g.area, 0) AS value_per_hectare
         FROM 
             (SELECT DISTINCT glebaId FROM safra_glebas WHERE safraId = :safraId) AS sg
+        JOIN 
+            glebas AS g ON g.id = sg.glebaId
         LEFT JOIN 
-            Custos AS custos
-        ON 
-            custos.glebaId = sg.glebaId 
-            AND custos.safraId = :safraId
-            AND custos.type = :type
+            Custos AS c ON 
+                c.glebaId = sg.glebaId 
+                AND c.safraId = :safraId
+                AND c.type = :type
         GROUP BY 
-            sg.glebaId;
+            sg.glebaId, g.area;
     `;
   
     try {
         const sumCustos = await connection.query(query, {
-            replacements: { safraId, type: safra.type },  
+            replacements: { safraId, type: safraType },  
             type: QueryTypes.SELECT  
         });
          
-        const glebas = [...new Set(sumCustos.map(item => item.glebaId))];
+        const glebaIds = [...new Set(sumCustos.map(item => item.glebaId))];
 
-        const result = glebas.map(glebaId => {
+        const glebasInfo = await Gleba.findAll({
+            where: {
+                id: glebaIds
+            },
+            attributes: ['id', 'name']
+        });
+
+        const result = glebasInfo.map(gleba => {
             const glebaData = {
-                gleba: `Gleba ${glebaId}` 
+                gleba: gleba.name
             };
 
             sumCustos.forEach(item => {
-                if (item.glebaId === glebaId) {
-                    glebaData["custo"] = item.value.toFixed(2); 
+                if (item.glebaId === gleba.id) {
+                    glebaData["custo"] = item.value_per_hectare.toFixed(2); 
                 }
             });
     
@@ -367,15 +381,14 @@ router.get('/custos-hectares-glebas-bar-chart', async (req, res) => {
       }
 });
 
-/* Rota para --> GRÁFICO DE BARRA DE CUSTO MÉDIO POR HECTARE POR GLEBA */
-router.get('/custos-categoria-bar-chart', async (req, res) => {
+/* Rota para --> GRÁFICO DE BARRA DE CUSTO POR GLEBA */
+router.get('/custos-categoria-bar-chart', verifyToken, async (req, res) => {
     const { id } = req.query;
 
     const safra = await Safra.findByPk(id);
         if (!safra) {
             return res.status(404).json({ error: 'Safra não encontrado' });
     }
-    console.log("teste" + safra);
 
     //Somando custos por categoria
     const query = `
@@ -406,7 +419,7 @@ router.get('/custos-categoria-bar-chart', async (req, res) => {
 });
 
 /* Rota para --> RELATÓRIO DE SAFRA */
-router.get('/report-safra', async (req, res) => {
+router.get('/report-safra', verifyToken, async (req, res) => {
     const { id } = req.query;
 
     const safra = await Safra.findByPk(id);
@@ -483,7 +496,7 @@ router.get('/report-safra', async (req, res) => {
 });
 
 /* Rota para --> RELATÓRIO DE CUSTO TOTAL */
-router.get('/report-custo', async (req, res) => {
+router.get('/report-custo', verifyToken, async (req, res) => {
     const { id } = req.query;
 
     const safra = await Safra.findByPk(id);
@@ -695,7 +708,7 @@ router.get('/report-custo', async (req, res) => {
             rentabilidade: [
                 { name: "Preço de venda " +  nomeAjuste + " (R$/saco)", value: formatCurrency(precoVenda)},
                 { name: "Receita bruta " + nomeAjuste2 +  " (R$/ha)", value: formatCurrency(receitaBrutaHec) },
-                { name: "Receita bruta total (Gleba)", value: formatCurrency(receitaBruta) },
+                { name: "Receita bruta total", value: formatCurrency(receitaBruta) },
                 { name: "Lucro " +  nomeAjuste + " (R$/ha)", value: formatCurrency(lucroHect) },
                 { name: "LAIR (R$)", value: formatCurrency(lucroTotal) },
             ],

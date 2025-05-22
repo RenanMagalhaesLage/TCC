@@ -12,6 +12,7 @@ import { Formik,useFormikContext } from "formik";
 import * as yup from "yup";
 
 const StoragePage = () => {
+    const token = secureLocalStorage.getItem('auth_token');
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const isMobile = useMediaQuery("(max-width: 1025px)");
@@ -28,7 +29,6 @@ const StoragePage = () => {
     const [glebaOptions, setGlebaOptions] = useState([]);
     const [storageQuantity, setStorageQuantity] = useState(""); 
     
-
     const headerNames = [
         "Cultivo",
         "Semente",
@@ -90,7 +90,7 @@ const StoragePage = () => {
             const fetchStorageData = async () => {
                 try {
                     const response = await axios.get(`http://localhost:3000/storage-by-id`,{
-                        params: { id: id }
+                        params: { id: id }, headers: {Authorization: `Bearer ${token}`}
                     });
                     setCusto(response.data);
                     setStorageQuantity(response.data.quantity)
@@ -99,8 +99,16 @@ const StoragePage = () => {
                     const owner = users.find(custo => custo.user_properties.access === 'owner');
                     setOwner(owner);
                 } catch (error) {
-                    console.log(`ERROR - ao buscar dados do estoque de id = ${id}.`);
-                    console.log(error);
+                    if (error.response?.status === 401) {
+                        alert('Sessão expirada. Faça login novamente.');
+                        secureLocalStorage.removeItem('userData');
+                        secureLocalStorage.removeItem('auth_token');
+                        window.location.href = '/login';
+                    } else {
+                        console.log(`ERROR - ao buscar dados do estoque de id = ${id}.`);
+                        console.log(error);
+                    }
+                    
                 }
             };
             fetchStorageData();
@@ -108,19 +116,27 @@ const StoragePage = () => {
             const fetchSafraData = async () => {
                 try {
                     const response = await axios.get(`http://localhost:3000/safras-by-user`,{
-                        params: { email: userData.email }
+                        headers: {Authorization: `Bearer ${token}`}
                     });
                     const safras = response.data
                     .filter(safra => safra.status === false)
                     .filter(safra => safra.type === "Realizado")
                     .map(safra => ({
                         id: safra.id,
-                        name: `${safra.name} - ${safra.cultivo}`
+                        name: `${safra.name} - ${safra.crop}`
                     }));
                     setSafraOptions(safras);
                 } catch (error) {
-                    console.log(`ERROR - ao buscar safras do usuário.`);
-                    console.log(error);
+                    if (error.response?.status === 401) {
+                        alert('Sessão expirada. Faça login novamente.');
+                        secureLocalStorage.removeItem('userData');
+                        secureLocalStorage.removeItem('auth_token');
+                        window.location.href = '/login';
+                    } else {
+                         console.log(`ERROR - ao buscar safras do usuário.`);
+                        console.log(error);
+                    }
+                   
                 }
             };
             fetchSafraData();
@@ -138,7 +154,7 @@ const StoragePage = () => {
     const fetchGlebaData = useCallback(async (safraId) => {
         try {
           const response = await axios.get(`http://localhost:3000/glebas-by-safra`, {
-            params: { id: safraId }
+            params: { id: safraId }, headers: {Authorization: `Bearer ${token}`}
           });
           const glebaData = response.data.map(gleba => ({
             id: gleba.id,
@@ -146,7 +162,15 @@ const StoragePage = () => {
           }));
           setGlebaOptions(response.data);
         } catch (error) {
-          console.error('Erro ao buscar dados da safra:', error);
+            if (error.response?.status === 401) {
+                alert('Sessão expirada. Faça login novamente.');
+                secureLocalStorage.removeItem('userData');
+                secureLocalStorage.removeItem('auth_token');
+                window.location.href = '/login';
+            } else {
+                console.error('Erro ao buscar dados da safra:', error);
+            }
+          
         }
     }, []);
 
@@ -172,11 +196,19 @@ const StoragePage = () => {
         handleCloseDelete();
         try {
             const response = await axios.delete(`http://localhost:3000/storage`, {
-                params: { id: id }
+                params: { id: id }, headers: {Authorization: `Bearer ${token}`}
             });
             navigate(`/estoque?message=${encodeURIComponent("3")}`);
         } catch (error) {
-            console.error("Erro ao deletar item de estoque:", error);
+            if (error.response?.status === 401) {
+                alert('Sessão expirada. Faça login novamente.');
+                secureLocalStorage.removeItem('userData');
+                secureLocalStorage.removeItem('auth_token');
+                window.location.href = '/login';
+            } else {
+                console.error("Erro ao deletar item de estoque:", error);
+            }
+            
         }
     }
 
@@ -196,13 +228,25 @@ const StoragePage = () => {
             idSafra: values.safra, 
             idGleba: values.gleba,
             quantity: values.quantity,        
-          });
+          },
+            {
+                headers: {Authorization: `Bearer ${token}`}
+
+            });
       
           if (response.status === 201) {  
             navigate(`/estoque?message=${encodeURIComponent("4")}`);
           }
         } catch (error) {
-          console.error("Erro ao transferir item estoque: " , error);
+            if (error.response?.status === 401) {
+                alert('Sessão expirada. Faça login novamente.');
+                secureLocalStorage.removeItem('userData');
+                secureLocalStorage.removeItem('auth_token');
+                window.location.href = '/login';
+            } else {
+                console.error("Erro ao transferir item estoque: " , error);
+            }
+          
         }
     };
 
@@ -570,7 +614,7 @@ const StoragePage = () => {
                                                                         renderInput={(params) => (
                                                                             <TextField 
                                                                                 {...params} 
-                                                                                label="Gleba"
+                                                                                label="Talhão"
                                                                                 variant="filled"
                                                                                 name="gleba"
                                                                                 error={!!touched.gleba && !!errors.gleba}
@@ -578,7 +622,7 @@ const StoragePage = () => {
                                                                                 onBlur={handleBlur} 
                                                                             />
                                                                         )}
-                                                                        noOptionsText="Nenhuma Gleba Disponível"
+                                                                        noOptionsText="Nenhum talhão disponível"
                                                                     />   
                                                                     <TextField
                                                                         id="quantity"  

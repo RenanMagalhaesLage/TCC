@@ -13,6 +13,7 @@ import * as yup from "yup";
 import { Formik, Form, Field } from "formik";
 
 const TotalPage = () => {
+    const token = secureLocalStorage.getItem('auth_token');
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const isMobile = useMediaQuery("(max-width: 1000px)");
@@ -23,55 +24,6 @@ const TotalPage = () => {
     const [safraId, setSafraId] = useState("");
     const [showPanel, setShowPanel] = useState(false);
 
-    const itens = [
-        {
-          nome: "Fertilizante Nitrogenado",
-          quantidade: 100,
-          unidade: "kg",
-          preco: 5.50,
-        },
-        {
-          nome: "Herbicida X",
-          quantidade: 20,
-          unidade: "litros",
-          preco: 18.75,
-        },
-        {
-          nome: "Semente de Milho",
-          quantidade: 50,
-          unidade: "kg",
-          preco: 12.30,
-        },
-        {
-          nome: "Inseticida Y",
-          quantidade: 15,
-          unidade: "litros",
-          preco: 22.00,
-        },
-        {
-          nome: "Adubo Orgânico",
-          quantidade: 200,
-          unidade: "kg",
-          preco: 4.20,
-        },
-    ];
-
-    const categoriasTotais = [
-        { nome: "Administrativo", total: 1250.00, porcentagem: "3.85%" },
-        { nome: "Arrendamento", total: 9800.50, porcentagem: "30.18%" },
-        { nome: "Operações", total: 4120.75, porcentagem: "12.69%" },
-        { nome: "Corretivos e Fertilizantes", total: 6350.00, porcentagem: "19.54%" },
-        { nome: "Sementes", total: 2780.40, porcentagem: "8.55%" },
-        { nome: "Defensivos", total: 3499.99, porcentagem: "10.77%" },
-    ];
-
-    const descritivo = [
-        { nome: "Preço de venda esperado (R$/saco)", total: 85.00 },
-        { nome: "Receita bruta esperada (R$/ha)", total: 3400.00 },
-        { nome: "Receita bruta total (Gleba)", total: 102000.00 },
-        { nome: "Lucro esperado (R$/ha)", total: 1150.00 },
-        { nome: "LAIR (R$)", total: 78500.00 },
-    ];
     const initialValues = {
         safra: "",
         property: ""
@@ -89,7 +41,7 @@ const TotalPage = () => {
           const fetchSafraData = async () => {
             try {
               const response = await axios.get(`http://localhost:3000/safras-by-user`, {
-                params: { email: userData.email }
+                headers: {Authorization: `Bearer ${token}`}
               });
                           
               const safras = response.data
@@ -100,7 +52,15 @@ const TotalPage = () => {
               setSafraOptions(safras);
     
             } catch (error) {
-              console.log("ERRO - ao buscar no banco de dados.");
+                if (error.response?.status === 401) {
+                    alert('Sessão expirada. Faça login novamente.');
+                    secureLocalStorage.removeItem('userData');
+                    secureLocalStorage.removeItem('auth_token');
+                    window.location.href = '/login';
+                }else {
+                    console.log("ERRO - ao buscar no banco de dados.");
+                }
+              
             }
           };
           fetchSafraData();
@@ -112,7 +72,7 @@ const TotalPage = () => {
         setSafraId(values.safra);      
         try {
             const response = await axios.get(`http://localhost:3000/report-custo`,{
-                params: { id: values.safra}
+                params: { id: values.safra}, headers: {Authorization: `Bearer ${token}`}
             });
             const custo = response.data;
             setCusto(custo);
@@ -120,7 +80,15 @@ const TotalPage = () => {
       
           setShowPanel(true); 
         } catch (error) {
-          console.error('Erro ao buscar dados dos custos da safra:', error);
+            if (error.response?.status === 401) {
+                alert('Sessão expirada. Faça login novamente.');
+                secureLocalStorage.removeItem('userData');
+                secureLocalStorage.removeItem('auth_token');
+                window.location.href = '/login';
+            } else {
+                console.error('Erro ao buscar dados dos custos da safra:', error);
+            }
+          
         }
       
         setTimeout(() => {

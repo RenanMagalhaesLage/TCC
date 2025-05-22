@@ -7,6 +7,7 @@ import secureLocalStorage from 'react-secure-storage';
 import axios from "axios";
 
 const PieChart = ({isDashboard, safraId }) => {
+  const token = secureLocalStorage.getItem('auth_token');
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const isMobile = useMediaQuery("(max-width: 800px)");
@@ -29,7 +30,7 @@ const PieChart = ({isDashboard, safraId }) => {
         try {
           if(safraId === '0' || safraId === 0){
             const response = await axios.get(`http://localhost:3000/all-custos-pie-chart`, {
-              params: { email: userData.email }
+              headers: {Authorization: `Bearer ${token}`}
             });
 
             if (response.data.length === 0) {
@@ -42,7 +43,7 @@ const PieChart = ({isDashboard, safraId }) => {
 
           }else{
             const response = await axios.get(`http://localhost:3000/custos-pie-chart`, {
-              params: { safraId: safraId }
+              params: { safraId: safraId }, headers: {Authorization: `Bearer ${token}`}
             });  
             setPieData(response.data); 
             setEmptyData(false);
@@ -52,6 +53,11 @@ const PieChart = ({isDashboard, safraId }) => {
           if (error.response && error.response.status === 404) {
             setEmptyData(true);
             console.log("Nenhum dado encontrado (404)");
+          } else if (error.response?.status === 401) {
+            alert('Sessão expirada. Faça login novamente.');
+            secureLocalStorage.removeItem('userData');
+            secureLocalStorage.removeItem('auth_token');
+            window.location.href = '/login';
           } else {
             console.error("Erro ao buscar dados:", error);
           }
@@ -65,7 +71,8 @@ const PieChart = ({isDashboard, safraId }) => {
     emptyData ? (
       <div style={{ textAlign: "center", padding: "2rem" }}>
         <img src="/farm-img.svg" alt="Farm" style={{ width:isMobile ?"200px" : "300px" }} />
-        <p style={{ color: "#aaa", marginTop: "1rem" }}>Nenhum dado disponível para exibir</p>
+        <p style={{ color: "#aaa", marginTop: "1rem", marginBottom:"-1px" }}>Nenhum dado disponível para exibir</p>
+        <a style={{ color: colors.mygreen[300]}} href="https://storyset.com/nature">Nature illustrations by Storyset</a>
       </div>
     ) : (
     <ResponsivePie

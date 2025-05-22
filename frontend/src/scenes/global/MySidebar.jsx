@@ -63,14 +63,15 @@ const Sidebar = ({ onLogout }) => {
   const [userData, setUserData] = useState(null);
 
   useEffect(() => {
-    // Recupera os dados do secureLocalStorage quando o componente é montado
-    const storedUser = secureLocalStorage.getItem('userData');
+    const storedUser = secureLocalStorage.getItem('userData'); 
     if (storedUser) {
       setUserData(JSON.parse(storedUser));
     }
+  }, []);
 
-    if (location.pathname.startsWith('/glebas')) {
-      setSelected('Glebas');
+  useEffect(() => {
+    if (location.pathname.startsWith('/talhoes')) {
+      setSelected('Talhões');
     }else if(location.pathname.startsWith('/safras')){
       setSelected('Safras');
     }else if(location.pathname.startsWith('/custos')){
@@ -85,15 +86,15 @@ const Sidebar = ({ onLogout }) => {
   }, [location.pathname]);
 
 
-
-
   useEffect(() => {
     setIsCollapsed(isMobile);
   }, [isMobile]);
 
   const handleLogout = () => {
-    onLogout(); // Chama a função de logout fornecida pelo App
-    navigate('/login'); // Redireciona para a página de login
+    secureLocalStorage.removeItem('userData');
+    secureLocalStorage.removeItem('auth_token');
+    onLogout(); 
+    navigate('/login'); 
   };
 
   return (
@@ -177,8 +178,8 @@ const Sidebar = ({ onLogout }) => {
               setSelected={setSelected}
             />
             <Item
-              title="Glebas"
-              to="/glebas"
+              title="Talhões"
+              to="/talhoes"
               icon={< FenceIcon/>}
               selected={selected}
               setSelected={setSelected}
@@ -329,7 +330,7 @@ const Sidebar = ({ onLogout }) => {
               icon={<LogoutIcon />}
               selected={selected}
               setSelected={setSelected}
-              onClick={handleLogout} // Use a função handleLogout aqui
+              onClick={handleLogout} 
             />
           </Box>
             

@@ -16,6 +16,7 @@ import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
 const Propertie = () => {
+    const token = secureLocalStorage.getItem('auth_token');
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const isMobile = useMediaQuery("(max-width: 800px)");
@@ -31,6 +32,9 @@ const Propertie = () => {
     const [open, setOpen] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
     const [openRemove, setOpenRemove] = useState(false); 
+
+    const [selectedUser, setSelectedUser] = useState(null);
+
 
     const columnsUsers = [
         { field: "name", headerName: "Nome", flex: 1, minWidth: 100, cellClassName: "name-column--cell", resizable: false },
@@ -76,6 +80,7 @@ const Propertie = () => {
             minWidth: 100,
             renderCell: (params) => {
                 const { user_properties } = params.row;
+                const{ id } = params.row;
                 return (
                     <Box 
                         display="flex" 
@@ -83,84 +88,86 @@ const Propertie = () => {
                         width="100%"
                         m="10px auto"
                     >
-                        <Modal
-                            open={openRemove}
-                            onClose={null} 
-                            aria-labelledby="transition-modal-title"
-                            aria-describedby="transition-modal-description"
-                            closeAfterTransition
-                            slots={{ backdrop: Backdrop }}
-                            slotProps={{
-                                backdrop: {
-                                    timeout: 500,
-                                },
-                            }}
-                        >
-                            <Fade in={openRemove}>
-                                <Box 
-                                    color={colors.grey[100]}
-                                    backgroundColor={colors.primary[400]}
-                                    sx={{ 
-                                        position: 'absolute',
-                                        top: '50%',
-                                        left: '50%',
-                                        transform: 'translate(-50%, -50%)',
-                                        width: 450,
-                                        borderRadius: 3, 
-                                        boxShadow: '0px 10px 30px rgba(0, 0, 0, 0.1)',
-                                        p: 4,
-                                    }}
-                                >
-                                    <Typography id="modal-modal-title" variant="h4" component="h2">
-                                        Deseja realmente remover este usuário da propriedade?
-                                    </Typography>
-                                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                                        Ao fazer isso, esteja ciente que:
-                                        <ul>
-                                            <li>Essa ação não pode ser revertida;</li>
-                                            <li>O usuário removido perderá o acesso total a todos os dados e recursos relacionados a essa propriedade.</li>
-                                        </ul>
-                                     </Typography>
-                                    <FormControlLabel
-                                            control={
-                                                <Checkbox
-                                                    checked={isChecked}
-                                                     onChange={handleCheckboxChange} 
-                                                />
-                                            }
-                                            label="Estou ciente e quero continuar."
-                                            sx={{ mt: 2 }}
-                                    />                                         
-                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
-                                        <Button 
-                                            onClick={handleCloseRemove} 
-                                            sx={{
-                                                color: colors.redAccent[500]
-                                            }}
-                                        >
-                                            Cancelar
-                                        </Button>
-                                        <Button 
-                                            onClick={() => handleRemoveUser(user_properties.propertyId, user_properties.userId)} 
-                                            variant="contained" 
-                                            sx={{ backgroundColor:  colors.redAccent[500],
-                                                "&:hover": {
-                                                    backgroundColor: colors.grey[700], 
-                                                },
-                                            }}
-                                            disabled={!isChecked} 
-                                        >
-                                            Remover
-                                        </Button>
+                        {selectedUser && (
+                            <Modal
+                                open={openRemove}
+                                onClose={null} 
+                                aria-labelledby="transition-modal-title"
+                                aria-describedby="transition-modal-description"
+                                closeAfterTransition
+                                slots={{ backdrop: Backdrop }}
+                                slotProps={{
+                                    backdrop: {
+                                        timeout: 500,
+                                    },
+                                }}
+                            >
+                                <Fade in={openRemove}>
+                                    <Box 
+                                        color={colors.grey[100]}
+                                        backgroundColor={colors.primary[400]}
+                                        sx={{ 
+                                            position: 'absolute',
+                                            top: '50%',
+                                            left: '50%',
+                                            transform: 'translate(-50%, -50%)',
+                                            width: 450,
+                                            borderRadius: 3, 
+                                            boxShadow: '0px 10px 30px rgba(0, 0, 0, 0.1)',
+                                            p: 4,
+                                        }}
+                                    >
+                                        <Typography id="modal-modal-title" variant="h4" component="h2">
+                                            Deseja realmente remover este usuário da propriedade?
+                                        </Typography>
+                                        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                                            Ao fazer isso, esteja ciente que:
+                                            <ul>
+                                                <li>Essa ação não pode ser revertida;</li>
+                                                <li>O usuário removido perderá o acesso total a todos os dados e recursos relacionados a essa propriedade.</li>
+                                            </ul>
+                                        </Typography>
+                                        <FormControlLabel
+                                                control={
+                                                    <Checkbox
+                                                        checked={isChecked}
+                                                        onChange={handleCheckboxChange} 
+                                                    />
+                                                }
+                                                label="Estou ciente e quero continuar."
+                                                sx={{ mt: 2 }}
+                                        />                                         
+                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
+                                            <Button 
+                                                onClick={handleCloseRemove} 
+                                                sx={{
+                                                    color: colors.redAccent[500]
+                                                }}
+                                            >
+                                                Cancelar
+                                            </Button>
+                                            <Button 
+                                                onClick={() => handleRemoveUser(selectedUser.propertyId, selectedUser.userId)} 
+                                                variant="contained" 
+                                                sx={{ backgroundColor:  colors.redAccent[500],
+                                                    "&:hover": {
+                                                        backgroundColor: colors.grey[700], 
+                                                    },
+                                                }}
+                                                disabled={!isChecked} 
+                                            >
+                                                Remover
+                                            </Button>
+                                        </Box>
                                     </Box>
-                                </Box>
-                            </Fade>
-                        </Modal>
+                                </Fade>
+                            </Modal>
+                        )}
                         {isMobile ? (
                             <>
                                 <Tooltip title="Remover">
                                     <IconButton 
-                                        onClick={() => handleOpenRemove()}  
+                                        onClick={() => handleOpenRemove(user_properties)}  
                                         style={{ color: !isOwner ? colors.grey[800] : user_properties.access !== "owner" ? colors.redAccent[500] : colors.grey[800] }}  
                                         disabled={user_properties.access === "owner" || !isOwner } 
                                     >
@@ -174,7 +181,7 @@ const Propertie = () => {
                                     <Button 
                                         variant="contained" 
                                         style={{ backgroundColor: !isOwner ? colors.grey[800] : user_properties.access !== "owner" ? colors.redAccent[500] : colors.grey[800] }} 
-                                        onClick={() => handleOpenRemove()}
+                                        onClick={() => handleOpenRemove(user_properties)}
                                         sx={{ ml: 2 }} 
                                         disabled={user_properties.access === "owner" || !isOwner } 
                                     >
@@ -318,7 +325,7 @@ const Propertie = () => {
             const fetchPropriedades = async () => {
                 try {
                     const response = await axios.get(`http://localhost:3000/properties`, {
-                        params: { id: id }
+                        params: { id: id }, headers: {Authorization: `Bearer ${token}`}
                     });
                     const property = response.data;
                     const users = property.users;
@@ -330,7 +337,15 @@ const Propertie = () => {
                     setGlebas(property.glebas);
                     setStorageItems(property.storage_items);
                 } catch (error) {
-                    console.log(`ERROR - ao buscar as propriedade de id = ${id}.`);
+                    if (error.response?.status === 401) {
+                        alert('Sessão expirada. Faça login novamente.');
+                        secureLocalStorage.removeItem('userData');
+                        secureLocalStorage.removeItem('auth_token');
+                        window.location.href = '/login';
+                    } else {
+                        console.log(`ERROR - ao buscar as propriedade de id = ${id}.`);
+                    }
+                    
                 }
             };
             fetchPropriedades();
@@ -343,7 +358,7 @@ const Propertie = () => {
         navigate(`/propriedades/edit/${id}`);
     }
     const handleView = (id) => {
-        navigate(`/glebas/${id}`);
+        navigate(`/talhoes/${id}`);
     };
 
     const handleViewStorageItem = (id) =>{
@@ -351,11 +366,11 @@ const Propertie = () => {
     }
 
     const handleAdd = () =>{
-        navigate(`/glebas/add/${id}`);
+        navigate(`/talhoes/add`);
     }
 
     const handleAddEstoque = () =>{
-        navigate(`/estoque/add/${id}`);
+        navigate(`/estoque/add`);
     }
 
     const handleInvite = () =>{
@@ -368,20 +383,32 @@ const Propertie = () => {
         setIsChecked(false);
     };
 
-    const handleOpenRemove = () => setOpenRemove(true);
+    const handleOpenRemove = (user_properties) => {
+        setSelectedUser(user_properties);
+        setOpenRemove(true);
+    };
 
     const handleCloseRemove = () => {
         setOpenRemove(false);
         setIsChecked(false);
+        setSelectedUser(null);
     };
+
     const handleRemoveUser = async (propertyId, userId) =>{
         try {
             const response = await axios.delete(`http://localhost:3000/user-properties`, {
-                params: { propertyId: propertyId, userId: userId }
+                params: { propertyId: propertyId, userId: userId }, headers: {Authorization: `Bearer ${token}`}
             });
             navigate(`/propriedades?message=${encodeURIComponent("5")}`);
         } catch (error) {
-            console.error("Erro ao remover usuário da propriedade:", error);
+            if (error.response?.status === 401) {
+                alert('Sessão expirada. Faça login novamente.');
+                secureLocalStorage.removeItem('userData');
+                secureLocalStorage.removeItem('auth_token');
+                window.location.href = '/login';
+            } else {
+                console.error("Erro ao remover usuário da propriedade:", error);
+            }
         }
         handleCloseRemove();
     }
@@ -390,11 +417,18 @@ const Propertie = () => {
         handleClose();
         try {
             const response = await axios.delete(`http://localhost:3000/properties`, {
-                params: { id: id }
+                params: { id: id }, headers: {Authorization: `Bearer ${token}`}
             });
             navigate(`/propriedades?message=${encodeURIComponent("3")}`);
         } catch (error) {
-            console.error("Erro ao deletar propriedade:", error);
+            if (error.response?.status === 401) {
+                alert('Sessão expirada. Faça login novamente.');
+                secureLocalStorage.removeItem('userData');
+                secureLocalStorage.removeItem('auth_token');
+                window.location.href = '/login';
+            } else {
+                console.error("Erro ao deletar propriedade:", error);
+            }
         }
 
     }
@@ -419,7 +453,7 @@ const Propertie = () => {
                         onClick={() => handleAdd()}
                     >
                         <AddCircleOutlineIcon sx={{ mr: isMobile? "0px" :"10px" }} />
-                        {!isMobile && ("Adicionar Gleba")}
+                        {!isMobile && ("Adicionar Talhão")}
                     </Button>
                 </Box>
             </Box>
@@ -566,7 +600,7 @@ const Propertie = () => {
                                                         Ao fazer isso, esteja ciente que:
                                                         <ul>
                                                             <li>Essa ação não pode ser revertida;</li>
-                                                            <li>Ao deletar a propriedade, as glebas e safras correspondentes também serão apagadas.</li>
+                                                            <li>Ao deletar a propriedade, os talhões e as safras correspondentes também serão apagados.</li>
                                                         </ul>
                                                     </Typography>
                                                     
@@ -641,7 +675,7 @@ const Propertie = () => {
                                 )}
                             </Box>   
                         </Box>
-                        {/* Tabela de Glebas & Tabela de usuários na fazenda */}
+                        {/* Tabela de Talhões & Tabela de usuários na fazenda */}
                         <Box
                             gridColumn="span 12"
                             display="flex"
@@ -651,7 +685,7 @@ const Propertie = () => {
                             mt={isMobile ? "120px": "0px"}
                         >
                             <Typography variant="h4" fontWeight="bold" color={colors.grey[100]}>
-                                Glebas da Propriedade
+                                Talhões da Propriedade
                             </Typography>
                         </Box>
                         <Box
@@ -671,7 +705,7 @@ const Propertie = () => {
                                     gap="20px"
                                 >
                                     <Typography variant={isMobile ? "h6": "h5"} fontWeight="bold" color={colors.grey[100]}>
-                                        Nenhuma gleba da propriedade foi encontrada.
+                                        Nenhum talhão da propriedade foi encontrado.
                                     </Typography>
                                     <Button
                                         sx={{
@@ -684,7 +718,7 @@ const Propertie = () => {
                                         onClick={() => handleAdd()}
                                     >
                                         <AddCircleOutlineIcon sx={{ mr: "10px" }} />
-                                        {("Adicionar Gleba")}
+                                        {("Adicionar Talhão")}
                                     </Button>
                                 </Box>
                             ) : (

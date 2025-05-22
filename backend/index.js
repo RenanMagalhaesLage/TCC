@@ -7,6 +7,7 @@ const {OAuth2Client} = require('google-auth-library');
 require('dotenv').config();
 const client = new OAuth2Client();
 //const nodemailer = require('nodemailer');
+const verifyToken = require('./middlewares/verifyToken');
 
 const app = express();
 const connection = require("./database/database");
@@ -28,7 +29,6 @@ const propertyController = require("./controller/PropertyController");
 const glebaController = require("./controller/GlebaController");
 const safraController = require("./controller/SafraController");
 const dashboardController = require("./controller/DashboardController");
-
 
 /*-------------------------------
             Models
@@ -158,40 +158,52 @@ app.use(bodyParser.json());
 app.use(express.json());
 const port = 3000;
 
-async function verificaTokens(req, res, next) {
-    try{
-        const token = req.headers.authorization.split(' ')[1];
-        console.log(token)
-        if(!token || token === undefined){
-            return res.status(401).json({error:'Invalid token'});
-        }
-
-        const ticket = await client.verifyIdToken({
-            idToken: token,
-            audience: process.env.AUDIENCE,  
-        });
-        const payload = ticket.getPayload();
-        const userid = payload['sub'];
-        const timestamp = payload.exp;
-        const expiracaoData = new Date(timestamp*1000);
-        const agora = new Date();
-
-        if(expiracaoData < agora){
-            return res.status(401).json({error:'Token expirado'});
-        }
-
-        req.user = payload;
-        next();
-    }catch(error){
-        return res.status(500).json({error:'Internal Server Error'});
-
-    }
-}
+/*
 app.get("/publica",(req,res) =>{
     res.json({message:"rota publica"});
 })
 
 app.post("/protegida", verificaTokens,async(req,res) =>{
+    const user = req.user
+    //Dados que necessito
+    const userName = req.user.name
+    const userEmail = req.user.email
+    const userPicture = req.user.picture
+    try {
+        const existingUser = await User.findOne({ where: { email: userEmail } });
+
+        if (!existingUser) {
+           const newUser = await User.create({
+                name: userName,
+                email: userEmail,
+                picture: userPicture,
+            });
+            //console.log('Usuário criado:', newUser);
+            return res.json({
+                message: "Usuário criado com sucesso",
+                user: newUser,
+                name: userName,
+                email: userEmail,
+                picture: userPicture,
+            });
+        }else{
+            return res.json({
+                message: "Usuário ja existente",
+                name: userName,
+                email: userEmail,
+                picture: userPicture,
+            });
+        }
+
+    } catch (error) {
+        console.error('Erro ao processar a solicitação:', error);
+        return res.status(500).json({ message: "Erro ao processar a solicitação" });
+    }
+    //node --watch index.js
+});*/
+
+/*  Rota para --> VALIDAR USUÁRIO*/
+app.post("/login", verifyToken,async(req,res) =>{
     const user = req.user
     //Dados que necessito
     const userName = req.user.name
@@ -241,11 +253,11 @@ app.use("/", dashboardController);
 
 /* Rota para --> BUSCA TODOS OS DADOS DO USER - DADO DETERMINADO EMAIL 
    Retorno: Propriedades, Glebas, Safras e Custos associados ao user */
-app.get('/user', async (req, res) => {
-    const { email }  = req.query;
+app.get('/user', verifyToken, async (req, res) => {
+    const userEmail = req.user.email
 
     try {
-        const user = await User.findOne({ where: { email: email } });
+        const user = await User.findOne({ where: { email: userEmail } });
         if (!user) {
             return res.status(404).json({ error: 'Usuário não encontrado' });
         }

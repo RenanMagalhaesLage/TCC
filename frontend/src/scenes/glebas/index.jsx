@@ -15,6 +15,7 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
 
 const Glebas = () => {
+    const token = secureLocalStorage.getItem('auth_token');
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const isMobile = useMediaQuery("(max-width: 800px)");
@@ -31,7 +32,7 @@ const Glebas = () => {
     useEffect(() => {
         switch (message) {
           case 1:
-            setSnackbarMessage("Gleba criada!");
+            setSnackbarMessage("Talhão Criado!");
             break;
     
           case 2:
@@ -39,7 +40,7 @@ const Glebas = () => {
             break;
     
           case 3:
-            setSnackbarMessage("Gleba excluída!");
+            setSnackbarMessage("Talhão excluído!");
             break;
     
           default:
@@ -146,7 +147,7 @@ const Glebas = () => {
             const fetchGlebasData = async () => {
                 try {
                     const response = await axios.get(`http://localhost:3000/user`, {
-                        params: { email: userData.email }
+                        headers: {Authorization: `Bearer ${token}`}
                     });
                     const linhasDaTabela = response.data.flatMap(fazenda => {
                         return fazenda.glebas.map(gleba => ({
@@ -162,7 +163,14 @@ const Glebas = () => {
 
                     
                 } catch (error) {
-                    console.log("ERRO - ao buscar as glebas.");
+                    if (error.response?.status === 401) {
+                        alert('Sessão expirada. Faça login novamente.');
+                        secureLocalStorage.removeItem('userData');
+                        secureLocalStorage.removeItem('auth_token');
+                        window.location.href = '/login';
+                    } else {
+                        console.log("ERRO - ao buscar as glebas." + error);
+                    } 
                 }
             };
             fetchGlebasData();
@@ -175,25 +183,25 @@ const Glebas = () => {
 
     const navigate = useNavigate(); 
     const handleView = (id) => {
-        navigate(`/glebas/${id}`);
+        navigate(`/talhoes/${id}`);
     };
 
     const handleAdd = () =>{
-        navigate(`/glebas/add`);
+        navigate(`/talhoes/add`);
     }
 
     const handleCloseSnackbar = (event, reason) => {
         if (reason === 'clickaway') {
             return;
         }
-        setOpenSnackbar(false); // Fecha o Snackbar
+        setOpenSnackbar(false);
     };
 
     return (
         <Box m="20px">
             <Box display="flex" justifyContent="space-between" alignItems="center">
 
-                <Header title="Glebas" subtitle="Gerencie as suas glebas" />
+                <Header title="Talhões" subtitle="Gerencie os seus talhões" />
                 <Box>
                     <Button
                         sx={{
@@ -206,7 +214,7 @@ const Glebas = () => {
                         onClick={() => handleAdd()}
                     >
                         <AddCircleOutlineIcon sx={{ mr: isMobile? "0px" :"10px" }} />
-                        {!isMobile && ("Adicionar Gleba")}
+                        {!isMobile && ("Adicionar Talhão")}
                     </Button>
                 </Box>
             </Box>
@@ -247,14 +255,14 @@ const Glebas = () => {
                             mt="50px"
                         >
                             <Typography variant={isMobile ? "h6": "h5"} fontWeight="bold" color={colors.grey[100]}>
-                                Nenhuma gleba encontrada.
+                                Nenhum talhão encontrado.
                             </Typography>
                         </Box>
                 ) : (
                     <DataGrid
                         rows={glebas}
                         columns={columns}
-                        localeText={{ noRowsLabel: <b>Nenhuma gleba encontrada.</b> }}
+                        localeText={{ noRowsLabel: <b>Nenhum talhão encontrado.</b> }}
                         initialState={{
                             ...glebas.initialState,
                             pagination: { paginationModel: { pageSize: 15 } },

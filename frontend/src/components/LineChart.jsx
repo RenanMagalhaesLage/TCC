@@ -7,6 +7,7 @@ import secureLocalStorage from 'react-secure-storage';
 import axios from "axios";
 
 const LineChart = ({ isDashboard , safraId}) => {
+  const token = secureLocalStorage.getItem('auth_token');
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const isMobile = useMediaQuery("(max-width: 800px)");
@@ -27,15 +28,19 @@ useEffect(() => {
     const fetchLineData = async () => {
       try {
         const response = await axios.get(`http://localhost:3000/custos-glebas-line-chart`, {
-          params: { safraId: 1 }
+          params: { safraId: 1 }, headers: {Authorization: `Bearer ${token}`}
         });
                     
-
-        setLineData(response.data); 
-
-                      
+        setLineData(response.data);                       
       } catch (error) {
-        console.log("ERRO - ao buscar no banco de dados.");
+        if (error.response?.status === 401) {
+            alert('Sessão expirada. Faça login novamente.');
+            secureLocalStorage.removeItem('userData');
+            secureLocalStorage.removeItem('auth_token');
+            window.location.href = '/login';
+          } else {
+          console.log("ERRO - ao buscar no banco de dados.");
+        }
       }
     };
     fetchLineData();

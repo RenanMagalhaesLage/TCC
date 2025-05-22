@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import * as yup from "yup";
 
 const DashboardRealizado = () => {
+  const token = secureLocalStorage.getItem('auth_token');
   const navigate = useNavigate(); 
   const isMobile = useMediaQuery("(max-width: 800px)");
   const isSmallDevice = useMediaQuery("(max-width: 1300px)");
@@ -47,7 +48,7 @@ const DashboardRealizado = () => {
       const fetchSafraData = async () => {
         try {
           const response = await axios.get(`http://localhost:3000/safras-by-user`, {
-            params: { email: userData.email }
+            headers: {Authorization: `Bearer ${token}`}
           });
                       
           const safras = response.data
@@ -59,7 +60,15 @@ const DashboardRealizado = () => {
           setSafraOptions(safras);
 
         } catch (error) {
-          console.log("ERRO - ao buscar no banco de dados.");
+          if (error.response?.status === 401) {
+            alert('Sessão expirada. Faça login novamente.');
+            secureLocalStorage.removeItem('userData');
+            secureLocalStorage.removeItem('auth_token');
+            window.location.href = '/login';
+          } else {
+            console.log("ERRO - ao buscar no banco de dados.");
+          }
+          
         }
       };
       fetchSafraData();
@@ -69,12 +78,19 @@ const DashboardRealizado = () => {
   const fetchPropertyData = useCallback(async (id) => {
     try {
       const response = await axios.get(`http://localhost:3000/properties-by-safra`, {
-        params: { id: id }
+        params: { id: id }, headers: {Authorization: `Bearer ${token}`}
       });
       setPropertyOptions(response.data);
       
     } catch (error) {
-      console.error('Erro ao buscar dados da propriedades da safra:', error);
+      if (error.response?.status === 401) {
+        alert('Sessão expirada. Faça login novamente.');
+        secureLocalStorage.removeItem('userData');
+        secureLocalStorage.removeItem('auth_token');
+        window.location.href = '/login';
+      } else {
+        console.error('Erro ao buscar dados da propriedades da safra:', error);
+      }
     }
   }, []);
 
@@ -97,14 +113,21 @@ const DashboardRealizado = () => {
   
     try {
       const response = await axios.get(`http://localhost:3000/report-safra`, {
-        params: { id: values.safra }  
+        params: { id: values.safra }, headers: {Authorization: `Bearer ${token}`}
       });
 
       setSafraData(response.data);
   
       setShowPanel(true); 
     } catch (error) {
-      console.error('Erro ao buscar dados da safra:', error);
+      if (error.response?.status === 401) {
+        alert('Sessão expirada. Faça login novamente.');
+        secureLocalStorage.removeItem('userData');
+        secureLocalStorage.removeItem('auth_token');
+        window.location.href = '/login';
+      } else {
+        console.error('Erro ao buscar dados da safra:', error);
+      }
     }
   
     setTimeout(() => {
@@ -484,13 +507,13 @@ const DashboardRealizado = () => {
                       fontWeight="600"
                       color={colors.grey[100]}
                     >
-                      Custos por categoria por Gleba
+                      Custos por categoria por Talhão
                     </Typography>
                     
                   </Box>
                   <Box>
                     <Tooltip title="Visualizar">
-                      <IconButton onClick={() => handleClickBarraCategory(safraId)}>
+                      <IconButton onClick={() => handleClickBarraCategory(safraId, "Realizado")}>
                         <VisibilityIcon
                           sx={{ fontSize: "26px", color: colors.mygreen[500] }}
                         />
@@ -499,7 +522,7 @@ const DashboardRealizado = () => {
                   </Box>
                 </Box>
                 <Box height="400px"  m="-20px 0 0 0">
-                  <BarChartCategory isDashboard={true} safraId={safraId}/>
+                  <BarChartCategory isDashboard={true} safraId={safraId} safraType={"Realizado"}/>
                 </Box>
               </Box>
               {/* ROW 4 */}
@@ -524,12 +547,12 @@ const DashboardRealizado = () => {
                       fontWeight="600"
                       color={colors.grey[100]}
                     >
-                      Custo médio por hectare por Gleba
+                      Custo médio por hectare por Talhão
                     </Typography>
                   </Box>
                   <Box>
                     <Tooltip title="Visualizar">
-                      <IconButton onClick={() => handleClickBarraHectares(safraId)}>
+                      <IconButton onClick={() => handleClickBarraHectares(safraId, "Realizado")}>
                         <VisibilityIcon
                           sx={{ fontSize: "26px", color: colors.mygreen[500] }}
                         />
@@ -538,7 +561,7 @@ const DashboardRealizado = () => {
                   </Box>
                 </Box>
                 <Box height="400px" m={isSmallDevice ? "-20px -0 0 0" : "-20px 0 0 0"}>
-                  <BarChartHectares isDashboard={true} safraId={safraId}/>
+                  <BarChartHectares isDashboard={true} safraId={safraId} safraType={"Realizado"}/>
                 </Box>
               </Box>
               {/* ROW 5 */}

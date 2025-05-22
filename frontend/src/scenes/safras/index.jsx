@@ -15,6 +15,7 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 
 const Safras = () => {
+    const token = secureLocalStorage.getItem('auth_token');
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const isMobile = useMediaQuery("(max-width: 800px)");
@@ -252,7 +253,7 @@ const Safras = () => {
             const fetchSafrasData = async () => {
                 try {
                     const response = await axios.get(`http://localhost:3000/safras-by-user`, {
-                        params: { email: userData.email }
+                        headers: {Authorization: `Bearer ${token}`}
                     });
 
                     const safrasEmAndamento = response.data.filter(safra => safra.status === false);
@@ -263,7 +264,15 @@ const Safras = () => {
                     setSafrasPlanejadas(safrasPlanejadas);
                     setSafrasRealizadas(safrasRealizadas);
                 } catch (error) {
-                    console.log("ERRO - ao buscar as glebas.");
+                    if (error.response?.status === 401) {
+                        alert('Sessão expirada. Faça login novamente.');
+                        secureLocalStorage.removeItem('userData');
+                        secureLocalStorage.removeItem('auth_token');
+                        window.location.href = '/login';
+                    } else {
+                        console.log("ERRO - ao buscar as glebas.");
+                    }
+                    
                 }
             };
             fetchSafrasData();

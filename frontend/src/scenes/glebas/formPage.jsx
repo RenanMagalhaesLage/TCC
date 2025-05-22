@@ -10,13 +10,13 @@ import secureLocalStorage from 'react-secure-storage';
 
 
 const GlebasForm = () => {
+  const token = secureLocalStorage.getItem('auth_token');
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const [propertyOptions, setPropertyOptions] = useState([]);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { id } = useParams(); 
   const [property,setProperty] = useState(null);
 
 
@@ -31,38 +31,30 @@ const GlebasForm = () => {
     if (userData && userData.email) {
       const fetchPropriedades = async () => {
         try {
-            const response = await axios.get(`http://localhost:3000/user`, {
-              params: { email: userData.email }
-            });
-            const propertyData = response.data.map(property =>({
-                id: property.id,
-                name: property.name
-            }));
-            setPropertyOptions(propertyData);
-
-            if(id){
-              const fetchPropertyData = async () => {
-                try {
-                    const response = await axios.get(`http://localhost:3000/propriedades/${id}`);
-                    setProperty(response.data.property);
-                    setLoading(false); 
-                } catch (error) {
-                    console.error("Erro ao buscar dados da gleba:", error);
-                    setLoading(false); 
-                }
-            };
-            fetchPropertyData();
-            }
-
-        } catch (err) {
-            console.error('Erro ao buscar propriedades:', err);  
+          const response = await axios.get(`http://localhost:3000/user`, {
+            headers: {Authorization: `Bearer ${token}`}
+          });
+          const propertyData = response.data.map(property =>({
+              id: property.id,
+              name: property.name
+          }));
+          setPropertyOptions(propertyData);
+        } catch (error) {
+          if (error.response?.status === 401) {
+            alert('Sessão expirada. Faça login novamente.');
+            secureLocalStorage.removeItem('userData');
+            secureLocalStorage.removeItem('auth_token');
+            window.location.href = '/login';
+          } else {
+            console.log("ERRO - ao buscar as propriedades." + error);
+          } 
         }finally {
           setLoading(false);
         }
       };
       fetchPropriedades();
     }
-  }, [userData,id]);
+  }, [userData]);
 
   const initialValues = {
     nameGleba: "",
@@ -72,25 +64,33 @@ const GlebasForm = () => {
 
   const navigate = useNavigate(); 
   const handleFormSubmit = async (values) => {
-    //console.log("Valores do formulário:", values);
-    if(id){
-      values.property = property.id
-    }
+    console.log("Valores do formulário:", values);
     try {
       const response = await axios.post("http://localhost:3000/glebas", {
         name: values.nameGleba,
         propertyId: values.property,          
         area: values.area,          
         email: userData.email
-      });
+      },{
+        headers: {Authorization: `Bearer ${token}`}
+      }
+      );
   
       if (response.status === 201) {
         //console.log("Gleba criada com sucesso:", response.data);
   
-        navigate(`/glebas?message=${encodeURIComponent("1")}`);
+        navigate(`/talhoes?message=${encodeURIComponent("1")}`);
       }
     } catch (error) {
-      console.error("Erro ao criar gleba: " , error);
+      if (error.response?.status === 401) {
+        alert('Sessão expirada. Faça login novamente.');
+        secureLocalStorage.removeItem('userData');
+        secureLocalStorage.removeItem('auth_token');
+        window.location.href = '/login';
+      } else {
+        console.error("Erro ao criar talhão: " , error);
+      }
+      
     }
   };
 
@@ -100,12 +100,12 @@ const GlebasForm = () => {
   
   return (
     <Box m="20px">
-      <Header title="Adicionar Gleba" subtitle="Preencha os campos para que seja cadastrado uma gleba" />
+      <Header title="Adicionar Talhão" subtitle="Preencha os campos para que seja cadastrado um talhão" />
 
       <Formik
         onSubmit={handleFormSubmit}
         initialValues={initialValues}
-        validationSchema={id ? checkoutSchema2 : checkoutSchema}
+        validationSchema={checkoutSchema}
       >
         {({
           values,
@@ -129,7 +129,7 @@ const GlebasForm = () => {
                 fullWidth
                 variant="filled"
                 type="text"
-                label="Nome da Gleba"
+                label="Nome do Talhão"
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.nameGleba}
@@ -225,8 +225,4 @@ const checkoutSchema = yup.object().shape({
     property: yup.string().required("Campo de preenchimento obrigatório"),
 });
 
-const checkoutSchema2 = yup.object().shape({
-  nameGleba: yup.string().required("Campo de preenchimento obrigatório"),
-  area: yup.number().required("Campo de preenchimento obrigatório").positive("Deve ser um número positivo"),
-});
 export default GlebasForm;

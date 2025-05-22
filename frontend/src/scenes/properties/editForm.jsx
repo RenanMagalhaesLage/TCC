@@ -10,6 +10,7 @@ import secureLocalStorage from 'react-secure-storage';
 import React, { useState, useEffect } from 'react';
 
 const PropertiesEditForm = () => {
+    const token = secureLocalStorage.getItem('auth_token');
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const isNonMobile = useMediaQuery("(min-width:600px)");
@@ -30,12 +31,19 @@ const PropertiesEditForm = () => {
             const fetchPropertyData = async () => {
                 try {
                     const response = await axios.get(`http://localhost:3000/properties`, {
-                        params: { id: id }
+                        params: { id: id }, headers: {Authorization: `Bearer ${token}`}
                     });
                     setPropertyData(response.data);
                     setLoading(false); 
                 } catch (error) {
-                    console.error("Erro ao buscar dados da propriedade:", error);
+                    if (error.response?.status === 401) {
+                        alert('Sessão expirada. Faça login novamente.');
+                        secureLocalStorage.removeItem('userData');
+                        secureLocalStorage.removeItem('auth_token');
+                        window.location.href = '/login';
+                    } else {
+                        console.error("Erro ao buscar dados da propriedade:", error);
+                    }
                     setLoading(false); 
                 }
             };
@@ -58,7 +66,10 @@ const PropertiesEditForm = () => {
                 name: values.namePropertie,
                 area: values.area,
                 city: values.city,
-                email: userData.email
+                email: userData.email              
+            },
+            {
+                headers: {Authorization: `Bearer ${token}`}  
             });
 
             if (response.status === 200) {
@@ -66,7 +77,14 @@ const PropertiesEditForm = () => {
                 navigate(`/propriedades?message=${encodeURIComponent("2")}`);
               }
         } catch (error) {
-            console.error("Erro ao atualizar propriedade:", error);
+            if (error.response?.status === 401) {
+                alert('Sessão expirada. Faça login novamente.');
+                secureLocalStorage.removeItem('userData');
+                secureLocalStorage.removeItem('auth_token');
+                window.location.href = '/login';
+            } else {
+                console.error("Erro ao atualizar propriedade:", error);                
+            }
         }
     };
 

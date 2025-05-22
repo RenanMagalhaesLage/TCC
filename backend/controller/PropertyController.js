@@ -3,6 +3,7 @@ const router = express.Router();
 const connection = require("../database/database");
 const { QueryTypes } = require('sequelize');
 const { Op } = require("sequelize");
+const verifyToken = require('../middlewares/verifyToken');
 /*-------------------------------
             Models
 ---------------------------------*/
@@ -18,7 +19,7 @@ const StorageItem = require("../database/StorageItem");
 
 /* Rota para --> BUSCAR PROPRIEDADE 
    Retorno: Propriedade, Glebas e Users associados à Propriedade */
-router.get('/properties', async (req, res) => {
+router.get('/properties',verifyToken, async (req, res) => {
     const { id }  = req.query;
 
     try {
@@ -61,10 +62,10 @@ router.get('/properties', async (req, res) => {
 });
 
 /* Rota para --> BUSCAR PROPRIEDADES DISPONÍVEIS PARA CONVITES */
-router.get('/properties-invites', async (req, res) => {
-    const { email }  = req.query;
+router.get('/properties-invites',verifyToken, async (req, res) => {
+    const userEmail = req.user.email;
     try{
-        const user = await User.findOne({ where: { email: email } });
+        const user = await User.findOne({ where: { email: userEmail } });
         if (!user) {
             return res.status(404).json({ error: 'Usuário não encontrado' });
         }
@@ -98,7 +99,7 @@ router.get('/properties-invites', async (req, res) => {
 });
 
 /* Rota para --> BUSCAR PROPRIEDADES POR SAFRA */
-router.get('/properties-by-safra', async (req, res) => {
+router.get('/properties-by-safra',verifyToken, async (req, res) => {
     const { id }  = req.query;
 
     try {
@@ -153,7 +154,7 @@ router.get('/properties-by-safra', async (req, res) => {
 });
 
 /* Rota para --> CADASTRAR PROPRIEDADE */
-router.post('/properties', async (req, res) => {
+router.post('/properties',verifyToken, async (req, res) => {
     try {
         const { name, city, area, email } = req.body;
         const user = await User.findOne({ where: { email: email } });
@@ -186,7 +187,7 @@ router.post('/properties', async (req, res) => {
 });
 
 /* Rota para --> EDITAR PROPRIEDADE */
-router.put('/properties', async (req, res) => {
+router.put('/properties',verifyToken, async (req, res) => {
     try {
         const {id, name, area, city } = req.body;
         const [updated] = await Property.update(
@@ -207,7 +208,7 @@ router.put('/properties', async (req, res) => {
 });
 
 /* Rota para --> REMOVER PROPRIEDADE */
-router.delete('/properties', async(req,res) =>{
+router.delete('/properties',verifyToken, async(req,res) =>{
     const { id }  = req.query;
     try {
         const propriedade = await Property.findByPk(id);
@@ -258,7 +259,7 @@ router.delete('/properties', async(req,res) =>{
 });
 
 /* Rota para --> REMOVER USUÁRIO DA PROPRIEDADE */
-router.delete('/user-properties', async(req,res) =>{
+router.delete('/user-properties',verifyToken, async(req,res) =>{
     const { propertyId, userId }  = req.query;
     try{
         const propriedade = await Property.findByPk(propertyId);

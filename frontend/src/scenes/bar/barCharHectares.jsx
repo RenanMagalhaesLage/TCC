@@ -5,13 +5,13 @@ import { useParams } from 'react-router-dom';
 
 
 const Bar = () => {
-  const { id } = useParams();
+  const { id, type } = useParams();
 
   return (
     <Box m="20px">
-      <Header title="Custo médio por hectare por Gleba" subtitle="" />
+      <Header title="Custo médio por hectare por Talhão" subtitle="" />
       <Box height="75vh">
-        <BarChart isDashboard={false} safraId={id}/>
+        <BarChart isDashboard={false} safraId={id} safraType={type}/>
       </Box>
     </Box>
   );

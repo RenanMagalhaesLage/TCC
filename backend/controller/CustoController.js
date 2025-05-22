@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const connection = require("../database/database");
 const { QueryTypes } = require('sequelize');
+const verifyToken = require('../middlewares/verifyToken');
 /*-------------------------------
             Models
 ---------------------------------*/
@@ -16,7 +17,7 @@ const SafraGleba = require("../database/SafraGleba");
 const StorageItem = require("../database/StorageItem");
 
 /* Rota para --> BUSCAR CUSTO POR ID*/
-router.get('/custos', async (req, res) => {
+router.get('/custos', verifyToken, async (req, res) => {
     const { id }  = req.query;
 
     try {
@@ -54,11 +55,11 @@ router.get('/custos', async (req, res) => {
 });
 
 /*  Rota para --> BUSCAR CUSTO POR USER*/
-router.get('/custos-by-user', async (req, res) => {
-    const { email }  = req.query;
+router.get('/custos-by-user', verifyToken, async (req, res) => {
+    const userEmail = req.user.email;
 
     try {
-        const user = await User.findOne({ where: { email: email } });
+        const user = await User.findOne({ where: { email: userEmail } });
         if (!user) {
             return res.status(404).json({ error: 'Usuário não encontrado' });
         }
@@ -106,7 +107,7 @@ router.get('/custos-by-user', async (req, res) => {
 });
 
 /* Rota para --> CADASTRAR CUSTOS */
-router.post('/custos', async (req, res) => {
+router.post('/custos', verifyToken, async (req, res) => {
     try {
         const { 
             email, 
@@ -155,7 +156,7 @@ router.post('/custos', async (req, res) => {
 });
 
 /* Rota para --> EDITAR CUSTOS */
-router.put('/custos', async (req, res) => {
+router.put('/custos', verifyToken, async (req, res) => {
     try {
         const { 
             id,
@@ -201,7 +202,7 @@ router.put('/custos', async (req, res) => {
 });
 
 /* Rota para --> REMOVER CUSTOS */
-router.delete('/custos/:id', async(req,res) =>{
+router.delete('/custos/:id', verifyToken, async(req,res) =>{
     try {
         const { id } = req.params; 
 

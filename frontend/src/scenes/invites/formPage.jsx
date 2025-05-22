@@ -9,6 +9,7 @@ import axios from 'axios';
 import secureLocalStorage from 'react-secure-storage'; 
 
 const InvitesForm = () => {
+  const token = secureLocalStorage.getItem('auth_token');
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const isNonMobile = useMediaQuery("(min-width:600px)");
@@ -31,7 +32,7 @@ const InvitesForm = () => {
       const fetchPropriedades = async () => {
         try {
           const response = await axios.get(`http://localhost:3000/properties-invites`, {
-            params: { email: userData.email }
+            headers: {Authorization: `Bearer ${token}`}
           });
           const properties = response.data;
           setPropertyOptions(properties);
@@ -41,8 +42,15 @@ const InvitesForm = () => {
             setProperty(property[0]);
           }
 
-        } catch (err) {
-            console.error('Erro ao buscar propriedades:', err);  
+        } catch (error) {
+          if (error.response?.status === 401) {
+            alert('Sessão expirada. Faça login novamente.');
+            secureLocalStorage.removeItem('userData');
+            secureLocalStorage.removeItem('auth_token');
+            window.location.href = '/login';
+          } else {
+            console.error('Erro ao buscar propriedades:', err);             
+          }
         } finally {
           setLoading(false);
         }
@@ -65,10 +73,13 @@ const InvitesForm = () => {
     }
 
     try {
-      const response = await axios.post("http://localhost:3000/createInvite", {
+      const response = await axios.post("http://localhost:3000/invites", {
         reciverEmail: values.email,
         propertyId: values.property,
         senderEmail: userData.email
+      },
+      {
+        headers: {Authorization: `Bearer ${token}`}
       });
   
       if (response.status === 201) {
@@ -77,9 +88,15 @@ const InvitesForm = () => {
         navigate(`/convites?message=${encodeURIComponent("2")}`);
       }
     } catch (error) {
-      console.error("Erro ao criar invite:", error);
-      if (error.response && error.response.status === 400) {
+      if (error.response?.status === 401) {
+        alert('Sessão expirada. Faça login novamente.');
+        secureLocalStorage.removeItem('userData');
+        secureLocalStorage.removeItem('auth_token');
+        window.location.href = '/login';
+      } else if (error.response && error.response.status === 400) {
         setErrorMessage(error.response.data.error || "Erro ao criar o convite.");
+      } else {
+        console.error("Erro ao criar invite:", error);
       }
     }
   };

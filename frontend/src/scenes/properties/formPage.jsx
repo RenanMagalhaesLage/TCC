@@ -11,8 +11,9 @@ import secureLocalStorage from 'react-secure-storage';
 
 
 const PropertiesForm = () => {
-    const theme = useTheme();
-    const colors = tokens(theme.palette.mode);
+  const token = secureLocalStorage.getItem('auth_token');
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const [userData, setUserData] = useState(null);
 
@@ -34,7 +35,9 @@ const PropertiesForm = () => {
       area: values.area,          
       city: values.city,          
       email: userData.email
-    });
+      },{
+        headers: {Authorization: `Bearer ${token}`}
+      });
 
     if (response.status === 201) {
       //console.log("Propriedade criada com sucesso:", response.data);
@@ -42,7 +45,14 @@ const PropertiesForm = () => {
       navigate(`/propriedades?message=${encodeURIComponent("1")}`);
     }
   } catch (error) {
+    if (error.response?.status === 401) {
+      alert('Sessão expirada. Faça login novamente.');
+      secureLocalStorage.removeItem('userData');
+      secureLocalStorage.removeItem('auth_token');
+      window.location.href = '/login';
+    } else {
     console.error("Erro ao criar propriedade:", error);
+    }
   }
 };
 

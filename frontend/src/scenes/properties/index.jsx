@@ -13,13 +13,13 @@ import secureLocalStorage from 'react-secure-storage';
 
 
 const Properties = () => {
+    const token = secureLocalStorage.getItem('auth_token');
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const isMobile = useMediaQuery("(max-width: 800px)");
     const isSmallDivice = useMediaQuery("(max-width: 1300px)");
     const [propriedades, setPropriedades] = useState([]);
     const [userData, setUserData] = useState(null);
-
     const location = useLocation();
     const query = new URLSearchParams(location.search);
     const message = Number(query.get('message'));
@@ -148,20 +148,29 @@ const Properties = () => {
     }, []);
 
     useEffect(() => {
-        if (userData && userData.email) { 
+        if (token) { 
             const fetchPropriedadesData = async () => {
                 try {
                     const response = await axios.get(`http://localhost:3000/user`, {
-                        params: { email: userData.email }
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
                     });
                     setPropriedades(response.data); 
                 } catch (error) {
-                    console.log("ERRO - ao buscar as propriedades.");
+                    if (error.response?.status === 401) {
+                        alert('Sessão expirada. Faça login novamente.');
+                        secureLocalStorage.removeItem('userData');
+                        secureLocalStorage.removeItem('auth_token');
+                        window.location.href = '/login';
+                    } else {
+                        console.log("ERRO - ao buscar as propriedades." + error);
+                    }
                 }
             };
             fetchPropriedadesData();
         }
-    }, [userData]);  
+    }, [token]);  
 
     useEffect(() => {
         //console.log(propriedades); 

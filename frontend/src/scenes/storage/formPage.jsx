@@ -10,6 +10,7 @@ import secureLocalStorage from 'react-secure-storage';
 import { NumericFormat } from 'react-number-format';
 
 const StorageForm = () => {
+  const token = secureLocalStorage.getItem('auth_token');
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const isNonMobile = useMediaQuery("(min-width:600px)");
@@ -50,15 +51,23 @@ const StorageForm = () => {
       const fetchStorageData = async () => {
         try {
           const response = await axios.get(`http://localhost:3000/user`, {
-            params: { email: userData.email }
+            headers: {Authorization: `Bearer ${token}`}
           });
           const propertyData = response.data.map(property => ({
             id: property.id,           
             name: property.name      
           }));
           setProperties(propertyData);
-        } catch (err) {
-          console.error('Erro ao buscar estoque:', err);  
+        } catch (error) {
+          if (error.response?.status === 401) {
+            alert('Sessão expirada. Faça login novamente.');
+            secureLocalStorage.removeItem('userData');
+            secureLocalStorage.removeItem('auth_token');
+            window.location.href = '/login';
+          } else {
+            console.error('Erro ao buscar estoque:', error);
+          }
+            
         }finally {
           setLoading(false);
         }
@@ -122,13 +131,23 @@ const StorageForm = () => {
         totalValue: values.totalValue,
         date: values.date || null,
         note: values.note || null
+      },
+      {
+        headers: {Authorization: `Bearer ${token}`}
       });
       if (response.status === 201) {  
         navigate(`/estoque?message=${encodeURIComponent("1")}`);
       }
       
     } catch (error) {
-      console.error("Erro ao criar item no estoque: " , error);
+      if (error.response?.status === 401) {
+          alert('Sessão expirada. Faça login novamente.');
+          secureLocalStorage.removeItem('userData');
+          secureLocalStorage.removeItem('auth_token');
+          window.location.href = '/login';
+      } else {
+        console.error("Erro ao criar item no estoque: " , error);
+      }
     }
   };
 

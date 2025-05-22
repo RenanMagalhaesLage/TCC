@@ -10,6 +10,7 @@ import secureLocalStorage from 'react-secure-storage';
 import { NumericFormat } from 'react-number-format';
 
 const CustosEditPage = () => {
+  const token = secureLocalStorage.getItem('auth_token');
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const isNonMobile = useMediaQuery("(min-width:600px)");
@@ -55,7 +56,7 @@ const CustosEditPage = () => {
       const fetchCustosData = async () => {
         try {
           const response = await axios.get(`http://localhost:3000/custos`,{
-            params: { id: id}
+            params: { id: id}, headers: {Authorization: `Bearer ${token}`}
           });
           const custo = response.data;
           const safra = response.data.safra;
@@ -135,13 +136,20 @@ const CustosEditPage = () => {
         totalValue: values.totalValue,
         date: values.date,
         note: values.note
-      });
+      },{headers: {Authorization: `Bearer ${token}`}});
       if (response.status === 200) {  
         navigate(`/custos?message=${encodeURIComponent("2")}`);
       }
       
     } catch (error) {
-      console.error("Erro ao editar custo: " , error);
+      if (error.response?.status === 401) {
+        alert('Sessão expirada. Faça login novamente.');
+        secureLocalStorage.removeItem('userData');
+        secureLocalStorage.removeItem('auth_token');
+        window.location.href = '/login';
+      }else {
+        console.error("Erro ao editar custo: " , error);
+      }
     }
   };
 
@@ -226,7 +234,7 @@ const CustosEditPage = () => {
                   renderInput={(params) => (
                     <TextField 
                       {...params} 
-                      label="Gleba"
+                      label="Talhão"
                       variant="filled"
                       name="gleba"
                       error={!!touched.gleba && !!errors.gleba}
@@ -235,7 +243,7 @@ const CustosEditPage = () => {
                     />
                   )}
                   sx={{ gridColumn: isSmallDevice ? "span 4" : "span 2" }}
-                  noOptionsText="Nenhuma Gleba Disponível"
+                  noOptionsText="Nenhum talhão escontrado"
                 />
                 <TextField
                   fullWidth

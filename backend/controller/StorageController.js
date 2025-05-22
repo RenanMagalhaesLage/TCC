@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const connection = require("../database/database");
 const { QueryTypes } = require('sequelize');
+const verifyToken = require('../middlewares/verifyToken');
 /*-------------------------------
             Models
 ---------------------------------*/
@@ -16,12 +17,12 @@ const SafraGleba = require("../database/SafraGleba");
 const StorageItem = require("../database/StorageItem");
 
 /*  Rota para --> BUSCAR ESTOQUE DO USUÁRIO*/
-router.get('/storage-by-user', async (req, res) => {
-    const { email } = req.query;
+router.get('/storage-by-user', verifyToken, async (req, res) => {
+    const userEmail = req.user.email;
 
     try {
         const user = await User.findOne({
-            where: { email: email },
+            where: { email: userEmail },
             include: {
                 model: Property, 
                 as: 'properties', 
@@ -52,7 +53,7 @@ router.get('/storage-by-user', async (req, res) => {
 });
 
 /*  Rota para --> BUSCAR ITEM ESTOQUE */
-router.get('/storage-by-id', async (req, res) => {
+router.get('/storage-by-id', verifyToken, async (req, res) => {
     const { id }  = req.query;
     
     try {
@@ -80,7 +81,7 @@ router.get('/storage-by-id', async (req, res) => {
 });
 
 /*  Rota para --> CADASTRAR ITEM ESTOQUE */
-router.post('/storage', async (req,res) => {
+router.post('/storage', verifyToken, async (req,res) => {
     try{
         const { email, 
             propertyId, 
@@ -126,7 +127,7 @@ router.post('/storage', async (req,res) => {
 });
 
 /*  Rota para --> EDITAR ITEM ESTOQUE */
-router.put('/storage', async (req,res) => {
+router.put('/storage', verifyToken, async (req,res) => {
     try{
         const { 
             id,
@@ -179,7 +180,7 @@ router.put('/storage', async (req,res) => {
 });
 
 /*  Rota para --> DELETAR ITEM ESTOQUE */
-router.delete('/storage', async(req,res) =>{
+router.delete('/storage', verifyToken, async(req,res) =>{
     const { id } = req.query;
 
     try {
@@ -198,7 +199,7 @@ router.delete('/storage', async(req,res) =>{
 });
 
 /*  Rota para --> TRANSFERIR UM ITEM ESTOQUE */
-router.post('/storage-custo', async (req,res) => {
+router.post('/storage-custo', verifyToken, async (req,res) => {
     try{
         const { 
             idStorageItem, 

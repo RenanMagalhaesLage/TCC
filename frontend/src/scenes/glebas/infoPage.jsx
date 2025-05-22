@@ -11,6 +11,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
 const Gleba = () => {
+    const token = secureLocalStorage.getItem('auth_token');
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const isMobile = useMediaQuery("(max-width: 800px)");
@@ -35,7 +36,9 @@ const Gleba = () => {
         if (userData && userData.email) { 
             const fetchGlebas = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:3000/glebas/${id}`);
+                    const response = await axios.get(`http://localhost:3000/glebas/${id}`, {
+                        headers: {Authorization: `Bearer ${token}`}
+                    });
                     const gleba = response.data;
                     const safras = gleba.safras.length !== 0  ? gleba.safras[0].name + " - " + gleba.safras[0].crop : "";  
                     setSafra(safras); 
@@ -47,8 +50,15 @@ const Gleba = () => {
                     
 
                 } catch (error) {
-                    console.log(`ERROR - ao buscar a gleba de id = ${id} .`);
-                    console.log(error);
+                    if (error.response?.status === 401) {
+                        alert('Sessão expirada. Faça login novamente.');
+                        secureLocalStorage.removeItem('userData');
+                        secureLocalStorage.removeItem('auth_token');
+                        window.location.href = '/login';
+                    } else {
+                        console.log(`ERROR - ao buscar o talhão de id = ${id} .`);
+                        console.log(error);
+                    }
                 }
             };
             fetchGlebas();
@@ -58,7 +68,7 @@ const Gleba = () => {
     const navigate = useNavigate(); 
 
     const handleEdit = () => {
-        navigate(`/glebas/edit/${id}`);
+        navigate(`/talhoes/edit/${id}`);
     }
 
     const handleView = (id) => {
@@ -75,11 +85,19 @@ const Gleba = () => {
         handleClose();
         try {
             const response = await axios.delete(`http://localhost:3000/glebas`, {
-                params: { id: id }
+                params: { id: id }, headers: {Authorization: `Bearer ${token}`}
             });
-            navigate(`/glebas?message=${encodeURIComponent("3")}`);
+            navigate(`/talhoes?message=${encodeURIComponent("3")}`);
         } catch (error) {
-                    console.error("Erro ao deletar gleba:", error);
+            if (error.response?.status === 401) {
+                alert('Sessão expirada. Faça login novamente.');
+                secureLocalStorage.removeItem('userData');
+                secureLocalStorage.removeItem('auth_token');
+                window.location.href = '/login';
+            } else {
+                console.error("Erro ao deletar talhão:", error); 
+            }
+           
         }
     }
 
@@ -91,7 +109,7 @@ const Gleba = () => {
     return (
         <Box m="20px">
             <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Header title="Gleba" subtitle="Informações da gleba" />
+                <Header title="Talhão" subtitle="Informações do talhão" />
             </Box>
             <Box m="20px 0 0 0" height="75vh" maxWidth="1600px" mx="auto"
                 sx={{
@@ -140,7 +158,7 @@ const Gleba = () => {
                             <Box display="flex" flexDirection="column" alignItems="flex-start">
                                 <Box display="flex" alignItems="center" marginBottom="15px">
                                     <Typography variant="h6" fontWeight="bold" color={colors.grey[100]} marginRight="10px">
-                                    Nome da Gleba:
+                                    Nome do Talhão:
                                     </Typography>
                                     <Typography variant="body1" color={colors.grey[300]}>
                                     {gleba.name}
@@ -246,13 +264,13 @@ const Gleba = () => {
                                                     }}
                                                 >
                                                     <Typography id="modal-modal-title" variant="h4" component="h2">
-                                                        Deseja realmente deletar esta gleba?
+                                                        Deseja realmente deletar este talhão?
                                                     </Typography>
                                                     <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                                                         Ao fazer isso, esteja ciente que:
                                                         <ul>
                                                             <li>Essa ação não pode ser revertida;</li>
-                                                            <li>Ao deletar a gleba, ela será removida da safra correspondente.</li>
+                                                            <li>Ao deletar o talhão, ele será removido da safra correspondente.</li>
                                                         </ul>
                                                     </Typography>
                                                     

@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const connection = require("../database/database");
 const { QueryTypes } = require('sequelize');
+const verifyToken = require('../middlewares/verifyToken');
 /*-------------------------------
             Models
 ---------------------------------*/
@@ -16,7 +17,7 @@ const SafraGleba = require("../database/SafraGleba");
 const StorageItem = require("../database/StorageItem");
 
 /*  Rota para --> BUSCAR SAFRA POR ID*/
-router.get('/safras/:id', async (req, res) => {
+router.get('/safras/:id', verifyToken, async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -55,11 +56,11 @@ router.get('/safras/:id', async (req, res) => {
 });
 
 /*  Rota para --> BUSCAR SAFRA POR USER*/
-router.get('/safras-by-user', async (req, res) => {
-    const { email }  = req.query;
+router.get('/safras-by-user', verifyToken, async (req, res) => {
+    const userEmail = req.user.email;
 
     try {
-        const user = await User.findOne({ where: { email: email } });
+        const user = await User.findOne({ where: { email: userEmail } });
         if (!user) {
             return res.status(404).json({ error: 'Usuário não encontrado' });
         }
@@ -107,7 +108,7 @@ router.get('/safras-by-user', async (req, res) => {
 });
 
 /* Rota para --> CADASTRAR SAFRAS*/
-router.post('/safras', async (req, res) => {
+router.post('/safras', verifyToken, async (req, res) => {
     try {
         const { 
             email, 
@@ -186,7 +187,7 @@ router.post('/safras', async (req, res) => {
 });
 
 /*  Rota para --> EDITAR SAFRAS */
-router.put('/safras', async (req, res) => {
+router.put('/safras', verifyToken, async (req, res) => {
     try {
         const { 
             id, 
@@ -289,7 +290,7 @@ router.put('/safras', async (req, res) => {
 });
 
 /* Rota para --> REMOVER SAFRAS */
-router.delete('/safras', async(req,res) =>{
+router.delete('/safras', verifyToken, async(req,res) =>{
     const { id }  = req.query;
     try {
         const safra = await Safra.findByPk(id);

@@ -7,7 +7,8 @@ import { colorSchemes } from "@nivo/colors";
 import secureLocalStorage from 'react-secure-storage';
 import axios from "axios";
 
-const BarChart = ({isDashboard, safraId}) => {
+const BarChart = ({isDashboard, safraId, safraType}) => {
+  const token = secureLocalStorage.getItem('auth_token');
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const isMobile = useMediaQuery("(max-width: 800px)");
@@ -30,12 +31,20 @@ const BarChart = ({isDashboard, safraId}) => {
       const fetchBarData = async () => {
         try {
           const response = await axios.get(`http://localhost:3000/custos-glebas-bar-chart`, {
-            params: { safraId: safraId }
+            params: { safraId: safraId, safraType: safraType}, headers: {Authorization: `Bearer ${token}`}
           });
           setBarData(response.data); 
                         
         } catch (error) {
-          console.log("ERRO - ao buscar no banco de dados.");
+          if (error.response?.status === 401) {
+            alert('Sessão expirada. Faça login novamente.');
+            secureLocalStorage.removeItem('userData');
+            secureLocalStorage.removeItem('auth_token');
+            window.location.href = '/login';
+          } else {
+            console.log("ERRO - ao buscar no banco de dados.");
+          }
+          
         }
       };
       fetchBarData();
@@ -110,7 +119,7 @@ const BarChart = ({isDashboard, safraId}) => {
             tickSize: 5,
             tickPadding: 5,
             tickRotation: 0,
-            legend: 'glebas',
+            legend: 'talhões',
             legendPosition: 'middle',
             legendOffset: 32,
             truncateTickAt: 0,
@@ -120,7 +129,7 @@ const BarChart = ({isDashboard, safraId}) => {
             tickSize: 5,
             tickPadding: 5,
             tickRotation: 0,
-            legend: isDashboard && isMobile ? '' : 'custos',
+            legend: isDashboard && isMobile ? '' : 'valor',
             legendPosition: 'middle',
             legendOffset: -48,
             truncateTickAt: 0

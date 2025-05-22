@@ -13,6 +13,7 @@ import axios from "axios";
 
 
 const Storage = () => {
+    const token = secureLocalStorage.getItem('auth_token');
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const isMobile = useMediaQuery("(max-width: 800px)");
@@ -122,7 +123,7 @@ const Storage = () => {
             const fetchStorageData = async () => {
                 try {
                     const response = await axios.get(`http://localhost:3000/storage-by-user`, {
-                        params: { email: userData.email }
+                        headers: {Authorization: `Bearer ${token}`}
                     });
                     const linhasDaTabela = response.data;
 
@@ -142,7 +143,15 @@ const Storage = () => {
                     setStorageData(linhasComLocalizacao);   
                     
                 } catch (error) {
-                    console.log("ERRO - ao buscar estoque.");
+                    if (error.response?.status === 401) {
+                        alert('Sessão expirada. Faça login novamente.');
+                        secureLocalStorage.removeItem('userData');
+                        secureLocalStorage.removeItem('auth_token');
+                        window.location.href = '/login';
+                    } else {
+                       console.log("ERRO - ao buscar estoque."); 
+                    }
+                    
                 }
             };
             fetchStorageData();

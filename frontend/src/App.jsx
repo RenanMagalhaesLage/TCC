@@ -73,8 +73,8 @@ function App() {
                   <Route path="/team" element={<Team />} />
                   <Route path="/contacts" element={<Contacts />} />
                   <Route path="/form" element={<Form />} />
-                  <Route path="/grafico-barra-category/:id" element={<BarCategory />} />
-                  <Route path="/grafico-barra-hectares/:id" element={<BarHectares />} />
+                  <Route path="/grafico-barra-category/:id/:type" element={<BarCategory />} />
+                  <Route path="/grafico-barra-hectares/:id/:type" element={<BarHectares />} />
                   <Route path="/grafico-barra-custos/:id" element={<BarCustos />} />
                   <Route path="/grafico-pizza/:id" element={<Pie />} />
                   <Route path="/line" element={<Line />} />
@@ -83,11 +83,11 @@ function App() {
                   <Route path="/propriedades/:id" element={<PropertyPage />} />
                   <Route path="/propriedades/add" element={<PropertyForm />} />
                   <Route path="/propriedades/edit/:id" element={<PropertyEditForm />} />
-                  <Route path="/glebas" element={<Glebas />} />
-                  <Route path="/glebas/:id" element={<GlebaPage />} />
-                  <Route path="/glebas/add" element={<GlebaForm />} />
-                  <Route path="/glebas/add/:id?" element={<GlebaForm />} />
-                  <Route path="/glebas/edit/:id" element={<GlebaEditForm />} />
+                  <Route path="/talhoes" element={<Glebas />} />
+                  <Route path="/talhoes/:id" element={<GlebaPage />} />
+                  <Route path="/talhoes/add" element={<GlebaForm />} />
+                  <Route path="/talhoes/add/:id?" element={<GlebaForm />} />
+                  <Route path="/talhoes/edit/:id" element={<GlebaEditForm />} />
                   <Route path="/safras" element={<Safras />} />
                   <Route path="/safras/:id" element={<SafraPage />} />
                   <Route path="/safras/add" element={<SafraForm />} />

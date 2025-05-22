@@ -17,6 +17,7 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 
 const CustosPage = () => {
+    const token = secureLocalStorage.getItem('auth_token');
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const isMobile = useMediaQuery("(max-width: 1000px)");
@@ -92,7 +93,7 @@ const CustosPage = () => {
             const fetchCustosData = async () => {
                 try {
                     const response = await axios.get(`http://localhost:3000/custos`,{
-                        params: { id: id}
+                        params: { id: id}, headers: {Authorization: `Bearer ${token}`}
                     });
                     const custo = response.data;
                     const safra = response.data.safra;
@@ -101,8 +102,16 @@ const CustosPage = () => {
                     setSafra(safra);
                     setGleba(glebas);
                 } catch (error) {
-                    console.log(`ERROR - ao buscar dados do custo de id = ${id}.`);
-                    console.log(error);
+                     if (error.response?.status === 401) {
+                        alert('Sessão expirada. Faça login novamente.');
+                        secureLocalStorage.removeItem('userData');
+                        secureLocalStorage.removeItem('auth_token');
+                        window.location.href = '/login';
+                    } else {
+                        console.log(`ERROR - ao buscar dados do custo de id = ${id}.`);
+                        console.log(error);
+                    }
+                    
                 }
             };
             fetchCustosData();
@@ -126,10 +135,18 @@ const CustosPage = () => {
         try {
             const response = await axios.delete(`http://localhost:3000/custos/${id}`, {
                 answer: false, 
-            });
+            }, {headers: {Authorization: `Bearer ${token}`}});
             navigate(`/custos?message=${encodeURIComponent("3")}`);
         } catch (error) {
-            console.error("Erro ao deletar custo:", error);
+            if (error.response?.status === 401) {
+                alert('Sessão expirada. Faça login novamente.');
+                secureLocalStorage.removeItem('userData');
+                secureLocalStorage.removeItem('auth_token');
+                window.location.href = '/login';
+            } else {
+                console.error("Erro ao deletar custo:", error);
+            }
+            
         }
     }
 

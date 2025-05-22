@@ -11,6 +11,7 @@ import InfoIcon from '@mui/icons-material/Info';
 
 
 const SafrasForm = () => {
+  const token = secureLocalStorage.getItem('auth_token');
   const isSmallDevice = useMediaQuery("(max-width: 800px)");
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -48,7 +49,7 @@ const SafrasForm = () => {
       const fetchSafras = async () => {
         try {
             const response = await axios.get(`http://localhost:3000/glebas-available`, {
-              params: { email: userData.email }
+              headers: {Authorization: `Bearer ${token}`}
             });
 
             const glebaData = response.data.map(gleba => ({
@@ -60,21 +61,37 @@ const SafrasForm = () => {
             if(id){
               const fetchSafraData = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:3000/glebas/${id}`);
+                    const response = await axios.get(`http://localhost:3000/glebas/${id}`, {
+                      headers: {Authorization: `Bearer ${token}`}
+                    });
                     const { gleba, propriedade, owner } = response.data;
                     setPropertie(propriedade);
                     //console.log("info --> " + propriedade.name + " " + gleba.name )
                     setLoading(false); 
                 } catch (error) {
+                  if (error.response?.status === 401) {
+                    alert('Sessão expirada. Faça login novamente.');
+                    secureLocalStorage.removeItem('userData');
+                    secureLocalStorage.removeItem('auth_token');
+                    window.location.href = '/login';
+                  } else {
                     console.error("Erro ao buscar dados da gleba:", error);
-                    setLoading(false); 
+                  }
+                  setLoading(false); 
                 }
             };
             fetchSafraData();
             }
 
-        } catch (err) {
-            console.error('Erro ao buscar safras:', err);  
+        } catch (error) {
+          if (error.response?.status === 401) {
+            alert('Sessão expirada. Faça login novamente.');
+            secureLocalStorage.removeItem('userData');
+            secureLocalStorage.removeItem('auth_token');
+            window.location.href = '/login';
+          } else {
+            console.error('Erro ao buscar safras:', error); 
+          }
         }finally {
           setLoading(false);
         }
@@ -141,13 +158,21 @@ const SafrasForm = () => {
         fieldDuration: values.tempoLavoura,
         expectedYield: values.prodPrevista,
         estimatedSalePrice: values.precoVendaEstimado,
-      });
+      }, {headers: {Authorization: `Bearer ${token}`}});
       if (response.status === 201) {  
         navigate(`/safras?message=${encodeURIComponent("1")}`);
       }
       
     } catch (error) {
-      console.error("Erro ao criar safra: " , error);
+      if (error.response?.status === 401) {
+        alert('Sessão expirada. Faça login novamente.');
+        secureLocalStorage.removeItem('userData');
+        secureLocalStorage.removeItem('auth_token');
+        window.location.href = '/login';
+      } else{
+        console.error("Erro ao criar safra: " , error);
+      }
+      
     }
   };
 
@@ -257,7 +282,7 @@ const SafrasForm = () => {
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    label="Gleba"
+                    label="Talhão"
                     variant="filled"
                     name="gleba"
                     error={!!touched.gleba && !!errors.gleba}
@@ -265,7 +290,7 @@ const SafrasForm = () => {
                     onBlur={handleBlur}
                   />
                 )}
-                noOptionsText="Não Encontrado"
+                noOptionsText="Nenhuma opção disponível"
               />
 
 

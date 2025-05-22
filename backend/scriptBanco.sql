@@ -1,21 +1,21 @@
 INSERT INTO properties (name, city, area, createdAt, updatedAt) VALUES 
-('Fazenda Rio Verde', 'Varginha', 142.00, NOW(), NOW()),
+('Fazenda Rio Verde', 'Varginha', 82, NOW(), NOW()),
 ('Fazenda Vale Azul', 'Belo Horizonte', 74.50, NOW(), NOW()),
 ('Fazenda Serra Alta', 'Alfenas', 85.40, NOW(), NOW()),
 ('Fazenda Boa Vista', 'Alfenas', 100.07, NOW(), NOW());
 
 INSERT INTO glebas (name, area, propertyId, createdAt, updatedAt) VALUES 
-('Gleba 1', 24, 1, NOW(), NOW()),
-('Gleba 2', 33, 1, NOW(), NOW()),
-('Gleba 3', 25, 1, NOW(), NOW()),
-('Gleba 4', 21, 2, NOW(), NOW()),
-('Gleba 5', 15, 2, NOW(), NOW()),
-('Gleba 6', 19, 2, NOW(), NOW()),
-('Gleba 7', 19.5, 2, NOW(), NOW()),
-('Gleba 8', 61.50, 3, NOW(), NOW()),
-('Gleba 9', 23.90, 3, NOW(), NOW()),
-('Gleba 10', 50.56, 4, NOW(), NOW()),
-('Gleba 11', 49.51, 4, NOW(), NOW());
+('Talhão 1', 24, 1, NOW(), NOW()),
+('Talhão 2', 33, 1, NOW(), NOW()),
+('Talhão 3', 25, 1, NOW(), NOW()),
+('Talhão 4', 21, 2, NOW(), NOW()),
+('Talhão 5', 15, 2, NOW(), NOW()),
+('Talhão 6', 19, 2, NOW(), NOW()),
+('Talhão 7', 19.5, 2, NOW(), NOW()),
+('Talhão 8', 61.50, 3, NOW(), NOW()),
+('Talhão 9', 23.90, 3, NOW(), NOW()),
+('Talhão 10', 50.56, 4, NOW(), NOW()),
+('Talhão 11', 49.51, 4, NOW(), NOW());
 
 INSERT INTO safras (type, status, crop, seed, dosage, tons, fertilizer, plantingEndDate, harvestEndDate, 
     fieldDuration, rainfall, moisture, impurity, damagedGrains, greenGrains, brokenGrains, expectedYield, actualYield, 
