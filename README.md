@@ -76,8 +76,11 @@ repositorio/
 ```bash
 cd backend
 ```
-
-2. Rode a aplicação
+2. Instale as dependências
+```bash
+npm install
+```
+3. Rode a aplicação
 
 ```bash
 nodemon index.js
@@ -92,7 +95,6 @@ nodemon index.js
 ```bash
 cd frontend
 ```
-
 2. Instale as dependências
 ```bash
 npm install
@@ -109,8 +111,8 @@ npm run dev
 
 ---
 
-## 🧩 Diagrama Entidade Relacionamento do Banco de Dados
-
+## 🧩 Modelo Entidade Relacionamento do Banco de Dados
+![Modelo ER](./img/diagramER.svg)
 
 ---
 
@@ -119,25 +121,25 @@ npm run dev
 Abaixo estão algumas capturas de tela que ilustram as principais funcionalidades do sistema:
 
 ### Tela de Login
-![Tela de Login](./img/Pagina_Login.png)
+![Tela de Login](./img/PaginaLogin.png)
 
 ### Tela inicial do sistema
-![Tela inicial do sistema](./img/Pagina_Registro.png)
+![Tela inicial do sistema](./img/PaginaInicial.svg)
 
 ### Tela de Listagem de Propriedades
-![Tela de Listagem de Propriedades](./img/Pagina_Listagem_Escolas.png)
+![Tela de Listagem de Propriedades](./img/ListagemPropriedade.svg)
 
 ### Tela de Visualização de Propriedade
-![Tela de Visualização de Propriedade](./img/Pagina_Visualizacao_Escola.png)
+![Tela de Visualização de Propriedade](./img/InformacoesPropriedade.png)
 
 ### Tela de Cadastro de Propriedade
-![Tela de Cadastro de Propriedade](./img/Pagina_Cadastro_Escola.png)
+![Tela de Cadastro de Propriedade](./img/CadastroPropriedade.png)
 
 ### Tela de Relatório de Custo
-![Tela de Relatório de Custo](./img/Pagina_Editar_Escola.png)
+![Tela de Relatório de Custo](./img/CustoTotal.png)
 
 ### Tela de Dashboard de safra 
-![Tela de Dashboard de safra ](./img/Modal_Deletar.png)
+![Tela de Dashboard de safra ](./img/PainelRealizado.png)
 
 
 
