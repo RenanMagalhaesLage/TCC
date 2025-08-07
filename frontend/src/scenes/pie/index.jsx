@@ -7,7 +7,7 @@ const Pie = () => {
   const { id } = useParams();
   return (
     <Box m="20px">
-      <Header title="Gráfico de Pizza de Custos" subtitle="" />
+      <Header title="Custos por Categoria" subtitle="" />
       <Box height="75vh">
         <PieChart isDashboard={false} safraId={id}/>
       </Box>

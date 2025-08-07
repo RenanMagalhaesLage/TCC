@@ -98,12 +98,12 @@ const DashboardRealizado = () => {
     navigate(`/grafico-barra-custos/${id}`); 
   };
   
-  const handleClickBarraCategory = (id) => {
-    navigate(`/grafico-barra-category/${id}`); 
+  const handleClickBarraCategory = (id, type) => {
+    navigate(`/grafico-barra-category/${id}/${type}`); 
   };
 
-  const   handleClickBarraHectares = (id) => {
-    navigate(`/grafico-barra-hectares/${id}`); 
+  const   handleClickBarraHectares = (id, type) => {
+    navigate(`/grafico-barra-hectares/${id}/${type}`); 
   };
 
   const handleFormSubmit = async (values) => {

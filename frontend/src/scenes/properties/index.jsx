@@ -151,7 +151,7 @@ const Properties = () => {
         if (token) { 
             const fetchPropriedadesData = async () => {
                 try {
-                    const response = await axios.get(`http://localhost:3000/user`, {
+                    const response = await axios.get(`/user`, {
                         headers: {
                             Authorization: `Bearer ${token}`
                         }

@@ -37,13 +37,11 @@ const Login = ({ onLogin }) => {
     const handleLoginSuccess = async (credentialResponse) => {
         try {
             const response = await axios.post('/login', 
+                { token: credentialResponse.credential }, 
                 {
-                    token: credentialResponse.credential
-                }, 
-                {
-                    headers: {
-                        Authorization: `Bearer ${credentialResponse.credential}`
-                    }
+                  headers: {
+                    Authorization: `Bearer ${credentialResponse.credential}`
+                  }
                 }
             );
             handleSave(response.data.name, response.data.email, response.data.picture, credentialResponse.credential);

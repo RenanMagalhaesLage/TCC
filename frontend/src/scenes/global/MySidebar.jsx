@@ -66,6 +66,7 @@ const Sidebar = ({ onLogout }) => {
     const storedUser = secureLocalStorage.getItem('userData'); 
     if (storedUser) {
       setUserData(JSON.parse(storedUser));
+      //console.log(storedUser)
     }
   }, []);
 
